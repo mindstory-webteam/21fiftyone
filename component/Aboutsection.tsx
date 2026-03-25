@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import BugSectionEffect from "./Bugsectioneffect"; // adjust import path as needed
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -219,56 +220,63 @@ export default function AboutSection() {
         }
       `}</style>
 
-      <section className="about" ref={sectionRef}>
-        <div className="about-inner">
+      {/*
+        BugSectionEffect wraps the entire <section>.
+        - bugCount={1}  → one wandering ladybug (use 2 for two bugs)
+        - leafCount={5} → five leaves for the bug to seek and eat
+        The wrapper is set to fill 100% width so it matches the section layout.
+      */}
+      <BugSectionEffect
+        bugCount={2}
+        leafCount={0}
+        style={{ width: "100%" }}
+      >
+        <section className="about" ref={sectionRef}>
+          <div className="about-inner">
 
-          {/* ── Left: image ─────────────────── */}
-          <div className="about-image-wrap" data-reveal data-delay="1">
-            {/*
-              Replace src with your actual image.
-              The design uses a dark architectural / cinematic photo.
-            */}
-            <img
-              src="/image/about-2.jpg"
-              alt="21FiftyOne studio — cinematic light study"
-            />
-          </div>
-
-          {/* ── Right: content ──────────────── */}
-          <div className="about-content">
-
-            <h2 className="about-title" data-reveal data-delay="2">
-              The Origin&nbsp;
-              {/* Red sparkle icon */}
-              <span className="sparkle" aria-hidden="true" />
-            </h2>
-
-            <div className="about-body">
-              <p className="about-p" data-reveal data-delay="3">
-                Founded in the quiet hours of 2021, our agency was born from a
-                singular obsession: the belief that the digital world has grown
-                too predictable, too &ldquo;safe.&rdquo; We sought a return to
-                the bold&mdash;the dramatic&mdash;the noir.
-              </p>
-              <p className="about-p" data-reveal data-delay="4">
-                The name 21FiftyOne is a tribute to the legendary year of
-                cinematic transformation and our commitment to the 51st state of
-                mind&mdash;a place where creative rebellion meets absolute
-                technical mastery.
-              </p>
+            {/* ── Left: image ─────────────────── */}
+            <div className="about-image-wrap" data-reveal data-delay="1">
+              <img
+                src="/image/about-2.jpg"
+                alt="21FiftyOne studio — cinematic light study"
+              />
             </div>
 
-            <div className="about-quote" data-reveal data-delay="5">
-              <p className="about-quote-label">The Methodology</p>
-              <p className="about-quote-text">
-                &ldquo;We don&rsquo;t build websites. We engineer digital
-                monuments that pulse with life and precision.&rdquo;
-              </p>
-            </div>
+            {/* ── Right: content ──────────────── */}
+            <div className="about-content">
 
+              <h2 className="about-title" data-reveal data-delay="2">
+                The Origin&nbsp;
+                <span className="sparkle" aria-hidden="true" />
+              </h2>
+
+              <div className="about-body">
+                <p className="about-p" data-reveal data-delay="3">
+                  Founded in the quiet hours of 2021, our agency was born from a
+                  singular obsession: the belief that the digital world has grown
+                  too predictable, too &ldquo;safe.&rdquo; We sought a return to
+                  the bold&mdash;the dramatic&mdash;the noir.
+                </p>
+                <p className="about-p" data-reveal data-delay="4">
+                  The name 21FiftyOne is a tribute to the legendary year of
+                  cinematic transformation and our commitment to the 51st state of
+                  mind&mdash;a place where creative rebellion meets absolute
+                  technical mastery.
+                </p>
+              </div>
+
+              <div className="about-quote" data-reveal data-delay="5">
+                <p className="about-quote-label">The Methodology</p>
+                <p className="about-quote-text">
+                  &ldquo;We don&rsquo;t build websites. We engineer digital
+                  monuments that pulse with life and precision.&rdquo;
+                </p>
+              </div>
+
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </BugSectionEffect>
     </>
   );
 }
