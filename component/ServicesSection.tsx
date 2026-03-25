@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import BugSectionEffect from "./Bugsectioneffect"; // adjust path as needed
+import BugSectionEffect from "./Bugsectioneffect";
 
 /* ── 8 cards, 4 groups of 2 ─────────────────────── */
 const CARDS = [
@@ -9,59 +9,73 @@ const CARDS = [
     id: 1, tag: "01", title: "BRAND IDENTITY",
     body: "Visual storytelling that resonates through tonal hierarchy and editorial precision. We create icons that stand the test of time.",
     cta: "EXPLORE IDENTITY", layout: "large", accent: true,
-    image: "/image/about-1.jpg", icon: null,
+    image: "/image/about-1.jpg",
+    icon: null,
   },
   {
     id: 2, tag: "02", title: "DIGITAL CRAFT",
     body: "High-performance web ecosystems designed for the modern era — built to convert and built to last.",
     cta: "EXPLORE CRAFT", layout: "small", accent: false,
-    image: "/image/about-2.jpg", icon: "code",
+    image: "/image/about-2.jpg",
+    icon: "code",
   },
   {
     id: 3, tag: "03", title: "SOCIAL ECHO",
     body: "Strategic movement that amplifies your brand's pulse across digital channels and beyond.",
     cta: "EXPLORE ECHO", layout: "large", accent: false,
-    image: "/image/about-1.jpg", icon: "asterisk",
+    image: "/image/about-1.jpg",
+    icon: "asterisk",
   },
   {
     id: 4, tag: "04", title: "CONTENT ALCHEMY",
     body: "Cinematic production that captures the essence of your vision, polished with the 21FiftyOne quality stamp.",
     cta: "EXPLORE ALCHEMY", layout: "small", accent: false,
-    image: "/image/about-2.jpg", icon: null,
+    image: "/image/about-2.jpg",
+    icon: null,
   },
   {
     id: 5, tag: "05", title: "MOTION & FILM",
     body: "From concept to colour grade — we craft moving images that don't just tell stories, they ignite them.",
     cta: "EXPLORE MOTION", layout: "small", accent: false,
-    image: "/image/about-1.jpg", icon: "film",
+    image: "/image/about-1.jpg",
+    icon: "film",
   },
   {
     id: 6, tag: "06", title: "EXPERIENCE DESIGN",
     body: "Immersive digital environments where intuition meets spectacle. Every interaction is a revelation.",
     cta: "EXPLORE UX", layout: "large", accent: true,
-    image: "/image/about-2.jpg", icon: null,
+    image: "/image/about-2.jpg",
+    icon: null,
   },
   {
     id: 7, tag: "07", title: "STRATEGY & VISION",
     body: "Market intelligence fused with creative ambition — a roadmap that turns obscurity into cultural authority.",
     cta: "EXPLORE STRATEGY", layout: "small", accent: false,
-    image: "/image/about-1.jpg", icon: "eye",
+    image: "/image/about-1.jpg",
+    icon: "eye",
   },
   {
     id: 8, tag: "08", title: "NOIR PRODUCTION",
     body: "Dark, dramatic, unforgettable. We build production worlds drenched in atmosphere and precision craft.",
     cta: "EXPLORE NOIR", layout: "small", accent: false,
-    image: "/image/about-2.jpg", icon: "diamond",
+    image: "/image/about-2.jpg",
+    icon: "diamond",
   },
 ];
 
-const GROUPS = [[0, 1], [2, 3], [4, 5], [6, 7]];
+/* 4 groups of 2 cards each */
+const GROUPS = [
+  [0, 1],
+  [2, 3],
+  [4, 5],
+  [6, 7],
+];
 
 export default function ServicesSection() {
-  const [groupIdx,     setGroupIdx]     = useState(0);
+  const [groupIdx, setGroupIdx] = useState(0);
   const [prevGroupIdx, setPrevGroupIdx] = useState<number | null>(null);
-  const [dir,          setDir]          = useState<"left" | "right">("left");
-  const [animating,    setAnimating]    = useState(false);
+  const [dir, setDir] = useState<"left" | "right">("left");
+  const [animating, setAnimating] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goTo = useCallback((idx: number, direction: "left" | "right") => {
@@ -70,22 +84,21 @@ export default function ServicesSection() {
     setDir(direction);
     setPrevGroupIdx(groupIdx);
     setGroupIdx(idx);
-    // FIX: match timeout to longest animation (leave = 0.4s, enter = 0.65s)
-    setTimeout(() => { setPrevGroupIdx(null); setAnimating(false); }, 700);
+    setTimeout(() => { setPrevGroupIdx(null); setAnimating(false); }, 680);
   }, [animating, groupIdx]);
 
-  const next = useCallback(() => goTo((groupIdx + 1) % GROUPS.length, "left"),  [goTo, groupIdx]);
+  const next = useCallback(() => goTo((groupIdx + 1) % GROUPS.length, "left"), [goTo, groupIdx]);
   const prev = useCallback(() => goTo((groupIdx - 1 + GROUPS.length) % GROUPS.length, "right"), [goTo, groupIdx]);
-
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(next, 6000);
-  }, [next]);
 
   useEffect(() => {
     timerRef.current = setTimeout(next, 6000);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [groupIdx, next]);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(next, 6000);
+  };
 
   return (
     <>
@@ -93,6 +106,7 @@ export default function ServicesSection() {
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,900;1,900&family=Barlow:wght@400;500;600&display=swap');
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
+        /* ── Section ── */
         .svc { width:100%; background:#f8f7f5; padding:100px 0 88px; overflow:hidden; }
         .svc-inner { max-width:1280px; margin:0 auto; padding:0 64px; }
 
@@ -105,19 +119,18 @@ export default function ServicesSection() {
         .svc-sup {
           font-family:'Barlow',sans-serif; font-size:10px; font-weight:600;
           letter-spacing:0.26em; color:#aaa; text-transform:uppercase; margin-bottom:16px;
-          display:block;
         }
         .svc-heading { line-height:0.9; margin-bottom:18px; }
         .svc-h-line {
           display:block; font-family:'Barlow Condensed',sans-serif; font-weight:900;
-          font-size:clamp(42px,5.5vw,80px); text-transform:uppercase; color:#0d0d0d;
+          font-size: clamp(60px, 8vw, 120px); text-transform:uppercase; color:#0d0d0d;
           line-height:0.9; letter-spacing:-0.025em;
         }
-        .svc-h-masked-row { display:block; line-height:0.9; overflow:hidden; }
-        /* FIX: explicit px height so canvas.offsetHeight is reliable */
+        .svc-h-masked-row { display:block; line-height:0.9; }
         .svc-masked-canvas {
           display:inline-block; vertical-align:bottom;
-          height:80px; width:auto;
+          height: clamp(60px, 8vw, 120px); width:auto;
+          min-height: clamp(60px, 8vw, 120px);
         }
         .svc-sub {
           font-family:'Barlow',sans-serif; font-size:15px; font-weight:400;
@@ -130,43 +143,26 @@ export default function ServicesSection() {
         .svc-counter span { color:#0d0d0d; }
 
         /* ── Stage ── */
-        /* FIX: use min-height so collapsing during leave animation is prevented */
-        .svc-stage {
-          position:relative;
-          overflow:hidden;
-          /* height is set by JS once cards render — fallback keeps layout stable */
-          min-height:620px;
-        }
+        .svc-stage { position:relative; overflow:hidden; min-height:640px; }
 
-        /* ── Card groups ── */
         .card-group {
           display:grid;
-          grid-template-columns:1fr 1fr;
+          grid-template-columns: 1fr 1fr;
           gap:20px;
           width:100%;
         }
-        /* FIX: leaving group is absolute so it doesn't push the entering group down */
-        .card-group.cg-leave-left,
-        .card-group.cg-leave-right {
-          position:absolute; inset:0;
-          pointer-events:none;
-          /* Match grid gap so overlay lines up */
-          grid-template-columns:1fr 1fr;
-          gap:20px;
-        }
-
         .card-group.cg-enter-left  { animation:cgInL  0.65s cubic-bezier(0.16,1,0.3,1) both; }
         .card-group.cg-enter-right { animation:cgInR  0.65s cubic-bezier(0.16,1,0.3,1) both; }
-        .card-group.cg-leave-left  { animation:cgOutL 0.42s ease both; }
-        .card-group.cg-leave-right { animation:cgOutR 0.42s ease both; }
+        .card-group.cg-leave-left  { position:absolute;inset:0;pointer-events:none;animation:cgOutL 0.4s ease both; }
+        .card-group.cg-leave-right { position:absolute;inset:0;pointer-events:none;animation:cgOutR 0.4s ease both; }
         @keyframes cgInL  { from{opacity:0;transform:translateX(72px)}  to{opacity:1;transform:translateX(0)} }
         @keyframes cgInR  { from{opacity:0;transform:translateX(-72px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes cgOutL { from{opacity:1;transform:translateX(0)}  to{opacity:0;transform:translateX(-56px)} }
-        @keyframes cgOutR { from{opacity:1;transform:translateX(0)}  to{opacity:0;transform:translateX(56px)} }
+        @keyframes cgOutL { from{opacity:1;transform:translateX(0)}  to{opacity:0;transform:translateX(-72px)} }
+        @keyframes cgOutR { from{opacity:1;transform:translateX(0)}  to{opacity:0;transform:translateX(72px)} }
 
         .card-group > * { animation:cardPop 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-        .card-group > *:nth-child(1) { animation-delay:0.05s; }
-        .card-group > *:nth-child(2) { animation-delay:0.15s; }
+        .card-group > *:nth-child(1){ animation-delay:0.05s; }
+        .card-group > *:nth-child(2){ animation-delay:0.15s; }
         @keyframes cardPop { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
 
         /* ── Card base ── */
@@ -175,7 +171,7 @@ export default function ServicesSection() {
           border:1px solid rgba(0,0,0,0.07);
           background:#ffffff;
           display:flex; flex-direction:column;
-          cursor:pointer;
+          cursor:none;
           transition:border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
         }
         .svc-card:hover {
@@ -183,11 +179,16 @@ export default function ServicesSection() {
           box-shadow:0 24px 64px rgba(0,0,0,0.24);
           transform:translateY(-4px);
         }
+
+        /* Large — tall left card */
         .svc-card.card-large { min-height:620px; }
         .svc-card.card-large .card-content { justify-content:flex-end; padding-bottom:40px; }
+
+        /* Small — right card */
         .svc-card.card-small { min-height:620px; }
         .svc-card.card-small .card-content { justify-content:space-between; }
 
+        /* Background image — hidden until hover */
         .card-bg-img {
           position:absolute; inset:0; z-index:0;
           background-size:cover; background-position:center;
@@ -198,20 +199,28 @@ export default function ServicesSection() {
         }
         .svc-card:hover .card-bg-img { opacity:1; transform:scale(1); }
 
+        /* Overlay */
         .card-overlay {
           position:absolute; inset:0; z-index:1;
-          background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.6) 45%,rgba(0,0,0,0.22) 100%);
+          background:linear-gradient(
+            to top,
+            rgba(0,0,0,0.92) 0%,
+            rgba(0,0,0,0.60) 45%,
+            rgba(0,0,0,0.22) 100%
+          );
           opacity:0; pointer-events:none;
           transition:opacity 0.55s ease;
         }
         .svc-card:hover .card-overlay { opacity:1; }
 
+        /* Content */
         .card-content {
           position:relative; z-index:2;
           display:flex; flex-direction:column; flex:1;
           padding:36px 36px 40px;
         }
 
+        /* Icon badge */
         .card-icon-badge {
           position:absolute; top:24px; right:24px; z-index:3;
           width:38px; height:38px; border-radius:50%;
@@ -227,42 +236,51 @@ export default function ServicesSection() {
         .card-icon-badge svg path { transition:stroke 0.4s; }
         .svc-card:hover .card-icon-badge svg path { stroke:rgba(255,255,255,0.9) !important; }
 
+        /* Accent line */
         .card-accent-line {
           width:40px; height:2px; background:#d42b2b;
           margin-bottom:24px; transition:opacity 0.4s;
         }
         .svc-card:hover .card-accent-line { opacity:0.7; }
 
+        /* Tag */
         .card-tag {
           font-family:'Barlow',sans-serif; font-size:9.5px; font-weight:600;
           letter-spacing:0.24em; text-transform:uppercase;
-          color:#c8c8c8; margin-bottom:10px; transition:color 0.4s;
+          color:#c8c8c8; margin-bottom:10px;
+          transition:color 0.4s;
         }
         .svc-card:hover .card-tag { color:rgba(255,255,255,0.5); }
 
+        /* Title */
         .card-title {
           font-family:'Barlow Condensed',sans-serif; font-weight:900;
           font-size:clamp(28px,3vw,42px); text-transform:uppercase;
           color:#0d0d0d; letter-spacing:-0.02em; line-height:0.95;
-          margin-bottom:14px; transition:color 0.4s;
+          margin-bottom:14px;
+          transition:color 0.4s;
         }
         .svc-card:hover .card-title { color:#ffffff; }
 
+        /* Body */
         .card-desc {
           font-family:'Barlow',sans-serif; font-size:14px; font-weight:400;
           line-height:1.75; color:#777; flex:1; margin-bottom:28px;
-          max-width:340px; transition:color 0.4s;
+          max-width:340px;
+          transition:color 0.4s;
         }
         .svc-card:hover .card-desc { color:rgba(255,255,255,0.72); }
 
+        /* CTA */
         .card-cta {
           display:inline-flex; align-items:center; gap:12px;
           font-family:'Barlow',sans-serif; font-size:10.5px; font-weight:600;
           letter-spacing:0.2em; text-transform:uppercase;
-          color:#0d0d0d; cursor:pointer; background:none; border:none;
+          color:#0d0d0d; cursor:none; background:none; border:none;
           padding:0; align-self:flex-start; transition:color 0.4s;
         }
         .svc-card:hover .card-cta { color:#ffffff; }
+
         .card-cta-line {
           width:32px; height:1px; flex-shrink:0;
           background:#0d0d0d; position:relative;
@@ -282,14 +300,43 @@ export default function ServicesSection() {
         .svc-card:hover .card-cta.red .card-cta-line { background:#fff; }
         .svc-card:hover .card-cta.red .card-cta-line::after { border-left-color:#fff; }
 
+        /* Ghost number */
         .card-ghost-num {
           position:absolute; bottom:-16px; right:20px; z-index:2;
           font-family:'Barlow Condensed',sans-serif; font-weight:900;
           font-size:140px; line-height:1; letter-spacing:-0.06em;
           pointer-events:none; user-select:none;
-          color:rgba(0,0,0,0.035); transition:color 0.4s;
+          color:rgba(0,0,0,0.035);
+          transition:color 0.4s;
         }
         .svc-card:hover .card-ghost-num { color:rgba(255,255,255,0.07); }
+
+        /* ── Custom cursor ── */
+        .card-cursor {
+          position:absolute; pointer-events:none; z-index:20;
+          width:90px; height:90px; border-radius:50%;
+          background:rgba(255,255,255,0.10);
+          border:1.5px solid rgba(255,255,255,0.55);
+          backdrop-filter:blur(6px);
+          display:flex; align-items:center; justify-content:center;
+          transform:translate(-50%,-50%) scale(0);
+          opacity:0;
+          transition:
+            transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+            opacity 0.22s ease;
+          will-change:transform,left,top;
+        }
+        .svc-card:hover .card-cursor {
+          opacity:1;
+          transform:translate(-50%,-50%) scale(1);
+        }
+        .card-cursor-label {
+          font-family:'Barlow',sans-serif;
+          font-size:8.5px; font-weight:600;
+          letter-spacing:0.24em; text-transform:uppercase;
+          color:#ffffff; text-align:center;
+          line-height:1.4; pointer-events:none; user-select:none;
+        }
 
         /* ── Navigation ── */
         .svc-nav { display:flex; align-items:center; gap:20px; margin-top:36px; }
@@ -328,31 +375,28 @@ export default function ServicesSection() {
 
         @media(max-width:960px){
           .svc-inner { padding:0 28px; }
-          .card-group,
-          .card-group.cg-leave-left,
-          .card-group.cg-leave-right { grid-template-columns:1fr; }
+          .card-group { grid-template-columns:1fr; }
           .svc-card.card-large,
           .svc-card.card-small { min-height:360px; }
           .svc-header { flex-direction:column; align-items:flex-start; }
-          .svc-masked-canvas { height:56px; }
         }
       `}</style>
 
-      {/* FIX: style tag is INSIDE BugSectionEffect wrapper, and BugSectionEffect
-              gets explicit width:100% so its overflow:hidden covers the section */}
-      <BugSectionEffect bugCount={2} leafCount={0} style={{ width: "100%" }}>
+      <BugSectionEffect
+        bugCount={2}
+        leafCount={0}
+        style={{ width: "100%" }}
+      >
         <section className="svc" id="services">
           <div className="svc-inner">
 
             {/* Header */}
             <div className="svc-header">
               <div className="svc-header-left">
-                <span className="svc-sup">What We Do</span>
+                <p className="svc-sup">What We Do</p>
                 <div className="svc-heading">
                   <span className="svc-h-line">CRAFTING THE</span>
                   <span className="svc-h-masked-row">
-                    {/* FIX: canvas height is now a fixed px value (80px), not clamp,
-                              so offsetHeight is always readable before fonts load */}
                     <SvcMaskedCanvas
                       word="EXCEPTIONAL"
                       videoSrc="/videos/video-1.mp4"
@@ -372,19 +416,17 @@ export default function ServicesSection() {
 
             {/* Stage */}
             <div className="svc-stage">
-              {/* Leaving group — absolute overlay */}
               {prevGroupIdx !== null && (
                 <div
-                  key={`out-${prevGroupIdx}`}
                   className={`card-group ${dir === "left" ? "cg-leave-left" : "cg-leave-right"}`}
+                  key={`out-${prevGroupIdx}`}
                 >
                   <CardGroup indices={GROUPS[prevGroupIdx]} />
                 </div>
               )}
-              {/* Entering group — normal flow (sets stage height) */}
               <div
-                key={`in-${groupIdx}`}
                 className={`card-group ${dir === "left" ? "cg-enter-left" : "cg-enter-right"}`}
+                key={`in-${groupIdx}`}
               >
                 <CardGroup indices={GROUPS[groupIdx]} />
               </div>
@@ -432,44 +474,73 @@ export default function ServicesSection() {
   );
 }
 
-/* ── Card group ── */
+/* ── Card group ─────────────────────────────────── */
 function CardGroup({ indices }: { indices: number[] }) {
   return (
     <>
-      {indices.map((ci) => {
-        const card = CARDS[ci];
-        return (
-          <div key={card.id} className={`svc-card card-${card.layout}`}>
-            <div className="card-bg-img" style={{ backgroundImage: `url(${card.image})` }} aria-hidden="true" />
-            <div className="card-overlay" aria-hidden="true" />
-            {card.icon && <IconBadge type={card.icon} />}
-            <div className="card-content">
-              {card.accent && <div className="card-accent-line" />}
-              <div>
-                <p className="card-tag">{card.tag}</p>
-                <h3 className="card-title">{card.title}</h3>
-                <p className="card-desc">{card.body}</p>
-              </div>
-              <button className={`card-cta${card.accent ? " red" : ""}`}>
-                <span className="card-cta-line" />
-                {card.cta}
-              </button>
-            </div>
-            <div className="card-ghost-num">{card.tag}</div>
-          </div>
-        );
-      })}
+      {indices.map((ci) => (
+        <ServiceCard key={CARDS[ci].id} card={CARDS[ci]} />
+      ))}
     </>
   );
 }
 
-/* ── Icon badges ── */
+/* ── Individual card with custom cursor ─────────── */
+function ServiceCard({ card }: { card: typeof CARDS[0] }) {
+  const cursorRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cursorRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    cursorRef.current.style.left = `${e.clientX - rect.left}px`;
+    cursorRef.current.style.top  = `${e.clientY - rect.top}px`;
+  };
+
+  return (
+    <div
+      className={`svc-card card-${card.layout}`}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Custom cursor bubble */}
+      <div className="card-cursor" ref={cursorRef}>
+        <span className="card-cursor-label">EXPLORE</span>
+      </div>
+
+      {/* BG image */}
+      <div className="card-bg-img" style={{ backgroundImage: `url(${card.image})` }} aria-hidden="true" />
+      {/* Overlay */}
+      <div className="card-overlay" aria-hidden="true" />
+
+      {/* Icon badge */}
+      {card.icon && <IconBadge type={card.icon} />}
+
+      {/* Content */}
+      <div className="card-content">
+        {card.accent && <div className="card-accent-line" />}
+
+        <div>
+          <p className="card-tag">{card.tag}</p>
+          <h3 className="card-title">{card.title}</h3>
+          <p className="card-desc">{card.body}</p>
+        </div>
+
+        <button className={`card-cta${card.accent ? " red" : ""}`}>
+          <span className="card-cta-line" />
+          {card.cta}
+        </button>
+      </div>
+
+      <div className="card-ghost-num">{card.tag}</div>
+    </div>
+  );
+}
+
+/* ── Icon badges ─────────────────────────────────── */
 function IconBadge({ type }: { type: string }) {
   const icons: Record<string, React.ReactElement> = {
     code: (
       <svg width="17" height="17" viewBox="0 0 17 17" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5.5 4.5L2 8.5L5.5 12.5" stroke="#d42b2b"/>
-        <path d="M11.5 4.5L15 8.5L11.5 12.5" stroke="#d42b2b"/>
+        <path d="M5.5 4.5L2 8.5L5.5 12.5" stroke="#d42b2b"/><path d="M11.5 4.5L15 8.5L11.5 12.5" stroke="#d42b2b"/>
       </svg>
     ),
     asterisk: (
@@ -496,19 +567,16 @@ function IconBadge({ type }: { type: string }) {
       </svg>
     ),
   };
-  return <div className="card-icon-badge">{icons[type] ?? null}</div>;
+
+  return (
+    <div className="card-icon-badge">
+      {icons[type] ?? null}
+    </div>
+  );
 }
 
-/* ── Canvas video mask ── */
-function SvcMaskedCanvas({
-  word,
-  videoSrc,
-  className,
-}: {
-  word: string;
-  videoSrc: string;
-  className: string;
-}) {
+/* ── Canvas video mask ──────────────────────────── */
+function SvcMaskedCanvas({ word, videoSrc, className }: { word: string; videoSrc: string; className: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef  = useRef<HTMLVideoElement>(null);
   const rafRef    = useRef<number>(0);
@@ -522,100 +590,53 @@ function SvcMaskedCanvas({
     if (!ctx) return;
     const dpr = window.devicePixelRatio || 1;
 
-    // FIX: derive cssH from the element's computed style, not offsetHeight,
-    //      so we get the correct value even if layout hasn't painted yet.
-    function getCssH(): number {
-      if (!canvas) return 80;
-      const h = canvas.offsetHeight;
-      // offsetHeight returns 0 if element not yet laid out — fall back to CSS value
-      if (h > 0) return h;
-      const computed = parseFloat(getComputedStyle(canvas).height);
-      return isNaN(computed) || computed === 0 ? 80 : computed;
-    }
-
     function initSize() {
       if (!canvas || !ctx) return;
-      const cssH = getCssH();
-      const fs   = cssH * 0.96;
-      ctx.font = `900 italic ${fs}px 'Barlow Condensed', sans-serif`;
+      const cssH = canvas.offsetHeight || 73;
+      const fs = cssH * 0.96;
+      ctx.font = `900  ${fs}px 'Barlow Condensed', sans-serif`;
       const tw = ctx.measureText(word).width;
-      canvas.width        = Math.ceil(tw * dpr);
-      canvas.height       = Math.ceil(cssH * dpr);
+      canvas.width  = Math.ceil(tw * dpr);
+      canvas.height = Math.ceil(cssH * dpr);
       canvas.style.width  = `${Math.ceil(tw)}px`;
       canvas.style.height = `${cssH}px`;
     }
 
     function frame() {
       if (!canvas || !video || !ctx) return;
-      const cW = canvas.width  / dpr;
+      const cW = canvas.width / dpr;
       const cH = canvas.height / dpr;
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, cW, cH);
-
+      ctx.save(); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, cW, cH);
       ctx.globalCompositeOperation = "source-over";
       if (readyRef.current && video.readyState >= 2) {
         ctx.drawImage(video, 0, 0, cW, cH);
       } else {
         const t = (Date.now() % 3000) / 3000;
         const g = ctx.createLinearGradient(cW * t, 0, cW * (t + 0.65), cH);
-        g.addColorStop(0,   "#a81008");
-        g.addColorStop(0.4, "#e0361a");
-        g.addColorStop(0.7, "#d42b2b");
-        g.addColorStop(1,   "#6e0000");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, cW, cH);
+        g.addColorStop(0, "#a81008"); g.addColorStop(0.4, "#e0361a");
+        g.addColorStop(0.7, "#d42b2b"); g.addColorStop(1, "#6e0000");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, cW, cH);
       }
-
       ctx.globalCompositeOperation = "destination-in";
-      ctx.font = `900 italic ${cH * 0.96}px 'Barlow Condensed', sans-serif`;
-      ctx.textBaseline = "top";
-      ctx.fillStyle    = "#000";
+      ctx.font = `900  ${cH * 0.96}px 'Barlow Condensed', sans-serif`;
+      ctx.textBaseline = "top"; ctx.fillStyle = "#000";
       ctx.fillText(word, 0, cH * 0.03);
       ctx.restore();
       rafRef.current = requestAnimationFrame(frame);
     }
 
-    // FIX: wait for both fonts AND first layout tick before initSize
-    const boot = () => {
-      // rAF ensures the browser has done one layout pass so offsetHeight is valid
-      requestAnimationFrame(() => { initSize(); frame(); });
-    };
-
-    if (document.fonts?.ready) {
-      document.fonts.ready.then(boot);
-    } else {
-      setTimeout(boot, 200);
-    }
-
-    video.crossOrigin  = "anonymous";
-    video.muted        = true;
-    video.loop         = true;
-    video.playsInline  = true;
-    video.src          = videoSrc;
-
-    const onCanPlay = () => {
-      readyRef.current = true;
-      video.play().catch(() => {});
-    };
+    document.fonts.ready.then(() => { initSize(); frame(); });
+    video.crossOrigin = "anonymous"; video.muted = true;
+    video.loop = true; video.playsInline = true; video.src = videoSrc;
+    const onCanPlay = () => { readyRef.current = true; video.play().catch(() => {}); };
     video.addEventListener("canplay", onCanPlay);
-
-    // FIX: ResizeObserver re-inits with layout-correct height
-    const ro = new ResizeObserver(() => {
-      if (document.fonts?.ready) {
-        document.fonts.ready.then(() => requestAnimationFrame(() => initSize()));
-      } else {
-        requestAnimationFrame(() => initSize());
-      }
-    });
+    const ro = new ResizeObserver(() => document.fonts.ready.then(() => initSize()));
     ro.observe(canvas);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       video.removeEventListener("canplay", onCanPlay);
-      ro.disconnect();
-      readyRef.current = false;
-      video.src = "";
+      ro.disconnect(); readyRef.current = false; video.src = "";
     };
   }, [word, videoSrc]);
 
