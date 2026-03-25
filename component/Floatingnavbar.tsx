@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const navLinks = [
   { label: "COLLECTIONS", href: "/collections" },
@@ -19,20 +20,14 @@ export default function FloatingNavbar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // Show/hide on scroll direction
       if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
         setVisible(false);
       } else {
         setVisible(true);
       }
-
-      // Add shadow/border when scrolled
       setScrolled(currentScrollY > 20);
-
       lastScrollY.current = currentScrollY;
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -42,6 +37,27 @@ export default function FloatingNavbar() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap');
 
+        /* ── iOS Glass Token ── */
+        :root {
+          --glass-bg:        rgba(255, 255, 255, 0.55);
+          --glass-bg-deep:   rgba(255, 255, 255, 0.72);
+          --glass-border:    rgba(255, 255, 255, 0.75);
+          --glass-shadow:    0 8px 32px rgba(212, 43, 43, 0.08),
+                             0 2px 12px rgba(0, 0, 0, 0.08),
+                             inset 0 1px 0 rgba(255,255,255,0.9);
+          --glass-shadow-deep: 0 16px 48px rgba(212, 43, 43, 0.14),
+                               0 4px 16px rgba(0, 0, 0, 0.10),
+                               inset 0 1px 0 rgba(255,255,255,1);
+          --accent:          #d42b2b;
+          --accent-dark:     #b82222;
+          --accent-glow:     rgba(212, 43, 43, 0.18);
+          --text-primary:    #1a1a1a;
+          --text-muted:      #888;
+          --blur:            saturate(180%) blur(20px);
+          --blur-deep:       saturate(200%) blur(28px);
+        }
+
+        /* ── Navbar ── */
         .floating-nav {
           position: fixed;
           top: 16px;
@@ -49,70 +65,77 @@ export default function FloatingNavbar() {
           transform: translateX(-50%) translateY(0);
           width: calc(100% - 48px);
           max-width: 1280px;
-          background: rgba(255, 255, 255, 0.96);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 4px;
+          background: var(--glass-bg);
+          backdrop-filter: var(--blur);
+          -webkit-backdrop-filter: var(--blur);
+          border-radius: 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 28px;
-          height: 60px;
+          padding: 0 24px;
+          height: 58px;
           z-index: 1000;
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                      box-shadow 0.3s ease,
-                      background 0.3s ease;
-          border: 1px solid rgba(0, 0, 0, 0.06);
+          transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                      box-shadow 0.35s ease,
+                      background 0.35s ease,
+                      border-color 0.35s ease;
+          border: 1px solid var(--glass-border);
+          box-shadow: var(--glass-shadow);
+        }
+
+        .floating-nav::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 20px; right: 20px;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(212,43,43,0.35) 30%,
+            rgba(212,43,43,0.55) 50%,
+            rgba(212,43,43,0.35) 70%,
+            transparent 100%
+          );
+          border-radius: 1px;
+          pointer-events: none;
         }
 
         .floating-nav.hidden {
-          transform: translateX(-50%) translateY(-110%);
+          transform: translateX(-50%) translateY(-120%);
         }
 
         .floating-nav.scrolled {
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
-          background: rgba(255, 255, 255, 0.98);
+          background: var(--glass-bg-deep);
+          backdrop-filter: var(--blur-deep);
+          -webkit-backdrop-filter: var(--blur-deep);
+          border-color: rgba(255,255,255,0.85);
         }
 
-        /* Logo */
+        /* ── Logo ── */
         .nav-logo {
           display: flex;
           align-items: center;
-          gap: 10px;
+          flex-shrink: 0;
           text-decoration: none;
-          flex-shrink: 0;
         }
 
-        .nav-logo-icon {
-          width: 28px;
-          height: 28px;
-          background: #f0ede8;
-          border-radius: 3px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 11px;
-          font-weight: 600;
-          color: #1a1a1a;
-          letter-spacing: -0.02em;
-          flex-shrink: 0;
+        .nav-logo-img {
+          height: 36px;
+          width: auto;
+          object-fit: contain;
+          display: block;
+          transition: opacity 0.2s ease;
         }
 
-        .nav-logo-text {
-          font-family: 'Montserrat', sans-serif;
-          font-size: 14px;
-          font-weight: 700;
-          color: #1a1a1a;
-          letter-spacing: -0.01em;
-          white-space: nowrap;
+        .nav-logo:hover .nav-logo-img {
+          opacity: 0.82;
         }
 
-        /* Center links */
+        /* ── Center links ── */
         .nav-links {
           display: flex;
           align-items: center;
-          gap: 36px;
+          gap: 4px;
           position: absolute;
           left: 50%;
           transform: translateX(-50%);
@@ -120,37 +143,34 @@ export default function FloatingNavbar() {
 
         .nav-link {
           font-family: 'Montserrat', sans-serif;
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 500;
           letter-spacing: 0.1em;
-          color: #888;
+          color: var(--text-muted);
           text-decoration: none;
           position: relative;
-          padding: 4px 0;
-          transition: color 0.2s ease;
+          padding: 6px 12px;
+          border-radius: 10px;
+          transition: color 0.2s ease, background 0.2s ease;
           white-space: nowrap;
         }
 
         .nav-link:hover {
-          color: #1a1a1a;
+          color: var(--text-primary);
+          background: rgba(0,0,0,0.04);
         }
 
         .nav-link.active {
-          color: #d42b2b;
+          color: var(--accent);
+          background: rgba(212, 43, 43, 0.09);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(212,43,43,0.18);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.6),
+                      0 1px 4px rgba(212,43,43,0.12);
         }
 
-        .nav-link.active::after {
-          content: '';
-          position: absolute;
-          bottom: -2px;
-          left: 0;
-          right: 0;
-          height: 1.5px;
-          background: #d42b2b;
-          border-radius: 1px;
-        }
-
-        /* CTA Button */
+        /* ── CTA ── */
         .nav-cta {
           display: flex;
           align-items: center;
@@ -159,31 +179,36 @@ export default function FloatingNavbar() {
 
         .nav-cta-btn {
           font-family: 'Montserrat', sans-serif;
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 700;
           letter-spacing: 0.12em;
           color: #fff;
-          background: #d42b2b;
+          background: linear-gradient(135deg, #d42b2b 0%, #b82222 100%);
           border: none;
-          border-radius: 3px;
-          padding: 10px 20px;
+          border-radius: 11px;
+          padding: 9px 18px;
           cursor: pointer;
           text-decoration: none;
-          transition: background 0.2s ease, transform 0.15s ease;
+          transition: box-shadow 0.2s ease, transform 0.15s ease, filter 0.2s ease;
           white-space: nowrap;
           display: inline-block;
+          box-shadow: 0 2px 10px rgba(212,43,43,0.38),
+                      inset 0 1px 0 rgba(255,255,255,0.22);
         }
 
         .nav-cta-btn:hover {
-          background: #b82222;
           transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(212,43,43,0.48),
+                      inset 0 1px 0 rgba(255,255,255,0.22);
+          filter: brightness(1.06);
         }
 
         .nav-cta-btn:active {
           transform: translateY(0);
+          filter: brightness(0.96);
         }
 
-        /* Mobile hamburger */
+        /* ── Mobile hamburger ── */
         .nav-hamburger {
           display: none;
           flex-direction: column;
@@ -198,41 +223,45 @@ export default function FloatingNavbar() {
           display: block;
           width: 22px;
           height: 1.5px;
-          background: #1a1a1a;
+          background: var(--text-primary);
           transition: all 0.3s ease;
+          border-radius: 2px;
         }
 
-        /* Mobile menu */
+        /* ── Mobile menu ── */
         .mobile-menu {
           position: fixed;
-          top: 88px;
+          top: 86px;
           left: 50%;
           transform: translateX(-50%);
           width: calc(100% - 48px);
           max-width: 1280px;
-          background: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(12px);
-          border-radius: 4px;
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          background: rgba(255, 255, 255, 0.78);
+          backdrop-filter: saturate(180%) blur(24px);
+          -webkit-backdrop-filter: saturate(180%) blur(24px);
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,0.75);
+          box-shadow: 0 12px 40px rgba(212,43,43,0.1),
+                      0 4px 16px rgba(0,0,0,0.08),
+                      inset 0 1px 0 rgba(255,255,255,0.9);
           z-index: 999;
           overflow: hidden;
           max-height: 0;
-          transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+          transition: max-height 0.42s cubic-bezier(0.16, 1, 0.3, 1),
                       opacity 0.3s ease;
           opacity: 0;
         }
 
         .mobile-menu.open {
-          max-height: 300px;
+          max-height: 320px;
           opacity: 1;
         }
 
         .mobile-menu-inner {
-          padding: 16px 28px 20px;
+          padding: 12px 20px 16px;
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 2px;
         }
 
         .mobile-nav-link {
@@ -240,35 +269,33 @@ export default function FloatingNavbar() {
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.1em;
-          color: #888;
+          color: var(--text-muted);
           text-decoration: none;
-          padding: 10px 0;
-          border-bottom: 1px solid rgba(0,0,0,0.05);
-          transition: color 0.2s ease;
+          padding: 11px 12px;
+          border-radius: 10px;
+          transition: color 0.2s ease, background 0.2s ease;
         }
 
-        .mobile-nav-link:last-child {
-          border-bottom: none;
+        .mobile-nav-link:hover {
+          color: var(--text-primary);
+          background: rgba(0,0,0,0.04);
         }
 
-        .mobile-nav-link:hover,
         .mobile-nav-link.active {
-          color: #d42b2b;
+          color: var(--accent);
+          background: rgba(212,43,43,0.08);
         }
 
         @media (max-width: 768px) {
-          .nav-links {
-            display: none;
-          }
-          .nav-hamburger {
-            display: flex;
-          }
+          .nav-links { display: none; }
+          .nav-hamburger { display: flex; }
           .floating-nav {
             width: calc(100% - 32px);
-            padding: 0 20px;
+            padding: 0 18px;
           }
           .mobile-menu {
             width: calc(100% - 32px);
+            top: 84px;
           }
         }
       `}</style>
@@ -313,8 +340,15 @@ function FloatingNavInner({
       >
         {/* Logo */}
         <Link href="/" className="nav-logo">
-          <div className="nav-logo-icon">21</div>
-          <span className="nav-logo-text">21FiftyOne</span>
+          <Image
+            src="/logo/2151-logo.png"
+            alt="21FiftyOne"
+            height={36}
+            width={120}
+            className="nav-logo-img"
+            style={{ width: "auto", height: "36px" }}
+            priority
+          />
         </Link>
 
         {/* Center Nav Links */}
@@ -332,11 +366,11 @@ function FloatingNavInner({
         </div>
 
         {/* CTA */}
-        <div className="nav-cta">
+        {/* <div className="nav-cta">
           <Link href="/shop" className="nav-cta-btn">
             SHOP NOW
           </Link>
-        </div>
+        </div> */}
 
         {/* Mobile Hamburger */}
         <button
@@ -344,21 +378,9 @@ function FloatingNavInner({
           aria-label="Toggle menu"
           onClick={() => setMobileOpen((o) => !o)}
         >
-          <span
-            style={
-              mobileOpen
-                ? { transform: "rotate(45deg) translate(4px, 4px)" }
-                : {}
-            }
-          />
+          <span style={mobileOpen ? { transform: "rotate(45deg) translate(4px, 4px)" } : {}} />
           <span style={mobileOpen ? { opacity: 0 } : {}} />
-          <span
-            style={
-              mobileOpen
-                ? { transform: "rotate(-45deg) translate(4px, -4px)" }
-                : {}
-            }
-          />
+          <span style={mobileOpen ? { transform: "rotate(-45deg) translate(4px, -4px)" } : {}} />
         </button>
       </nav>
 

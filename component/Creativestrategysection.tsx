@@ -1,5 +1,6 @@
 "use client";
-import BugSectionEffect from "./Bugsectioneffect"; // adjust import path as needed
+import { useEffect, useRef } from "react";
+import BugSectionEffect from "./Bugsectioneffect";
 
 interface Step {
   id: number;
@@ -86,20 +87,18 @@ export default function CreativeStrategySection() {
           --arrow-h:rgba(212,43,43,0.14);
         }
 
-        /* ── Section ── */
         .cs-section {
           width: 100%;
           background: var(--bg);
           padding: 80px 0 72px;
         }
-
         .cs-inner {
           max-width: 1280px;
           margin: 0 auto;
           padding: 0 72px;
         }
 
-        /* ── Header row ── */
+        /* ── Header ── */
         .cs-header {
           display: flex;
           align-items: flex-end;
@@ -120,30 +119,51 @@ export default function CreativeStrategySection() {
           margin-bottom: 14px;
         }
 
-        /* "CREATIVE STRATEGY" solid */
-        .cs-h-solid {
+        /* Heading block — mirrors .svc-heading structure */
+        .cs-heading {
+          line-height: 0.9;
+          margin-bottom: 18px;
+        }
+
+        /* "CREATIVE" — solid black, same scale as svc-h-line */
+        .cs-h-line {
           display: block;
           font-family: 'Barlow Condensed', sans-serif;
           font-weight: 900;
-          font-size: clamp(44px, 5.8vw, 84px);
+          font-size: clamp(60px, 8vw, 120px);
           text-transform: uppercase;
           color: var(--black);
           line-height: 0.9;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.025em;
         }
 
-        /* "& MARKETING" — red accent */
+        /* "STRATEGY" — masked canvas row, same as svc-h-masked-row */
+        .cs-h-masked-row {
+          display: block;
+          line-height: 0.9;
+        }
+
+        .cs-masked-canvas {
+          display: inline-block;
+          vertical-align: bottom;
+          height: clamp(60px, 8vw, 120px);
+          min-height: clamp(60px, 8vw, 120px);
+          width: auto;
+          min-width: 10px;
+        }
+
+        /* "& MARKETING" — red italic accent, sits below masked row */
         .cs-h-accent {
           display: block;
           font-family: 'Barlow Condensed', sans-serif;
           font-weight: 900;
           font-style: italic;
-          font-size: clamp(44px, 5.8vw, 84px);
+          font-size: clamp(32px, 4vw, 64px);
           text-transform: uppercase;
           color: var(--red);
           line-height: 0.9;
           letter-spacing: -0.03em;
-          margin-top: 4px;
+          margin-top: 8px;
         }
 
         .cs-sub {
@@ -179,13 +199,12 @@ export default function CreativeStrategySection() {
           margin-bottom: 48px;
         }
 
-        /* ── Arrow chevron row ── */
+        /* ── Chevron arrows ── */
         .cs-arrows {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           margin-bottom: 40px;
         }
-
         .cs-arrow {
           position: relative;
           background: var(--arrow);
@@ -202,26 +221,17 @@ export default function CreativeStrategySection() {
         }
         .cs-arrow:not(:first-child) { margin-left: -2px; }
         .cs-arrow:hover { background: var(--arrow-h); }
-
-        /* Thin red left edge on non-first arrows */
         .cs-arrow:not(:first-child)::before {
           content: '';
           position: absolute;
-          left: 24px;
-          top: 20%;
-          height: 60%;
+          left: 24px; top: 20%; height: 60%;
           width: 1px;
           background: rgba(212,43,43,0.18);
         }
-
         .cs-arrow-icon {
-          position: relative;
-          z-index: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 44px;
-          height: 44px;
+          position: relative; z-index: 1;
+          display: flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px;
         }
 
         /* ── Step cards ── */
@@ -230,65 +240,38 @@ export default function CreativeStrategySection() {
           grid-template-columns: repeat(3, 1fr);
           gap: 40px;
         }
-
         .cs-card { display: flex; flex-direction: column; gap: 0; }
-
-        /* tag + rule row */
         .cs-card-top {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 14px;
+          display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
         }
         .cs-card-tag {
           font-family: 'Barlow', sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.22em;
-          color: var(--red);
-          text-transform: uppercase;
+          font-size: 9px; font-weight: 600;
+          letter-spacing: 0.22em; color: var(--red); text-transform: uppercase;
         }
-        .cs-card-rule {
-          flex: 1;
-          height: 1px;
-          background: var(--border);
-        }
-
+        .cs-card-rule { flex: 1; height: 1px; background: var(--border); }
         .cs-card-title {
           font-family: 'Barlow Condensed', sans-serif;
           font-weight: 900;
           font-size: clamp(20px, 2vw, 28px);
-          text-transform: uppercase;
-          color: var(--black);
-          letter-spacing: -0.015em;
-          line-height: 1;
-          margin-bottom: 12px;
+          text-transform: uppercase; color: var(--black);
+          letter-spacing: -0.015em; line-height: 1; margin-bottom: 12px;
         }
-
         .cs-card-desc {
           font-family: 'Barlow', sans-serif;
-          font-size: 13.5px;
-          font-weight: 400;
-          line-height: 1.78;
-          color: var(--muted);
-          max-width: 320px;
+          font-size: 13.5px; font-weight: 400;
+          line-height: 1.78; color: var(--muted); max-width: 320px;
         }
 
-        /* Bottom divider */
         .cs-bottom-rule {
-          width: 100%;
-          height: 1px;
-          background: var(--border);
-          margin-top: 64px;
+          width: 100%; height: 1px;
+          background: var(--border); margin-top: 64px;
         }
 
         @media (max-width: 860px) {
           .cs-inner { padding: 0 28px; }
           .cs-header { flex-direction: column; align-items: flex-start; }
-          .cs-arrows {
-            grid-template-columns: 1fr;
-            gap: 8px;
-          }
+          .cs-arrows { grid-template-columns: 1fr; gap: 8px; }
           .cs-arrow {
             clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%) !important;
             margin-left: 0 !important;
@@ -299,63 +282,193 @@ export default function CreativeStrategySection() {
         }
       `}</style>
 
- <BugSectionEffect
-        bugCount={2}
-        leafCount={0}
-        style={{ width: "100%" }}
-      >
-      <section className="cs-section" id="creative-strategy">
-        <div className="cs-inner">
+      <BugSectionEffect bugCount={2} leafCount={0} style={{ width: "100%" }}>
+        <section className="cs-section" id="creative-strategy">
+          <div className="cs-inner">
 
-          {/* ── Header ── */}
-          <div className="cs-header">
-            <div className="cs-header-left">
-              <span className="cs-sup">Our Approach</span>
-              <span className="cs-h-solid">CREATIVE STRATEGY</span>
-              <span className="cs-h-accent">&amp; MARKETING</span>
-              <p className="cs-sub">
-                Multidisciplinary thinking that blends data precision
-                with cinematic creative ambition.
-              </p>
-            </div>
-            <div className="cs-header-right">
-              SERVICES&nbsp;/&nbsp;<b>01</b>&nbsp;—&nbsp;<b>03</b>
-            </div>
-          </div>
+            {/* ── Header ── */}
+            <div className="cs-header">
+              <div className="cs-header-left">
+                <span className="cs-sup">Our Approach</span>
 
-          {/* ── Divider ── */}
-          <div className="cs-divider" />
+                {/* Heading block — mirrors ServicesSection structure exactly */}
+               <div className="cs-heading">
+  <span className="cs-h-masked-row" style={{ display: "flex", alignItems: "bottom", gap: "1.18em" }}>
+    <span className="cs-h-line" style={{ display: "inline", lineHeight: 0.9 }}>CREATIVE</span>
+    <CsMaskedCanvas
+      word="STRATEGY"
+      videoSrc="/videos/video-1.mp4"
+      className="cs-masked-canvas"
+    />
+  </span>
+</div>
 
-          {/* ── Chevron arrows ── */}
-          <div className="cs-arrows">
-            {STEPS.map((step) => (
-              <div className="cs-arrow" key={step.id}>
-                <div className="cs-arrow-icon">{ICONS[step.icon]}</div>
+                {/* Red italic accent line below */}
+                {/* <span className="cs-h-accent">&amp; MARKETING</span> */}
+
+                <p className="cs-sub">
+                  Multidisciplinary thinking that blends data precision
+                  with cinematic creative ambition.
+                </p>
               </div>
-            ))}
-          </div>
 
-          {/* ── Step cards ── */}
-          <div className="cs-cards">
-            {STEPS.map((step, i) => (
-              <div className="cs-card" key={step.id}>
-                <div className="cs-card-top">
-                  <span className="cs-card-tag">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="cs-card-rule" />
+              <div className="cs-header-right">
+                SERVICES&nbsp;/&nbsp;<b>01</b>&nbsp;—&nbsp;<b>03</b>
+              </div>
+            </div>
+
+            {/* ── Divider ── */}
+            <div className="cs-divider" />
+
+            {/* ── Chevron arrows ── */}
+            <div className="cs-arrows">
+              {STEPS.map((step) => (
+                <div className="cs-arrow" key={step.id}>
+                  <div className="cs-arrow-icon">{ICONS[step.icon]}</div>
                 </div>
-                <h3 className="cs-card-title">{step.title}</h3>
-                <p className="cs-card-desc">{step.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* ── Step cards ── */}
+            <div className="cs-cards">
+              {STEPS.map((step, i) => (
+                <div className="cs-card" key={step.id}>
+                  <div className="cs-card-top">
+                    <span className="cs-card-tag">{String(i + 1).padStart(2, "0")}</span>
+                    <div className="cs-card-rule" />
+                  </div>
+                  <h3 className="cs-card-title">{step.title}</h3>
+                  <p className="cs-card-desc">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="cs-bottom-rule" />
+
           </div>
-
-          <div className="cs-bottom-rule" />
-
-        </div>
-      </section>
+        </section>
       </BugSectionEffect>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────
+   CsMaskedCanvas
+   Identical logic to SvcMaskedCanvas in ServicesSection —
+   video fill clipped to the text shape via canvas compositing.
+───────────────────────────────────────────────────── */
+function CsMaskedCanvas({
+  word,
+  videoSrc,
+  className,
+}: {
+  word: string;
+  videoSrc: string;
+  className: string;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef  = useRef<HTMLVideoElement>(null);
+  const rafRef    = useRef<number>(0);
+  const readyRef  = useRef(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const video  = videoRef.current;
+    if (!canvas || !video) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+
+    // font string must match what the @import actually loaded
+    const fontFamily = "'Barlow Condensed', sans-serif";
+    const fontWeight = "900";
+
+    function buildFont(cssH: number) {
+      return `${fontWeight} ${cssH * 0.96}px ${fontFamily}`;
+    }
+
+    function initSize() {
+      if (!canvas || !ctx) return;
+      const cssH = canvas.offsetHeight || 73;
+      ctx.font = buildFont(cssH);
+      const tw = ctx.measureText(word).width;
+      canvas.width  = Math.ceil(tw * dpr);
+      canvas.height = Math.ceil(cssH * dpr);
+      canvas.style.width  = `${Math.ceil(tw)}px`;
+      canvas.style.height = `${cssH}px`;
+    }
+
+    function frame() {
+      if (!canvas || !video || !ctx) return;
+      const cW = canvas.width  / dpr;
+      const cH = canvas.height / dpr;
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, cW, cH);
+
+      // 1 — fill layer (video or animated gradient fallback)
+      ctx.globalCompositeOperation = "source-over";
+      if (readyRef.current && video.readyState >= 2) {
+        ctx.drawImage(video, 0, 0, cW, cH);
+      } else {
+        const t = (Date.now() % 3000) / 3000;
+        const g = ctx.createLinearGradient(cW * t, 0, cW * (t + 0.65), cH);
+        g.addColorStop(0,   "#a81008");
+        g.addColorStop(0.4, "#e0361a");
+        g.addColorStop(0.7, "#d42b2b");
+        g.addColorStop(1,   "#6e0000");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, cW, cH);
+      }
+
+      // 2 — punch text mask
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.font = buildFont(cH);
+      ctx.textBaseline = "top";
+      ctx.fillStyle = "#000";
+      ctx.fillText(word, 0, cH * 0.03);
+
+      ctx.restore();
+      rafRef.current = requestAnimationFrame(frame);
+    }
+
+    // Gate everything on fonts being loaded so metrics are accurate
+    document.fonts.ready.then(() => {
+      initSize();
+      frame();
+    });
+
+    video.crossOrigin  = "anonymous";
+    video.muted        = true;
+    video.loop         = true;
+    video.playsInline  = true;
+    video.src          = videoSrc;
+
+    const onCanPlay = () => {
+      readyRef.current = true;
+      video.play().catch(() => {});
+    };
+    video.addEventListener("canplay", onCanPlay);
+
+    const ro = new ResizeObserver(() =>
+      document.fonts.ready.then(() => initSize())
+    );
+    ro.observe(canvas);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      video.removeEventListener("canplay", onCanPlay);
+      ro.disconnect();
+      readyRef.current = false;
+      video.src = "";
+    };
+  }, [word, videoSrc]);
+
+  return (
+    <>
+      <video ref={videoRef} style={{ display: "none" }} muted loop playsInline />
+      <canvas ref={canvasRef} className={className} aria-label={word} />
     </>
   );
 }

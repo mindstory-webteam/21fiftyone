@@ -5,6 +5,7 @@ import CreativeStrategySection from "@/component/Creativestrategysection";
 import FloatingNavbar from "@/component/Floatingnavbar";
 import Footer from "@/component/Footer";
 import HeroSection from "@/component/Herosection";
+import ProjectLumina from "@/component/Projectlumina";
 
 import SelectedWorks from "@/component/Selectedworks";
 import ServicesSection from "@/component/ServicesSection";
@@ -19,9 +20,9 @@ export default function Home() {
         <FloatingNavbar />
         <HeroSection />
         <AboutSection />
-        
         <ServicesSection />
         <CreativeStrategySection />
+        <ProjectLumina />
         <SelectedWorks />
         <BreakTheMold />
         <Footer />
