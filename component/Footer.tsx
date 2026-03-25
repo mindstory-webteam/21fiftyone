@@ -65,8 +65,8 @@ export default function Footer() {
           flex-shrink: 0;
         }
         .footer-social-btn:hover {
-          border-color: #0d0d0d;
-          color: #0d0d0d;
+          border-color: red;
+          color: red;
         }
         .footer-social-btn svg {
           width: 13px;
@@ -102,7 +102,7 @@ export default function Footer() {
           text-decoration: none;
           transition: color 0.2s;
         }
-        .footer-col-links a:hover { color: #0d0d0d; }
+        .footer-col-links a:hover { color: red; }
 
         /* ── Contact col ── */
         .footer-contact-address {
@@ -194,7 +194,7 @@ export default function Footer() {
 
           {/* ── Brand ── */}
           <div className="footer-brand">
-            <a href="/" className="footer-brand-logo">21FiftyOne</a>
+           <a href="/" className="footer-brand-logo">21FiftyOne</a>
             <p className="footer-brand-tagline">
               Elevating brands through the art of digital alchemy and technical precision.
             </p>
