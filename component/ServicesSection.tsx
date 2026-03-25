@@ -371,7 +371,7 @@ export default function ServicesSection() {
                 <span className="svc-h-masked-row">
                   <SvcMaskedCanvas
                     word="EXCEPTIONAL"
-                    videoSrc="/videos/mask.mp4"
+                    videoSrc="/videos/video-1.mp4"
                     className="svc-masked-canvas"
                   />
                 </span>

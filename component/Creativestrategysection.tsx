@@ -1,4 +1,5 @@
 "use client";
+import BugSectionEffect from "./Bugsectioneffect"; // adjust import path as needed
 
 interface Step {
   id: number;
@@ -298,6 +299,11 @@ export default function CreativeStrategySection() {
         }
       `}</style>
 
+ <BugSectionEffect
+        bugCount={2}
+        leafCount={0}
+        style={{ width: "100%" }}
+      >
       <section className="cs-section" id="creative-strategy">
         <div className="cs-inner">
 
@@ -349,6 +355,7 @@ export default function CreativeStrategySection() {
 
         </div>
       </section>
+      </BugSectionEffect>
     </>
   );
 }
