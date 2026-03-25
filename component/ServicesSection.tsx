@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import BugSectionEffect from "./Bugsectioneffect"; // adjust import path as needed
 
 /* ── 8 cards, 4 groups of 2 ─────────────────────── */
@@ -129,7 +129,7 @@ export default function ServicesSection() {
         .svc-h-masked-row { display:block; line-height:0.9; }
         .svc-masked-canvas {
           display:inline-block; vertical-align:bottom;
-          height:clamp(38px,5vw,73px); width:auto;
+         height:clamp(42px,5.5vw,80px); width:auto;
         }
         .svc-sub {
           font-family:'Barlow',sans-serif; font-size:15px; font-weight:400;
@@ -489,7 +489,7 @@ function CardGroup({ indices }: { indices: number[] }) {
 
 /* ── Icon badges ─────────────────────────────────── */
 function IconBadge({ type }: { type: string }) {
-  const icons: Record<string, JSX.Element> = {
+  const icons: Record<string, React.ReactElement> = {
     code: (
       <svg width="17" height="17" viewBox="0 0 17 17" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M5.5 4.5L2 8.5L5.5 12.5" stroke="#d42b2b"/><path d="M11.5 4.5L15 8.5L11.5 12.5" stroke="#d42b2b"/>
