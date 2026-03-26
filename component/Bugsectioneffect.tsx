@@ -10,24 +10,24 @@
  * • Bug bobs head while eating
  */
 
-import { useEffect, useRef, ReactNode } from "react";
+import { useEffect, useRef, useMemo, ReactNode } from "react";
 
 /* ══════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════ */
-const FLEE_RADIUS  = 120;
-const FLEE_WARN    = 190;    // distance where bug slows & senses danger
-const CRAWL_SPEED  = 0.5;
-const FLY_SPEED    = 2.4;   // slow graceful top speed
-const FLY_ACCEL    = 0.055; // ramps up gradually
-const BUG_SIZE     = 56;
-const LEAF_SIZE    = 22;
-const EAT_DIST     = 28;
-const EAT_FRAMES   = 150;   // frames spent eating
-const HIDE_MIN     = 3200;
-const HIDE_MAX     = 6000;
-const LEAF_COUNT   = 5;
-const TURN_SPEED   = 0.055;
+const FLEE_RADIUS = 120;
+const FLEE_WARN   = 190;   // distance where bug slows & senses danger
+const CRAWL_SPEED = 0.5;
+const FLY_SPEED   = 2.4;   // slow graceful top speed
+const FLY_ACCEL   = 0.055; // ramps up gradually
+const BUG_SIZE    = 56;
+const LEAF_SIZE   = 22;
+const EAT_DIST    = 28;
+const EAT_FRAMES  = 150;   // frames spent eating
+const HIDE_MIN    = 3200;
+const HIDE_MAX    = 6000;
+const LEAF_COUNT  = 5;
+const TURN_SPEED  = 0.055;
 
 /* ══════════════════════════════════════════════════════
    TYPES
@@ -64,20 +64,23 @@ function lerpAngle(a: number, b: number, t: number) {
   while (d < -180) d += 360;
   return a + d * t;
 }
-function rand(lo: number, hi: number) { return lo + Math.random() * (hi - lo); }
+
+function rand(lo: number, hi: number) {
+  return lo + Math.random() * (hi - lo);
+}
 
 function edgeEntry(W: number, H: number) {
   const e = Math.floor(Math.random() * 4);
-  if (e === 0) return { x: rand(20, W - 20), y: -BUG_SIZE,    angle: 180 };
+  if (e === 0) return { x: rand(20, W - 20), y: -BUG_SIZE,        angle: 180 };
   if (e === 1) return { x: W + BUG_SIZE,     y: rand(20, H - 20), angle: 270 };
-  if (e === 2) return { x: rand(20, W - 20), y: H + BUG_SIZE, angle: 0   };
+  if (e === 2) return { x: rand(20, W - 20), y: H + BUG_SIZE,     angle: 0   };
                return { x: -BUG_SIZE,        y: rand(20, H - 20), angle: 90  };
 }
 
 function randLeafPos(W: number, H: number) {
   return {
-    x: 60  + Math.random() * (W - 120),
-    y: 50  + Math.random() * (H - 100),
+    x:   60 + Math.random() * (W - 120),
+    y:   50 + Math.random() * (H - 100),
     rot: Math.random() * 360,
   };
 }
@@ -107,21 +110,34 @@ function LeafSVG({ si, ci }: { si: number; ci: number }) {
   const path  = LEAF_PATHS[si % LEAF_PATHS.length];
   const color = LEAF_COLORS[ci % LEAF_COLORS.length];
   return (
-    <svg viewBox="-4 -2 28 28" width={LEAF_SIZE} height={LEAF_SIZE}
-      style={{ display: "block", overflow: "visible" }}>
+    <svg
+      viewBox="-4 -2 28 28"
+      width={LEAF_SIZE}
+      height={LEAF_SIZE}
+      style={{ display: "block", overflow: "visible" }}
+    >
       <path d={path} fill={color.fill} />
-      <line x1="10" y1="1" x2="10" y2="21"
-        stroke={color.vein} strokeWidth="0.9" strokeLinecap="round" opacity="0.6" />
+      <line
+        x1="10" y1="1" x2="10" y2="21"
+        stroke={color.vein} strokeWidth="0.9" strokeLinecap="round" opacity="0.6"
+      />
       {[0.3, 0.55, 0.75].map((t, i) => (
         <g key={i}>
-          <line x1="10" y1={1 + t * 20} x2={10 - 6} y2={1 + t * 20 - 4}
-            stroke={color.vein} strokeWidth="0.6" strokeLinecap="round" opacity="0.45" />
-          <line x1="10" y1={1 + t * 20} x2={10 + 6} y2={1 + t * 20 - 4}
-            stroke={color.vein} strokeWidth="0.6" strokeLinecap="round" opacity="0.45" />
+          <line
+            x1="10" y1={1 + t * 20} x2={10 - 6} y2={1 + t * 20 - 4}
+            stroke={color.vein} strokeWidth="0.6" strokeLinecap="round" opacity="0.45"
+          />
+          <line
+            x1="10" y1={1 + t * 20} x2={10 + 6} y2={1 + t * 20 - 4}
+            stroke={color.vein} strokeWidth="0.6" strokeLinecap="round" opacity="0.45"
+          />
         </g>
       ))}
-      <ellipse cx="6" cy="6" rx="3" ry="4"
-        fill="rgba(255,255,255,0.1)" transform="rotate(-15,6,6)" />
+      <ellipse
+        cx="6" cy="6" rx="3" ry="4"
+        fill="rgba(255,255,255,0.1)"
+        transform="rotate(-15,6,6)"
+      />
     </svg>
   );
 }
@@ -133,6 +149,7 @@ function useLeaves(containerRef: React.RefObject<HTMLElement>, count: number) {
   const leavesRef  = useRef<LeafState[]>([]);
   const leafElsRef = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Initialise leaf state once — no Math.random() during render
   if (leavesRef.current.length === 0) {
     leavesRef.current = Array.from({ length: count }, (_, i) => ({
       id: i, x: 0, y: 0, rot: 0,
@@ -146,7 +163,7 @@ function useLeaves(containerRef: React.RefObject<HTMLElement>, count: number) {
     const el = leafElsRef.current[lf.id];
     if (!el) return;
     if (!lf.visible) { el.style.opacity = "0"; return; }
-    el.style.opacity = String(Math.max(0, Math.min(1, lf.scale)));
+    el.style.opacity   = String(Math.max(0, Math.min(1, lf.scale)));
     el.style.transform =
       `translate(${lf.x - LEAF_SIZE / 2}px,${lf.y - LEAF_SIZE / 2}px)`
       + ` rotate(${lf.rot}deg) scale(${Math.max(0.02, lf.scale)})`;
@@ -172,27 +189,37 @@ function useLeaves(containerRef: React.RefObject<HTMLElement>, count: number) {
   function respawn(lf: LeafState, W: number, H: number) {
     const p = randLeafPos(W, H);
     lf.x = p.x; lf.y = p.y; lf.rot = p.rot;
-    lf.scale = 0.02; lf.visible = true; lf.growing = true;
+    lf.scale   = 0.02;
+    lf.visible = true;
+    lf.growing = true;
     lf.shapeIdx = Math.floor(Math.random() * LEAF_PATHS.length);
     lf.colorIdx = Math.floor(Math.random() * LEAF_COLORS.length);
     writeLeaf(lf);
     const grow = () => {
-      if (lf.scale < 1) { lf.scale = Math.min(1, lf.scale + 0.02); writeLeaf(lf); setTimeout(grow, 16); }
-      else lf.growing = false;
+      if (lf.scale < 1) {
+        lf.scale = Math.min(1, lf.scale + 0.02);
+        writeLeaf(lf);
+        setTimeout(grow, 16);
+      } else {
+        lf.growing = false;
+      }
     };
     grow();
   }
 
-  // Place all leaves once container is ready
+  // Place all leaves once container is measured
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const t = setTimeout(() => {
-      const W = container.offsetWidth, H = container.offsetHeight;
+      const W = container.offsetWidth;
+      const H = container.offsetHeight;
       leavesRef.current.forEach((lf) => {
         const p = randLeafPos(W, H);
         lf.x = p.x; lf.y = p.y; lf.rot = p.rot;
-        lf.scale = 1; lf.visible = true; lf.growing = false;
+        lf.scale   = 1;
+        lf.visible = true;
+        lf.growing = false;
         writeLeaf(lf);
       });
     }, 250);
@@ -206,17 +233,14 @@ function useLeaves(containerRef: React.RefObject<HTMLElement>, count: number) {
 /* ══════════════════════════════════════════════════════
    SINGLE BUG
 ══════════════════════════════════════════════════════ */
-function SingleBug({
-  containerRef,
-  leavesRef,
-  eatLeaf,
-  startDelay = 0,
-}: {
+interface SingleBugProps {
   containerRef: React.RefObject<HTMLElement>;
   leavesRef: React.RefObject<LeafState[]>;
   eatLeaf: (id: number, W: number, H: number) => void;
   startDelay?: number;
-}) {
+}
+
+function SingleBug({ containerRef, leavesRef, eatLeaf, startDelay = 0 }: SingleBugProps) {
   const elRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -234,8 +258,8 @@ function SingleBug({
       targetLeafId: null, eatTimer: 0,
     };
 
-    const setWings = (v: boolean) => {
-      if (wings) wings.style.opacity = v ? "1" : "0";
+    const setWings = (open: boolean) => {
+      if (wings) wings.style.opacity = open ? "1" : "0";
     };
 
     const apply = () => {
@@ -245,7 +269,8 @@ function SingleBug({
 
     const resetEntry = () => {
       const e = edgeEntry(container.offsetWidth, container.offsetHeight);
-      s.x = e.x; s.y = e.y; s.angle = e.angle; s.targetAngle = e.angle;
+      s.x = e.x; s.y = e.y;
+      s.angle = e.angle; s.targetAngle = e.angle;
       s.mode = "entering"; s.targetLeafId = null; s.fleeSpeed = 0;
       el.style.opacity = "1";
       setWings(false);
@@ -253,7 +278,7 @@ function SingleBug({
     };
 
     const onMouse = (evt: MouseEvent) => {
-      const r = container.getBoundingClientRect();
+      const r  = container.getBoundingClientRect();
       s.mouseX = evt.clientX - r.left;
       s.mouseY = evt.clientY - r.top;
     };
@@ -265,121 +290,145 @@ function SingleBug({
     let eatBobT = 0;
 
     const frame = () => {
-      const W = container.offsetWidth, H = container.offsetHeight;
+      const W = container.offsetWidth;
+      const H = container.offsetHeight;
+
       if (s.mode === "hidden") { raf = requestAnimationFrame(frame); return; }
 
-      const mdx   = s.mouseX - s.x;
-      const mdy   = s.mouseY - s.y;
-      const mDist = Math.hypot(mdx, mdy);
+      const mdx     = s.mouseX - s.x;
+      const mdy     = s.mouseY - s.y;
+      const mDist   = Math.hypot(mdx, mdy);
       const sensing = mDist < FLEE_WARN && s.mode !== "fleeing";
 
       /* ── Flee trigger ── */
       if (s.mode !== "fleeing" && mDist < FLEE_RADIUS) {
-        s.mode = "fleeing";
-        s.fleeSpeed = 0.3;
-        setWings(true);
-        const len = mDist || 1;
-        s.fleeVx = -(mdx / len);
-        s.fleeVy = -(mdy / len);
+        s.mode       = "fleeing";
+        s.fleeSpeed  = 0.3;
+        const len    = mDist || 1;
+        s.fleeVx     = -(mdx / len);
+        s.fleeVy     = -(mdy / len);
         s.targetAngle = Math.atan2(s.fleeVy, s.fleeVx) * (180 / Math.PI) + 90;
+        setWings(true);
       }
 
       /* ── FLEEING ── */
       if (s.mode === "fleeing") {
         s.fleeSpeed = Math.min(FLY_SPEED, s.fleeSpeed + FLY_ACCEL);
-        s.x += s.fleeVx * s.fleeSpeed;
-        s.y += s.fleeVy * s.fleeSpeed;
-        s.angle = lerpAngle(s.angle, s.targetAngle, 0.07);
+        s.x        += s.fleeVx * s.fleeSpeed;
+        s.y        += s.fleeVy * s.fleeSpeed;
+        s.angle     = lerpAngle(s.angle, s.targetAngle, 0.07);
         apply();
         const mg = BUG_SIZE * 3;
         if (s.x < -mg || s.x > W + mg || s.y < -mg || s.y > H + mg) {
-          s.mode = "hidden"; el.style.opacity = "0"; setWings(false);
+          s.mode = "hidden";
+          el.style.opacity = "0";
+          setWings(false);
           setTimeout(resetEntry, rand(HIDE_MIN, HIDE_MAX));
         }
-        raf = requestAnimationFrame(frame); return;
+        raf = requestAnimationFrame(frame);
+        return;
       }
 
       /* ── EATING ── */
       if (s.mode === "eating") {
         s.eatTimer--;
-        eatBobT += 0.12;
-        // Gentle bob while eating
-        s.angle = s.angle + Math.sin(eatBobT) * 0.6;
+        eatBobT    += 0.12;
+        s.angle     = s.angle + Math.sin(eatBobT) * 0.6;
         apply();
         if (s.eatTimer <= 0) {
-          if (s.targetLeafId !== null) { eatLeaf(s.targetLeafId, W, H); s.targetLeafId = null; }
-          s.mode = "seeking"; s.wanderTimer = rand(30, 80);
+          if (s.targetLeafId !== null) {
+            eatLeaf(s.targetLeafId, W, H);
+            s.targetLeafId = null;
+          }
+          s.mode        = "seeking";
+          s.wanderTimer = rand(30, 80);
         }
-        raf = requestAnimationFrame(frame); return;
+        raf = requestAnimationFrame(frame);
+        return;
       }
 
-      /* ── ENTERING → center ── */
+      /* ── ENTERING → walk toward center ── */
       if (s.mode === "entering") {
-        const cx = W / 2, cy = H / 2;
-        const ex = cx - s.x, ey = cy - s.y;
+        const cx   = W / 2, cy = H / 2;
+        const ex   = cx - s.x, ey = cy - s.y;
         const dist = Math.hypot(ex, ey);
-        if (dist < 80) { s.mode = "seeking"; }
-        else {
+        if (dist < 80) {
+          s.mode = "seeking";
+        } else {
           const spd = sensing ? CRAWL_SPEED * 0.35 : CRAWL_SPEED * 1.3;
-          s.x += (ex / dist) * spd;
-          s.y += (ey / dist) * spd;
-          s.angle = lerpAngle(s.angle, Math.atan2(ey, ex) * (180 / Math.PI) + 90, 0.07);
-          apply(); raf = requestAnimationFrame(frame); return;
+          s.x      += (ex / dist) * spd;
+          s.y      += (ey / dist) * spd;
+          s.angle   = lerpAngle(s.angle, Math.atan2(ey, ex) * (180 / Math.PI) + 90, 0.07);
+          apply();
+          raf = requestAnimationFrame(frame);
+          return;
         }
       }
 
-      /* ── SEEK / WANDER ── */
-      const visLeaves = leavesRef.current?.filter(l => l.visible && !l.growing) ?? [];
+      /* ── SEEK nearest leaf ── */
+      const visLeaves = leavesRef.current?.filter((l) => l.visible && !l.growing) ?? [];
 
       if (visLeaves.length > 0) {
-        let best = visLeaves[0], bestD = Infinity;
+        let best  = visLeaves[0];
+        let bestD = Infinity;
         for (const lf of visLeaves) {
           const d = Math.hypot(lf.x - s.x, lf.y - s.y);
           if (d < bestD) { bestD = d; best = lf; }
         }
 
         if (bestD < EAT_DIST && s.targetLeafId === null) {
-          s.mode = "eating"; s.eatTimer = EAT_FRAMES; s.targetLeafId = best.id; eatBobT = 0;
-          raf = requestAnimationFrame(frame); return;
+          s.mode         = "eating";
+          s.eatTimer     = EAT_FRAMES;
+          s.targetLeafId = best.id;
+          eatBobT        = 0;
+          raf = requestAnimationFrame(frame);
+          return;
         }
 
-        // Walk toward best leaf
-        const ex = best.x - s.x, ey = best.y - s.y;
+        const ex   = best.x - s.x, ey = best.y - s.y;
         const dist = Math.hypot(ex, ey);
-        const spd = sensing ? CRAWL_SPEED * 0.3 : CRAWL_SPEED;
-        s.x += (ex / dist) * spd;
-        s.y += (ey / dist) * spd;
-        const ta = Math.atan2(ey, ex) * (180 / Math.PI) + 90;
-        s.angle = lerpAngle(s.angle, ta, sensing ? 0.02 : TURN_SPEED);
-        apply(); raf = requestAnimationFrame(frame); return;
+        const spd  = sensing ? CRAWL_SPEED * 0.3 : CRAWL_SPEED;
+        s.x        += (ex / dist) * spd;
+        s.y        += (ey / dist) * spd;
+        const ta   = Math.atan2(ey, ex) * (180 / Math.PI) + 90;
+        s.angle    = lerpAngle(s.angle, ta, sensing ? 0.02 : TURN_SPEED);
+        apply();
+        raf = requestAnimationFrame(frame);
+        return;
       }
 
-      /* No visible leaves — wander */
+      /* ── WANDER (no visible leaves) ── */
       if (--s.wanderTimer <= 0) {
-        const tca = Math.atan2(H / 2 - s.y, W / 2 - s.x) * (180 / Math.PI);
+        const tca  = Math.atan2(H / 2 - s.y, W / 2 - s.x) * (180 / Math.PI);
         const near = s.x < 50 || s.x > W - 50 || s.y < 50 || s.y > H - 50;
         s.targetAngle = tca + rand(near ? -55 : -155, near ? 55 : 155) - 90;
         s.wanderTimer = rand(60, 180);
       }
       const spd = sensing ? CRAWL_SPEED * 0.3 : CRAWL_SPEED;
-      s.angle = lerpAngle(s.angle, s.targetAngle, sensing ? 0.015 : TURN_SPEED);
+      s.angle   = lerpAngle(s.angle, s.targetAngle, sensing ? 0.015 : TURN_SPEED);
       const rad = (s.angle - 90) * (Math.PI / 180);
-      s.x += Math.cos(rad) * spd;
-      s.y += Math.sin(rad) * spd;
+      s.x      += Math.cos(rad) * spd;
+      s.y      += Math.sin(rad) * spd;
 
+      // Bounce off edges
       const p = BUG_SIZE;
-      if (s.x < p)     { s.x = p;     s.targetAngle = rand(0, 180); }
+      if (s.x < p)     { s.x = p;     s.targetAngle = rand(0, 180);   }
       if (s.x > W - p) { s.x = W - p; s.targetAngle = rand(180, 360); }
-      if (s.y < p)     { s.y = p;     s.targetAngle = rand(90, 270); }
-      if (s.y > H - p) { s.y = H - p; s.targetAngle = rand(-90, 90); }
+      if (s.y < p)     { s.y = p;     s.targetAngle = rand(90, 270);  }
+      if (s.y > H - p) { s.y = H - p; s.targetAngle = rand(-90, 90);  }
 
       apply();
       raf = requestAnimationFrame(frame);
     };
 
-    const timer = setTimeout(() => { resetEntry(); raf = requestAnimationFrame(frame); }, startDelay);
+    const timer = setTimeout(() => {
+      resetEntry();
+      raf = requestAnimationFrame(frame);
+    }, startDelay);
+
     return () => {
-      clearTimeout(timer); cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      cancelAnimationFrame(raf);
       container.removeEventListener("mousemove", onMouse);
       container.removeEventListener("mouseleave", onLeave);
     };
@@ -392,14 +441,17 @@ function SingleBug({
       style={{
         position: "absolute", top: 0, left: 0,
         width: BUG_SIZE, height: BUG_SIZE,
-        pointerEvents: "none", willChange: "transform,opacity",
-        zIndex: 9999, transformOrigin: "center center", opacity: 0,
+        pointerEvents: "none",
+        willChange: "transform,opacity",
+        zIndex: 9999,
+        transformOrigin: "center center",
+        opacity: 0,
       }}
     >
       <style>{`
         @keyframes bseWingFlap {
-          0%,100% { transform: scaleX(1); }
-          50%      { transform: scaleX(1.44); }
+          0%, 100% { transform: scaleX(1);    }
+          50%       { transform: scaleX(1.44); }
         }
         .bse-wings {
           opacity: 0;
@@ -408,9 +460,13 @@ function SingleBug({
           animation: bseWingFlap 0.3s ease-in-out infinite;
         }
       `}</style>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 250"
-        width={BUG_SIZE} height={BUG_SIZE}
-        style={{ overflow: "visible", display: "block" }}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 260 250"
+        width={BUG_SIZE}
+        height={BUG_SIZE}
+        style={{ overflow: "visible", display: "block" }}
+      >
         {/* Wings */}
         <g className="bse-wings">
           <ellipse cx={72}  cy={108} rx={68} ry={34}
@@ -443,13 +499,12 @@ function SingleBug({
 /* ══════════════════════════════════════════════════════
    LEAF DOM NODE
 ══════════════════════════════════════════════════════ */
-function LeafNode({
-  leaf,
-  setRef,
-}: {
+interface LeafNodeProps {
   leaf: LeafState;
   setRef: (el: HTMLDivElement | null) => void;
-}) {
+}
+
+function LeafNode({ leaf, setRef }: LeafNodeProps) {
   return (
     <div
       ref={setRef}
@@ -484,16 +539,23 @@ interface BugSectionEffectProps {
 
 export default function BugSectionEffect({
   children,
-  bugCount = 1,
+  bugCount  = 1,
   leafCount = LEAF_COUNT,
   className,
   style,
 }: BugSectionEffectProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ✅ Compute stable per-bug delays once — never during render
+  const bugDelays = useMemo(
+    () => Array.from({ length: bugCount }, (_, i) => i * 1500 + Math.random() * 800),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [bugCount]
+  );
+
   const { leavesRef, leafElsRef, eatLeaf } = useLeaves(
     containerRef as React.RefObject<HTMLElement>,
-    leafCount
+    leafCount,
   );
 
   return (
@@ -504,7 +566,7 @@ export default function BugSectionEffect({
     >
       {children}
 
-      {/* Render leaves */}
+      {/* Leaves */}
       {leavesRef.current.map((lf) => (
         <LeafNode
           key={lf.id}
@@ -513,14 +575,14 @@ export default function BugSectionEffect({
         />
       ))}
 
-      {/* Render bugs */}
-      {Array.from({ length: bugCount }, (_, i) => (
+      {/* Bugs */}
+      {bugDelays.map((delay, i) => (
         <SingleBug
           key={i}
           containerRef={containerRef as React.RefObject<HTMLElement>}
           leavesRef={leavesRef}
           eatLeaf={eatLeaf}
-          startDelay={i * 1500 + Math.random() * 800}
+          startDelay={delay}
         />
       ))}
     </div>

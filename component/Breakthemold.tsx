@@ -285,7 +285,7 @@ export default function BreakTheMold() {
           {/* Eyebrow */}
           <div className={`btm-eyebrow${visible ? " show" : ""}`}>
             <div className="btm-eyebrow-line" />
-            <span className="btm-eyebrow-text">Let's Create Together</span>
+            <span className="btm-eyebrow-text">Let s Create Together</span>
             <div className="btm-eyebrow-line" />
           </div>
 
@@ -297,7 +297,7 @@ export default function BreakTheMold() {
 
           {/* Subtext */}
           <p className={`btm-sub${visible ? " show" : ""}`}>
-            Let's collaborate on your next masterpiece. Our studio
+            Let s collaborate on your next masterpiece. Our studio
             doors are always open for the brave.
           </p>
 
