@@ -20,7 +20,7 @@ const WORKS: Work[] = [
     title: "THE OBSIDIAN\nCOLLECTIVE",
     desc: "A tonal visual overhaul for a boutique fashion house, focusing on tonal layering and high-contrast typography.",
     cta: "VIEW CASE STUDY",
-    video: "/videos/video-1.mp4",
+    video: "/videos/video-1.webm",
     poster: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=900&q=80",
   },
   {
@@ -28,7 +28,7 @@ const WORKS: Work[] = [
     title: "NOIR DIGITAL\nEXPERIENCE",
     desc: "An immersive web platform built for maximum conversion with cinematic precision and dark elegance.",
     cta: "VIEW CASE STUDY",
-    video: "/videos/video-2.mp4",
+    video: "/videos/video-2.webm",
     poster: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=900&q=80",
   },
   {
@@ -36,7 +36,7 @@ const WORKS: Work[] = [
     title: "PHANTOM\nFRAMES",
     desc: "A cinematic campaign for a global creative agency — three films, one narrative thread, zero compromises.",
     cta: "VIEW CASE STUDY",
-    video: "/videos/video-3.mp4",
+    video: "/videos/video-3.webm",
     poster: "https://images.unsplash.com/photo-1561736778-92e52a7769ef?w=900&q=80",
   },
   {
@@ -44,7 +44,7 @@ const WORKS: Work[] = [
     title: "ECHO\nCHAMBER",
     desc: "A social strategy that turned a niche streetwear brand into a cultural moment felt across four continents.",
     cta: "VIEW CASE STUDY",
-    video: "/videos/video-1.mp4",
+    video: "/videos/video-1.webm",
     poster: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=900&q=80",
   },
   {
@@ -52,7 +52,7 @@ const WORKS: Work[] = [
     title: "VELVET\nSHADOWS",
     desc: "A short-form visual anthology exploring texture, light and the language of silence in motion design.",
     cta: "VIEW CASE STUDY",
-    video: "/videos/video-2.mp4",
+    video: "/videos/video-2.webm",
     poster: "https://images.unsplash.com/photo-1533240332313-0db49b459ad6?w=900&q=80",
   },
 ];
