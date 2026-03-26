@@ -10,7 +10,7 @@ const SLIDES = [
     line3: "OF DIGITAL NOIR.",
     sub: "Forged in the intersection of cinematic artistry and raw technical precision, 21FiftyOne transforms brands into immersive experiences.",
     maskVideo: "/videos/mask.webm",
-    bgVideo: "/videos/video-1.webm",
+    bgVideo: "/public/videos/video-1.webm",
   },
   {
     eyebrow: "Our Vision",
@@ -18,7 +18,7 @@ const SLIDES = [
     masked: "CINEMATIC",
     line3: "STORYTELLING.",
     sub: "Every frame is a canvas. Every second of footage a brushstroke in the epic narrative of your brand's legacy.",
-    maskVideo: "/videos/mask.webm",
+    maskVideo: "/videos/mask-2.mp4",
     bgVideo: "/videos/video-2.webm",
   },
   {
@@ -27,7 +27,7 @@ const SLIDES = [
     masked: "IMMERSIVE",
     line3: "WORLDS.",
     sub: "We build environments where audiences don't just watch — they feel, breathe, and live inside the story.",
-    maskVideo: "/videos/mask.webm",
+    maskVideo: "/videos/mask.mp4",
     bgVideo: "/videos/video-3.webm",
   },
 ];

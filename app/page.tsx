@@ -1,11 +1,13 @@
 import AboutSection from "@/component/Aboutsection";
 import BreakTheMold from "@/component/Breakthemold";
+import CraftingCulture from "@/component/Craftingculture";
 
 import CreativeStrategySection from "@/component/Creativestrategysection";
 import FloatingNavbar from "@/component/Floatingnavbar";
 import Footer from "@/component/Footer";
 import HeroSection from "@/component/Herosection";
 import ProjectLumina from "@/component/Projectlumina";
+import ProjectsScroll from "@/component/Projectsscroll";
 
 import SelectedWorks from "@/component/Selectedworks";
 import ServicesSection from "@/component/ServicesSection";
@@ -19,11 +21,17 @@ export default function Home() {
      
         <FloatingNavbar />
         <HeroSection />
-        <AboutSection />
-        <ServicesSection />
-        <CreativeStrategySection />
+        
+      
+
+        <CraftingCulture />
+
+          <ProjectsScroll />
+        {/* <AboutSection /> */}
+        {/* <ServicesSection /> */}
+        {/* <CreativeStrategySection /> */}
         {/* <ProjectLumina /> */}
-        <SelectedWorks />
+        {/* <SelectedWorks /> */}
         <BreakTheMold />
         <Footer />
        
