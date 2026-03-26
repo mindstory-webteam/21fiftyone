@@ -312,7 +312,7 @@ export default function ZoomScrollSection() {
 }
 
 /* ── Tiny progress indicator ── */
-function ProgressLine({ wrapRef }: { wrapRef: React.RefObject<HTMLDivElement> }) {
+function ProgressLine({ wrapRef }: { wrapRef: React.RefObject<HTMLDivElement | null> }) {
   const fillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
