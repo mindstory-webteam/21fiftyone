@@ -582,7 +582,7 @@ export default function CraftingCulture() {
                   <span className="cc-label">Detroit Studio</span>
                   {TitleEl}
                   <p className="cc-subtitle" style={{ color: slide.subtitleColor }}>{slide.subtitle}</p>
-                  {"thumbs" in slide && (slide as any).thumbs && (
+                  {/* {"thumbs" in slide && (slide as any).thumbs && (
                     <div className="cc-thumbs">
                       {(slide as any).thumbs.map((src: string, j: number) => (
                         <div key={j} className="cc-thumb">
@@ -590,7 +590,7 @@ export default function CraftingCulture() {
                         </div>
                       ))}
                     </div>
-                  )}
+                  )} */}
                 </div>
                 <VideoPanel video={slide.video} poster={slide.poster} active={isActive} />
               </div>

@@ -7,6 +7,8 @@ import React from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+
+
 gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Design tokens ─── */
@@ -476,7 +478,7 @@ export default function BenefitSection() {
         /* Header */
         .bs-header {
           max-width: 1280px; margin: 0 auto; padding: 0 64px 80px;
-          display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: end;
+        //   display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: end;
         }
 
         /*
@@ -692,8 +694,12 @@ export default function BenefitSection() {
                   hoverRollDirection="center"
                 />
               </div>
+              
+              
+         
             </div>
           </div>
+
 
           <div className="bs-carousel">
             <div
