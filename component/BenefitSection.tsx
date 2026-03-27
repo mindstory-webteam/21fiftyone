@@ -456,6 +456,7 @@ export default function BenefitSection() {
           overflow-x: clip;
           font-family: 'DM Sans', sans-serif;
           position: relative;
+          text-align: justify;
         }
         .bs-root::before {
           content: '';

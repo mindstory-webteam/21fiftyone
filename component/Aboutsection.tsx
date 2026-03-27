@@ -50,6 +50,7 @@ export default function AboutSection() {
           padding: 120px 0 140px;
           overflow: hidden;
           position: relative;
+          text-align: justify;
         }
         .about::before {
           content: '';
@@ -134,6 +135,7 @@ export default function AboutSection() {
           padding: 48px 44px 44px;
           position: relative;
           align-self: end;
+          margin-left: 64px;
         }
         .about-intro-card::before {
           content: '';
