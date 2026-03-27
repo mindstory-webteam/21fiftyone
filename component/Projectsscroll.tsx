@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import SplitText from "./Splittext";
 
 const projects = [
   {
@@ -63,20 +64,35 @@ const TOTAL = projects.length;
 
 function VideoPanel({ video, poster, active }: { video: string; poster: string; active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (active) { if (v.paused) v.play().catch(() => {}); }
-    else { v.pause(); v.currentTime = 0; }
+
+    if (active) {
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+      v.currentTime = 0;
+    }
   }, [active]);
+
   return (
-    <div style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-      <video
-        ref={ref} src={video} poster={poster}
-        muted loop playsInline preload="metadata"
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-      />
-    </div>
+    <video
+      ref={ref}
+      src={video}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        display: "block",
+      }}
+    />
   );
 }
 
@@ -88,39 +104,61 @@ export default function ProjectsScroll() {
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   /* ── Scroll progress (0..1) for list translate effect ── */
-  const [scrollProgress, setScrollProgress] = useState(0);
+  
 
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        ticking = false;
-        const container = containerRef.current;
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        const scrolled = -rect.top;
-        const total = rect.height - window.innerHeight;
-        const progress = Math.max(0, Math.min(1, scrolled / total));
-        // Each slide = 1/TOTAL of total progress
-        const next = Math.min(TOTAL - 1, Math.floor(progress * TOTAL));
-        setCurrent(prev => prev !== next ? next : prev);
-        setScrollProgress(progress);
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+useEffect(() => {
+  let rafId: number | null = null;
 
-  const scrollToSlide = (idx: number) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const h = container.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: (idx / TOTAL) * h + container.offsetTop, behavior: "smooth" });
+  const handleScroll = () => {
+    if (rafId) return;
+
+    rafId = requestAnimationFrame(() => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const scrolled = -rect.top;
+      const total = rect.height - window.innerHeight;
+
+      const progress = Math.max(0, Math.min(1, scrolled / total));
+      const nextIndex = Math.min(TOTAL - 1, Math.floor(progress * TOTAL));
+
+      setCurrent(prev => (prev !== nextIndex ? nextIndex : prev));
+
+      rafId = null;
+    });
   };
 
-  const displayIndex = hoveredIndex !== null ? hoveredIndex : current;
+  window.addEventListener("scroll", handleScroll, { passive: true });
+
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+    if (rafId) cancelAnimationFrame(rafId);
+  };
+}, []);
+
+ 
+
+  const scrollToSlide = (idx: number) => {
+  const container = containerRef.current;
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const absoluteTop = window.scrollY + rect.top;
+
+  const scrollTarget =
+    absoluteTop + (idx / TOTAL) * (container.offsetHeight - window.innerHeight);
+
+  window.scrollTo({
+    top: scrollTarget,
+    behavior: "smooth",
+  });
+};
+
+  const displayIndex =
+  hoveredIndex !== null && hoveredIndex !== current
+    ? hoveredIndex
+    : current;
   const slide = projects[displayIndex];
 
   // List translate: as user scrolls, list moves up to keep active item centred
@@ -236,6 +274,7 @@ export default function ProjectsScroll() {
           inset: 0;
           opacity: 0;
           transition: opacity 0.75s cubic-bezier(0.23,1,0.32,1);
+          will-change: opacity;
         }
         .ps-video-slide.ps-vid-on { opacity: 1; }
         .ps-video-overlay {
@@ -393,6 +432,7 @@ export default function ProjectsScroll() {
             padding-left 0.4s cubic-bezier(0.23,1,0.32,1),
             opacity 0.4s ease;
           opacity: 0.28;
+          will-change: transform, opacity;
         }
         .ps-item:first-child { border-top: 1px solid rgba(13,13,13,0.08); }
 
@@ -578,18 +618,125 @@ export default function ProjectsScroll() {
           .ps-list-panel { display: none; }
           .ps-heading-block { padding: 80px 28px 0; }
         }
+         /* ══════════════════════════════════════
+   SPLIT TEXT HEADING (FIXED VERSION)
+══════════════════════════════════════ */
+
+.ps-split-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;                 /* MORE SPACE BETWEEN LINES */
+  margin-top: 20px;
+}
+
+/* FIRST LINE (MAIN TITLE) */
+.ps-split-line {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+
+  font-size: clamp(5rem, 13vw, 16rem); /* slightly reduced */
+  line-height: 0.9;                    /* FIX overlap */
+  letter-spacing: -0.035em;
+
+  text-transform: uppercase;
+  color: #0d0d0d;
+
+  white-space: nowrap;
+  margin-bottom: 10px;                 /* breathing space */
+}
+
+/* SECOND LINE (ACCENT) */
+.ps-split-accent {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+
+  font-size: clamp(2.8rem, 8vw, 9rem); /* smaller than title */
+  line-height: 1;                      /* FIX squishing */
+  letter-spacing: -0.03em;
+
+  text-transform: uppercase;
+  color: rgba(13, 13, 13, 0.12);       /* lighter */
+
+  white-space: nowrap;
+
+  margin-top: 8px;
+  margin-left: 6px;                    /* premium offset */
+}
+  /* FULL HEIGHT LIST */
+.ps-list-full {
+  height: 100%;
+  overflow-y: auto;
+  padding: 100px 56px 80px 52px;
+}
+
+/* Smooth scroll feel */
+.ps-list-full::-webkit-scrollbar {
+  width: 4px;
+}
+.ps-list-full::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+  .ps-list-panel {
+  height: 100vh;   /* FULL HEIGHT */
+}
       `}</style>
 
       <div className="ps-root">
 
         {/* ── BIG HEADING ── */}
-        <div className="ps-heading-block">
+        {/* <div className="ps-heading-block">
           <p className="ps-heading-eyebrow">Detroit Studio — Paris</p>
           <span className="ps-heading-title">SELECTED</span>
           <span className="ps-heading-sub">WORK 2022–2024</span>
           <div className="ps-heading-divider" />
-        </div>
+        </div> */}
 
+<div className="ps-heading-block">
+  <p className="ps-heading-eyebrow">Detroit Studio — Paris</p>
+
+  <div className="ps-split-wrapper">
+
+    {/* TOP LINE */}
+    <div className="ps-split-line">
+      <SplitText
+        text="Selected"
+        splitType="chars"
+        from={{ opacity: 0, y: 80, skewX: 6 }}
+        to={{ opacity: 1, y: 0, skewX: 0 }}
+        delay={40}
+        duration={1.2}
+        ease="power3.out"
+        threshold={0.15}
+        rootMargin="-80px"
+        hoverRoll
+        hoverRollDirection="left"
+      />
+    </div>
+
+    {/* BOTTOM LINE */}
+    <div className="ps-split-accent">
+      <SplitText
+        text="Works 2022–2024"
+        splitType="words"
+        from={{ opacity: 0, y: 100 }}
+        to={{ opacity: 1, y: 0 }}
+        delay={120}
+        duration={1.3}
+        ease="power4.out"
+        threshold={0.15}
+        rootMargin="-80px"
+        hoverRoll
+        hoverRollDirection="center"
+      />
+    </div>
+
+  </div>
+
+  <div className="ps-heading-divider" />
+</div>
         {/* ── SCROLL SECTION ── */}
         <div className="ps-scroll-section" ref={containerRef}>
           <div className="ps-sticky">
@@ -604,7 +751,23 @@ export default function ProjectsScroll() {
               <div className="ps-video-overlay" />
               <div className="ps-video-info">
                 <p className="ps-vi-eyebrow">{slide.category}</p>
-                <h2 className="ps-vi-title">{slide.name}</h2>
+                <h2 className="ps-vi-title">
+  {slide.name.split("\n").map((line, index) => (
+    <div key={index}>
+      <SplitText
+        text={line}
+        splitType="chars"
+        from={{ opacity: 0, y: 80, skewX: 6 }}
+        to={{ opacity: 1, y: 0, skewX: 0 }}
+        delay={index * 120}   // stagger between lines
+        duration={1.2}
+        ease="power3.out"
+        threshold={0.2}
+        rootMargin="-50px"
+      />
+    </div>
+  ))}
+</h2>
                 <div className="ps-vi-tags">
                   {slide.tags.map(t => <span key={t} className="ps-vi-tag">{t}</span>)}
                 </div>
@@ -612,45 +775,43 @@ export default function ProjectsScroll() {
             </div>
 
             {/* RIGHT: Scrolling List */}
-            <div className="ps-list-panel">
-              <p className="ps-list-label">Selected Work</p>
+            {/* RIGHT: Scrolling List */}
+<div className="ps-list-panel">
 
-              {/* Viewport clips the list; track slides up via transform */}
-              <div className="ps-list-viewport">
-                <div
-                  className="ps-list-track"
-                  style={{
-                    transform: `translateY(${110 - current * 110}px)`,
-                  }}
-                >
-                  {projects.map((p, i) => {
-                    const isOn = current === i || hoveredIndex === i;
-                    return (
-                      <div
-                        key={p.id}
-                        ref={el => { itemRefs.current[i] = el; }}
-                        className={`ps-item${isOn ? " ps-on" : ""}`}
-                        onMouseEnter={() => setHoveredIndex(i)}
-                        onMouseLeave={() => setHoveredIndex(null)}
-                        onClick={() => scrollToSlide(i)}
-                      >
-                        <div className="ps-item-row">
-                          <span className="ps-num">{String(i + 1).padStart(2, "0")}</span>
-                          <h3 className="ps-name">{p.name}</h3>
-                          <span className="ps-year">{p.year}</span>
-                        </div>
-                        <div className="ps-meta">
-                          <span className="ps-cat">{p.category}</span>
-                          <span className="ps-sep" />
-                          <div className="ps-tags">
-                            {p.tags.map(t => <span key={t} className="ps-tag">{t}</span>)}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+  <p className="ps-list-label">Selected Work</p>
+
+  <div className="ps-list-full">
+  {projects.map((p, i) => {
+    const isOn = current === i || hoveredIndex === i;
+
+    return (
+      <div
+        key={p.id}
+        ref={el => { itemRefs.current[i] = el; }}
+        className={`ps-item${isOn ? " ps-on" : ""}`}
+        onMouseEnter={() => setHoveredIndex(i)}
+        onMouseLeave={() => setHoveredIndex(null)}
+        onClick={() => scrollToSlide(i)}
+      >
+        <div className="ps-item-row">
+          <span className="ps-num">{String(i + 1).padStart(2, "0")}</span>
+          <h3 className="ps-name">{p.name}</h3>
+          <span className="ps-year">{p.year}</span>
+        </div>
+
+        <div className="ps-meta">
+          <span className="ps-cat">{p.category}</span>
+          <span className="ps-sep" />
+          <div className="ps-tags">
+            {p.tags.map(t => (
+              <span key={t} className="ps-tag">{t}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
 
               {/* Nav dots */}
               <div className="ps-dots">

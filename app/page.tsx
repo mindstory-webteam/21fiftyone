@@ -26,6 +26,7 @@ export default function Home() {
         <FloatingNavbar />
         <HeroSection />
          <CraftingCulture />
+          <AboutSection />
        
         
         <BenefitSection />
@@ -34,7 +35,7 @@ export default function Home() {
      
 
        
-          <AboutSection />
+         
 
           <ProjectsScroll />
       
