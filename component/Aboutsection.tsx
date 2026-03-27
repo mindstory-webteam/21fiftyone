@@ -537,20 +537,22 @@ export default function AboutSection() {
                 <cite>— Jonathan Gilbert, Founder</cite>
               </div>
 
-              <p className="about-paragraph" data-reveal data-d="5">
-                Our studio partners with Louis Vuitton, Hermès, Dom Pérignon and
-                Chanel to tell stories that feel both timeless and radically now.
-              </p>
-
-              <div className="about-tags" data-reveal data-d="6">
-                {["Luxury", "AI Production", "3D & CGI", "Print & Film", "Editorial", "Paris"].map((t) => (
-                  <span key={t} className="tag">{t}</span>
-                ))}
-              </div>
+             
             </div>
 
             {/* Right col */}
             <div className="about-right-col" data-reveal data-d="4">
+               <div className="about-tags" data-reveal data-d="6">
+                {["Luxury", "AI Production", "3D & CGI", "Print & Film", "Editorial", "Paris"].map((t) => (
+                  <span key={t} className="tag">{t}</span>
+                ))}
+              </div>
+               <p className="about-paragraph" data-reveal data-d="5">
+                Our studio partners with Louis Vuitton, Hermès, Dom Pérignon and
+                Chanel to tell stories that feel both timeless and radically now.
+              </p>
+
+             
               <div className="v-marquee-wrap">
                 <div className="v-marquee">
                   {[

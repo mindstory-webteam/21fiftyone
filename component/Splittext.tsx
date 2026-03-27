@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, CSSProperties } from "react";
+import type { ElementType } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -19,18 +20,18 @@ type FromTo = {
 interface SplitTextProps {
   text: string;
   className?: string;
-  delay?: number;          // stagger delay between letters in ms
-  duration?: number;       // animation duration in seconds
-  ease?: string;           // GSAP ease string
+  delay?: number;
+  duration?: number;
+  ease?: string;
   splitType?: "chars" | "words" | "lines";
   from?: FromTo;
   to?: FromTo;
-  threshold?: number;      // IntersectionObserver threshold (0–1)
-  rootMargin?: string;     // e.g. "-100px"
+  threshold?: number;
+  rootMargin?: string;
   textAlign?: CSSProperties["textAlign"];
   onLetterAnimationComplete?: () => void;
   showCallback?: boolean;
-  tag?: keyof JSX.IntrinsicElements;
+  tag?: ElementType;   // ← replaces keyof JSX.IntrinsicElements
 }
 
 export default function SplitText({
@@ -56,7 +57,6 @@ export default function SplitText({
     const container = containerRef.current;
     if (!container) return;
 
-    // ── Split text into spans ───────────────────────────────────────
     const buildSpans = (): HTMLElement[] => {
       container.innerHTML = "";
 
@@ -79,7 +79,6 @@ export default function SplitText({
           });
 
           container.appendChild(wordEl);
-          // add space between words (not after last)
           if (wi < words.length - 1) {
             const space = document.createElement("span");
             space.innerHTML = "&nbsp;";
@@ -102,7 +101,6 @@ export default function SplitText({
         });
       }
 
-      // lines — treat each sentence/newline as a line
       return text.split("\n").map((line) => {
         const el = document.createElement("span");
         el.textContent = line;
@@ -116,10 +114,8 @@ export default function SplitText({
     const targets = buildSpans();
     if (!targets.length) return;
 
-    // ── Set initial state ───────────────────────────────────────────
     gsap.set(targets, { ...from });
 
-    // ── Build timeline ──────────────────────────────────────────────
     tlRef.current = gsap.timeline({
       paused: true,
       onComplete: () => {
@@ -136,7 +132,6 @@ export default function SplitText({
       stagger: delay / 1000,
     });
 
-    // ── ScrollTrigger / IntersectionObserver ────────────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -146,10 +141,7 @@ export default function SplitText({
           }
         });
       },
-      {
-        threshold,
-        rootMargin,
-      }
+      { threshold, rootMargin }
     );
 
     observer.observe(container);
@@ -157,15 +149,13 @@ export default function SplitText({
     return () => {
       observer.disconnect();
       tlRef.current?.kill();
-      // restore plain text so hot-reload works cleanly
       if (container) container.innerHTML = text;
     };
   }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
 
   return (
-    // @ts-expect-error — dynamic tag
     <Tag
-      ref={containerRef}
+      ref={containerRef as React.Ref<never>}
       className={className}
       style={{ textAlign, lineHeight: "inherit" }}
       aria-label={text}
