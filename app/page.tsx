@@ -1,4 +1,6 @@
+
 import AboutSection from "@/component/Aboutsection";
+import  BenefitSection  from "@/component/BenefitSection";
 import BreakTheMold from "@/component/Breakthemold";
 import CraftingCulture from "@/component/Craftingculture";
 
@@ -11,6 +13,8 @@ import ProjectsScroll from "@/component/Projectsscroll";
 
 import SelectedWorks from "@/component/Selectedworks";
 import ServicesSection from "@/component/ServicesSection";
+import  StickyVideoSection  from "@/component/StickyVideoSection";
+
 import Image from "next/image";
 
 export default function Home() {
@@ -22,12 +26,18 @@ export default function Home() {
         <FloatingNavbar />
         <HeroSection />
         
+       
+        
+        <BenefitSection />
+        {/* <StickyVideoSection /> */}
       
+     
 
         <CraftingCulture />
+          <AboutSection />
 
           <ProjectsScroll />
-        {/* <AboutSection /> */}
+      
         {/* <ServicesSection /> */}
         {/* <CreativeStrategySection /> */}
         {/* <ProjectLumina /> */}

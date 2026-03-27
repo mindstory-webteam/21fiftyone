@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import BugSectionEffect from "./Bugsectioneffect"; // adjust import path as needed
+import SplitText from "./Splittext"; // adjust path as needed
+
+const handleAnimationComplete = () => {
+  console.log("All letters have animated!");
+};
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
-  /* Intersection Observer — fade-in on scroll */
+  /* Scroll reveal for non-heading elements */
   useEffect(() => {
     const els = sectionRef.current?.querySelectorAll<HTMLElement>("[data-reveal]");
     if (!els) return;
@@ -20,7 +24,7 @@ export default function AboutSection() {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
 
     els.forEach((el) => io.observe(el));
@@ -30,253 +34,581 @@ export default function AboutSection() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Barlow:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
+
+        :root {
+          --cream: #f2ede6;
+          --black: #0c0c0c;
+          --red:   #c8372d;
+          --muted: #8a8480;
+          --line:  rgba(12,12,12,0.12);
+        }
 
         .about {
           width: 100%;
-          background: #f8f7f5;
-          padding: 100px 0;
+          background: var(--cream);
+          padding: 120px 0 140px;
           overflow: hidden;
+          position: relative;
         }
-
+        .about::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 64px; right: 64px;
+          height: 1px;
+          background: var(--line);
+        }
         .about-inner {
-          max-width: 1180px;
+          max-width: 1280px;
           margin: 0 auto;
           padding: 0 64px;
+        }
+
+        /* Label row */
+        .about-label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 56px;
+        }
+        .about-label {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--red);
+        }
+        .about-label-right {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+
+        /* Hero grid */
+        .about-hero {
           display: grid;
-          grid-template-columns: 420px 1fr;
-          gap: 80px;
+          grid-template-columns: 1fr 480px;
+          gap: 0;
+          align-items: end;
+          margin-bottom: 96px;
+        }
+
+        /* SplitText heading styles */
+        .about-headline {
+          font-family: 'Anton', sans-serif !important;
+          font-size: clamp(88px, 12vw, 168px) !important;
+          line-height: 0.88 !important;
+          letter-spacing: -0.02em !important;
+          color: var(--black) !important;
+          text-transform: uppercase;
+          padding-bottom: 4px;
+          display: block;
+        }
+        .about-headline-accent {
+          font-family: 'Playfair Display', serif !important;
+          font-style: italic !important;
+          font-size: clamp(64px, 8.5vw, 120px) !important;
+          color: var(--red) !important;
+          line-height: 1 !important;
+          letter-spacing: -0.01em !important;
+          display: block;
+          margin-top: 8px;
+        }
+
+        /* Dark intro card */
+        .about-intro-card {
+          background: var(--black);
+          padding: 48px 44px 44px;
+          position: relative;
+          align-self: end;
+        }
+        .about-intro-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 3px; height: 48px;
+          background: var(--red);
+        }
+        .about-intro-card p {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 15px;
+          line-height: 1.8;
+          color: #b0a99e;
+          margin-bottom: 28px;
+          font-weight: 300;
+        }
+        .card-stat {
+          display: flex;
+          gap: 48px;
+          padding-top: 28px;
+          border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-num {
+          font-family: 'Anton', sans-serif;
+          font-size: 44px;
+          line-height: 1;
+          color: #fff;
+          display: block;
+        }
+        .stat-label {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #666;
+          margin-top: 6px;
+          display: block;
+        }
+
+        /* Body grid */
+        .about-body-grid {
+          display: grid;
+          grid-template-columns: 380px 1fr 300px;
+          gap: 56px;
           align-items: start;
         }
 
-        /* ── Left image ──────────────────────── */
-        .about-image-wrap {
-          position: relative;
+        /* Image */
+        .image-stack { position: relative; }
+        .image-main {
           width: 100%;
-          aspect-ratio: 3 / 4;
+          aspect-ratio: 3/4;
           overflow: hidden;
-          border-radius: 2px;
         }
-
-        .about-image-wrap img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        .image-main img {
+          width: 100%; height: 100%;
+          object-fit: cover; display: block;
+          filter: grayscale(15%);
+          transition: filter 0.6s ease, transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
         }
-
-        .about-image-wrap:hover img {
-          transform: scale(1.04);
-        }
-
-        /* Thin accent line on image bottom-left corner */
-        .about-image-wrap::after {
-          content: '';
+        .image-main:hover img { filter: grayscale(0%); transform: scale(1.04); }
+        .image-accent {
           position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 40px;
-          height: 3px;
-          background: #d42b2b;
+          bottom: -28px; right: -28px;
+          width: 140px; height: 100px;
+          overflow: hidden;
+          border: 3px solid var(--cream);
+        }
+        .image-accent img { width: 100%; height: 100%; object-fit: cover; }
+        .image-caption {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid var(--line);
         }
 
-        /* ── Right content ───────────────────── */
-        .about-content {
-          padding-top: 8px;
+        /* Text column */
+        .about-text-col { padding-top: 8px; }
+        .about-section-title {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 24px;
+        }
+        .about-paragraph {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 16px;
+          line-height: 1.82;
+          color: #3a3735;
+          font-weight: 300;
+          margin-bottom: 24px;
+        }
+        .about-quote-block {
+          margin: 44px 0;
+          padding: 36px 40px;
+          background: #eae4db;
+          position: relative;
+        }
+        .about-quote-block::before {
+          content: '\u201C';
+          font-family: 'Playfair Display', serif;
+          font-size: 120px;
+          color: var(--red);
+          opacity: 0.18;
+          position: absolute;
+          top: -16px; left: 24px;
+          line-height: 1;
+        }
+        .about-quote-block blockquote {
+          font-family: 'Playfair Display', serif;
+          font-style: italic;
+          font-size: 22px;
+          line-height: 1.5;
+          color: var(--black);
+          position: relative;
+          z-index: 1;
+        }
+        .about-quote-block cite {
+          font-family: 'DM Sans', sans-serif;
+          font-style: normal;
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-top: 20px;
+          display: block;
         }
 
-        /* Heading */
-        .about-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(32px, 3.5vw, 48px);
-          font-weight: 600;
-          color: #0d0d0d;
-          letter-spacing: -0.02em;
-          line-height: 1.1;
-          margin-bottom: 28px;
+        /* Tags */
+        .about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; }
+        .tag {
+          border: 1px solid rgba(12,12,12,0.18);
+          padding: 8px 16px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--black);
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          transition: color 0.25s;
+        }
+        .tag::after {
+          content: '';
+          position: absolute; inset: 0;
+          background: var(--black);
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+          z-index: -1;
+        }
+        .tag:hover { color: var(--cream); border-color: var(--black); }
+        .tag:hover::after { transform: scaleX(1); }
+
+        /* Right col */
+        .about-right-col { display: flex; flex-direction: column; gap: 32px; padding-top: 8px; }
+        .v-marquee-wrap {
+          height: 260px;
+          overflow: hidden;
+          border-left: 1px solid var(--line);
+          padding-left: 24px;
+        }
+        .v-marquee {
           display: flex;
-          align-items: center;
-          gap: 10px;
+          flex-direction: column;
+          animation: marqueeUp 10s linear infinite;
         }
-
-        .about-title-icon {
+        .v-marquee-item {
+          font-family: 'Anton', sans-serif;
+          font-size: 13px;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: var(--muted);
+          padding: 10px 0;
+          white-space: nowrap;
+          transition: color 0.2s;
+        }
+        .v-marquee-item:hover { color: var(--red); }
+        @keyframes marqueeUp {
+          0%   { transform: translateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+        .about-cta {
           display: inline-flex;
           align-items: center;
-          gap: 2px;
-          flex-shrink: 0;
-        }
-
-        /* Sparkle icon — pure CSS */
-        .sparkle {
-          position: relative;
-          width: 22px;
-          height: 22px;
-          flex-shrink: 0;
-        }
-        .sparkle::before,
-        .sparkle::after {
-          content: '';
-          position: absolute;
-          background: #d42b2b;
-          border-radius: 1px;
-        }
-        /* Vertical bar */
-        .sparkle::before {
-          width: 3px;
-          height: 100%;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          clip-path: polygon(50% 0%, 60% 35%, 100% 50%, 60% 65%, 50% 100%, 40% 65%, 0% 50%, 40% 35%);
-        }
-        /* The sparkle shape */
-        .sparkle::after {
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          clip-path: polygon(50% 0%, 60% 35%, 100% 50%, 60% 65%, 50% 100%, 40% 65%, 0% 50%, 40% 35%);
-        }
-
-        /* Body paragraphs */
-        .about-body {
-          margin-bottom: 36px;
-        }
-
-        .about-p {
-          font-family: 'Barlow', sans-serif;
-          font-size: 15px;
-          font-weight: 400;
-          line-height: 1.78;
-          color: #444;
-          margin-bottom: 20px;
-          letter-spacing: 0.005em;
-        }
-        .about-p:last-child { margin-bottom: 0; }
-
-        /* Quote block */
-        .about-quote {
-          border-left: 2px solid #d42b2b;
-          padding-left: 24px;
-          margin-top: 40px;
-        }
-
-        .about-quote-label {
-          font-family: 'Barlow', sans-serif;
-          font-size: 9.5px;
-          font-weight: 600;
+          gap: 16px;
+          background: var(--red);
+          color: #fff;
+          padding: 18px 28px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
           letter-spacing: 0.22em;
-          color: #aaa;
           text-transform: uppercase;
-          margin-bottom: 14px;
+          text-decoration: none;
+          font-weight: 500;
+          transition: gap 0.3s;
+        }
+        .about-cta:hover { gap: 24px; }
+        .about-cta svg { transition: transform 0.3s; }
+        .about-cta:hover svg { transform: translateX(4px); }
+
+        /* Process strip */
+        .about-hr { border: none; border-top: 1px solid var(--line); margin: 80px 0 0; }
+        .process-strip {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          padding-top: 56px;
+        }
+        .process-item {
+          padding: 0 32px 0 0;
+          border-right: 1px solid var(--line);
+          transition: transform 0.3s ease;
+        }
+        .process-item:first-child { padding-left: 0; }
+        .process-item:last-child { border-right: none; padding-right: 0; }
+        .process-item:hover { transform: translateY(-4px); }
+        .process-num {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          color: var(--red);
+          margin-bottom: 16px;
+        }
+        .process-title {
+          font-family: 'Anton', sans-serif;
+          font-size: 22px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: var(--black);
+          margin-bottom: 12px;
+          transition: color 0.2s;
+        }
+        .process-item:hover .process-title { color: var(--red); }
+        .process-desc {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          line-height: 1.7;
+          color: var(--muted);
+          font-weight: 300;
         }
 
-        .about-quote-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(20px, 2.2vw, 28px);
-          font-weight: 600;
-          color: #0d0d0d;
-          line-height: 1.35;
-          letter-spacing: -0.01em;
-        }
-
-        /* ── Reveal animations ───────────────── */
+        /* Scroll reveal */
         [data-reveal] {
           opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+          transform: translateY(28px);
+          transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+                      transform 0.8s cubic-bezier(0.16,1,0.3,1);
         }
-        [data-reveal].revealed {
-          opacity: 1;
-          transform: translateY(0);
-        }
-        [data-reveal][data-delay="1"] { transition-delay: 0.1s; }
-        [data-reveal][data-delay="2"] { transition-delay: 0.22s; }
-        [data-reveal][data-delay="3"] { transition-delay: 0.36s; }
-        [data-reveal][data-delay="4"] { transition-delay: 0.5s; }
-        [data-reveal][data-delay="5"] { transition-delay: 0.64s; }
+        [data-reveal].revealed { opacity: 1; transform: translateY(0); }
+        [data-reveal][data-d="1"] { transition-delay: 0.08s; }
+        [data-reveal][data-d="2"] { transition-delay: 0.18s; }
+        [data-reveal][data-d="3"] { transition-delay: 0.3s; }
+        [data-reveal][data-d="4"] { transition-delay: 0.44s; }
+        [data-reveal][data-d="5"] { transition-delay: 0.58s; }
+        [data-reveal][data-d="6"] { transition-delay: 0.72s; }
+        [data-reveal][data-d="7"] { transition-delay: 0.86s; }
+        .image-stack[data-reveal] { transform: translateY(40px) scale(0.97); }
+        .image-stack[data-reveal].revealed { transform: translateY(0) scale(1); }
 
-        /* Image reveal — slides up with slight scale */
-        .about-image-wrap[data-reveal] {
-          transform: translateY(32px) scale(0.98);
+        @media (max-width: 1100px) {
+          .about-body-grid { grid-template-columns: 300px 1fr; }
+          .about-right-col { display: none; }
         }
-        .about-image-wrap[data-reveal].revealed {
-          transform: translateY(0) scale(1);
-        }
-
-        /* ── Responsive ──────────────────────── */
-        @media (max-width: 900px) {
-          .about-inner {
-            grid-template-columns: 1fr;
-            gap: 48px;
-            padding: 0 28px;
-          }
-          .about-image-wrap {
-            aspect-ratio: 4 / 3;
-            max-width: 520px;
-          }
-          .about { padding: 72px 0; }
+        @media (max-width: 800px) {
+          .about-inner { padding: 0 24px; }
+          .about::before { left: 24px; right: 24px; }
+          .about-hero { grid-template-columns: 1fr; }
+          .about-intro-card { margin-top: 32px; }
+          .about-body-grid { grid-template-columns: 1fr; }
+          .process-strip { grid-template-columns: 1fr 1fr; gap: 40px; }
+          .process-item { border-right: none; padding-right: 0; }
         }
       `}</style>
 
-      {/*
-        BugSectionEffect wraps the entire <section>.
-        - bugCount={1}  → one wandering ladybug (use 2 for two bugs)
-        - leafCount={5} → five leaves for the bug to seek and eat
-        The wrapper is set to fill 100% width so it matches the section layout.
-      */}
-      <BugSectionEffect
-        bugCount={2}
-        leafCount={0}
-        style={{ width: "100%" }}
-      >
-        <section className="about" ref={sectionRef}>
-          <div className="about-inner">
+      <section className="about" ref={sectionRef}>
+        <div className="about-inner">
 
-            {/* ── Left: image ─────────────────── */}
-            <div className="about-image-wrap" data-reveal data-delay="1">
-              <img
-                src="/image/about-2.jpg"
-                alt="21FiftyOne studio — cinematic light study"
+          {/* Label row */}
+          <div className="about-label-row" data-reveal>
+            <span className="about-label">Detroit Studio</span>
+            <span className="about-label-right">Est. 2021 — Paris</span>
+          </div>
+
+          {/* Hero: SplitText headings + dark card */}
+          <div className="about-hero">
+            <div>
+              {/* "We" — line 1 */}
+              <SplitText
+                text="We"
+                tag="div"
+                className="about-headline"
+                delay={45}
+                duration={1.25}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 60 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-60px"
+                textAlign="left"
+                onLetterAnimationComplete={handleAnimationComplete}
+                showCallback
+              />
+
+              {/* "Make" — line 2 */}
+              <SplitText
+                text="Make"
+                tag="div"
+                className="about-headline"
+                delay={40}
+                duration={1.25}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 60 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-60px"
+                textAlign="left"
+              />
+
+              {/* "Culture" — italic accent, line 3 */}
+              <SplitText
+                text="Culture"
+                tag="div"
+                className="about-headline-accent"
+                delay={35}
+                duration={1.4}
+                ease="power4.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 80, skewX: 8 }}
+                to={{ opacity: 1, y: 0, skewX: 0 }}
+                threshold={0.1}
+                rootMargin="-60px"
+                textAlign="left"
               />
             </div>
 
-            {/* ── Right: content ──────────────── */}
-            <div className="about-content">
-
-              <h2 className="about-title" data-reveal data-delay="2">
-                The Origin&nbsp;
-                <span className="sparkle" aria-hidden="true" />
-              </h2>
-
-              <div className="about-body">
-                <p className="about-p" data-reveal data-delay="3">
-                  Founded in the quiet hours of 2021, our agency was born from a
-                  singular obsession: the belief that the digital world has grown
-                  too predictable, too &ldquo;safe.&rdquo; We sought a return to
-                  the bold&mdash;the dramatic&mdash;the noir.
-                </p>
-                <p className="about-p" data-reveal data-delay="4">
-                  The name 21FiftyOne is a tribute to the legendary year of
-                  cinematic transformation and our commitment to the 51st state of
-                  mind&mdash;a place where creative rebellion meets absolute
-                  technical mastery.
-                </p>
+            {/* Dark card */}
+            <div className="about-intro-card" data-reveal data-d="2">
+              <p>
+                Detroit is an AI Production House in Paris, obsessed with crafting
+                culture for luxury brands. We sit at the intersection of human
+                artistry and machine precision.
+              </p>
+              <div className="card-stat">
+                <div>
+                  <span className="stat-num">120+</span>
+                  <span className="stat-label">Projects</span>
+                </div>
+                <div>
+                  <span className="stat-num">48</span>
+                  <span className="stat-label">Brands</span>
+                </div>
+                <div>
+                  <span className="stat-num">4yr</span>
+                  <span className="stat-label">Studio</span>
+                </div>
               </div>
-
-              <div className="about-quote" data-reveal data-delay="5">
-                <p className="about-quote-label">The Methodology</p>
-                <p className="about-quote-text">
-                  &ldquo;We don&rsquo;t build websites. We engineer digital
-                  monuments that pulse with life and precision.&rdquo;
-                </p>
-              </div>
-
             </div>
           </div>
-        </section>
-      </BugSectionEffect>
+
+          {/* Body grid */}
+          <div className="about-body-grid">
+
+            {/* Image stack */}
+            <div className="image-stack" data-reveal data-d="3">
+              <div className="image-main">
+                <img
+                  src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=90"
+                  alt="Studio portrait"
+                />
+              </div>
+              <div className="image-accent">
+                <img
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"
+                  alt="Luxury shoot"
+                />
+              </div>
+              <p className="image-caption">Studio — Paris, 2024</p>
+            </div>
+
+            {/* Text column */}
+            <div className="about-text-col">
+              <p className="about-section-title" data-reveal data-d="3">The Origin</p>
+              <p className="about-paragraph" data-reveal data-d="4">
+                Founded in the quiet hours of 2021, our agency was born from a
+                singular obsession: the belief that the digital world has grown too
+                predictable, too &ldquo;safe.&rdquo; We sought a return to the
+                bold&mdash;the dramatic&mdash;the cinematic.
+              </p>
+              <p className="about-paragraph" data-reveal data-d="4">
+                Detroit merges the raw energy of editorial photography with the
+                infinite possibilities of AI and CGI. Every frame is a deliberate
+                act. Every pixel, a decision.
+              </p>
+
+              <div className="about-quote-block" data-reveal data-d="5">
+                <blockquote>
+                  &ldquo;We don&rsquo;t build campaigns. We engineer cultural
+                  moments that outlive the season.&rdquo;
+                </blockquote>
+                <cite>— Jonathan Gilbert, Founder</cite>
+              </div>
+
+              <p className="about-paragraph" data-reveal data-d="5">
+                Our studio partners with Louis Vuitton, Hermès, Dom Pérignon and
+                Chanel to tell stories that feel both timeless and radically now.
+              </p>
+
+              <div className="about-tags" data-reveal data-d="6">
+                {["Luxury", "AI Production", "3D & CGI", "Print & Film", "Editorial", "Paris"].map((t) => (
+                  <span key={t} className="tag">{t}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right col */}
+            <div className="about-right-col" data-reveal data-d="4">
+              <div className="v-marquee-wrap">
+                <div className="v-marquee">
+                  {[
+                    "Louis Vuitton","Hermès","Dom Pérignon","Chanel",
+                    "La Mer","Google","Taittinger","Marly Garden",
+                    "Louis Vuitton","Hermès","Dom Pérignon","Chanel",
+                    "La Mer","Google","Taittinger","Marly Garden",
+                  ].map((brand, i) => (
+                    <div key={i} className="v-marquee-item">{brand}</div>
+                  ))}
+                </div>
+              </div>
+
+              <a href="#" className="about-cta">
+                View Our Work
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M3 8h10M9 4l4 4-4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+
+              <p style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "11px",
+                color: "var(--muted)",
+                letterSpacing: "0.12em",
+                lineHeight: "1.8",
+              }}>
+                We accept a limited number of new partners each quarter.{" "}
+                <strong style={{ color: "var(--black)" }}>2 slots open</strong> for Q3 2025.
+              </p>
+            </div>
+          </div>
+
+          {/* Process strip */}
+          <hr className="about-hr" data-reveal data-d="5" />
+          <div className="process-strip">
+            {[
+              { num: "01", title: "Conceive", desc: "Deep immersion in your brand world — uncovering the tension between heritage and the unexpected." },
+              { num: "02", title: "Design",   desc: "Storyboards, art direction and AI pre-visualization built in parallel — at speed." },
+              { num: "03", title: "Produce",  desc: "On-location or studio. Physical and digital. Human talent and machine intelligence — unified." },
+              { num: "04", title: "Deliver",  desc: "Print-ready masters, film cuts and 3D assets — all from one studio, one creative vision." },
+            ].map(({ num, title, desc }, i) => (
+              <div key={num} className="process-item" data-reveal data-d={String(i + 4)}>
+                <p className="process-num">{num}</p>
+                <h3 className="process-title">{title}</h3>
+                <p className="process-desc">{desc}</p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
     </>
   );
 }
