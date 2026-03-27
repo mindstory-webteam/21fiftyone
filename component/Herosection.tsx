@@ -66,7 +66,7 @@ export default function Hero() {
   const nextIndex = (currentIndex + 1) % VIDEOS.length;
 
   const slides = [
-    { eyebrow: "Detroit Studio — Paris",  line1: "We",    line2: "Make",  accent: "Culture.",    sub: "AI Production House · Luxury & Editorial",      cta: "View Our Work" },
+    { eyebrow: "21FIFTYONE — Paris",  line1: "We",    line2: "Make",  accent: "Culture.",    sub: "AI Production House · Luxury & Editorial",      cta: "View Our Work" },
     { eyebrow: "120+ Projects Delivered", line1: "Human", line2: "Meets", accent: "Machine.",    sub: "Where artistry meets AI precision",              cta: "Our Process"   },
     { eyebrow: "48 Luxury Brands",        line1: "Every", line2: "Frame", accent: "Deliberate.", sub: "Louis Vuitton · Hermès · Chanel · Dom Pérignon", cta: "Case Studies"  },
     { eyebrow: "Est. 2021 — Paris",       line1: "Born",  line2: "From",  accent: "Obsession.",  sub: "We engineer cultural moments that last",          cta: "About Us"      },
@@ -198,10 +198,10 @@ export default function Hero() {
           font-family: 'Anton', sans-serif;
           font-size: clamp(72px, 10vw, 148px);
           line-height: .84; letter-spacing: -.02em; text-transform: uppercase;
-          -webkit-text-stroke: 1.5px rgba(242,237,230,.14); color: transparent;
+          -webkit-text-stroke: 1.5px red; color: transparent;
           pointer-events: none; user-select: none;
         }
-        .d-ghost-dark { -webkit-text-stroke: 1.5px rgba(12,12,12,.12); }
+        .d-ghost-dark { -webkit-text-stroke: 1.5px black; }
 
         /* Eyebrow */
         .d-eyebrow {
@@ -304,6 +304,7 @@ export default function Hero() {
           position:absolute;
           right: 0; top:0; bottom:0;
           width: clamp(260px, 30vw, 400px);
+       
           z-index:44;
           display:flex; align-items:center; justify-content:center;
           cursor:pointer;
@@ -322,7 +323,7 @@ export default function Hero() {
         /* The card */
         .preview-card {
           position:absolute;
-          width: clamp(200px, 22vw, 300px);
+          width: clamp(100px, 14vw, 300px);
           aspect-ratio: 9/14;
           border-radius:8px; overflow:hidden;
           box-shadow:0 24px 72px rgba(0,0,0,.75), 0 2px 12px rgba(0,0,0,.5);
@@ -423,19 +424,19 @@ export default function Hero() {
           }} />
 
           {/* Corners */}
-          <div className="d-corner dc-tl" />
-          <div className="d-corner dc-tr" />
+          {/* <div className="d-corner dc-tl" />
+          <div className="d-corner dc-tr" /> */}
 
           {/* HUD */}
-          <div className="d-hud" style={{ top:22, left:64, display:"flex", gap:14, alignItems:"center" }}>
+          {/* <div className="d-hud" style={{ top:22, left:64, display:"flex", gap:14, alignItems:"center" }}>
             <span className="d-rec">● REC</span>
             <span>4K / 24fps</span>
           </div>
-          <div className="d-hud" style={{ top:22, right:64 }}>Detroit Studio — Paris</div>
+          <div className="d-hud" style={{ top:22, right:64 }}>Detroit Studio — Paris</div> */}
 
           {/* Ghost inside */}
           <h1 className="d-ghost" style={{ position:"absolute", bottom:16, right:16, zIndex:40 }}>
-            DETROIT
+            21FIFTYONE
           </h1>
 
           {/* ══ LEFT COLUMN ══ */}
@@ -513,8 +514,8 @@ export default function Hero() {
         </div>
 
         {/* Ghost outside */}
-        <h1 className="d-ghost d-ghost-dark" style={{ position:"absolute", bottom:16, right:16 }}>
-          DETROIT
+        <h1 className="d-ghost d-ghost-dark" style={{ position:"absolute", bottom:16, right:16  }}>
+          21FIFTYONE
         </h1>
 
       </div>

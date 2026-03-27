@@ -90,7 +90,7 @@ export default function AboutSection() {
         /* Hero grid */
         .about-hero {
           display: grid;
-          grid-template-columns: 1fr 480px;
+          grid-template-columns: 1fr 580px;
           gap: 0;
           align-items: end;
           margin-bottom: 96px;
@@ -104,8 +104,10 @@ export default function AboutSection() {
           letter-spacing: -0.02em !important;
           color: var(--black) !important;
           text-transform: uppercase;
-          padding-bottom: 4px;
+          padding-bottom: 10px;
           display: block;
+          /* allow TextRoll overflow to clip correctly */
+          overflow: visible;
         }
         .about-headline-accent {
           font-family: 'Playfair Display', serif !important;
@@ -116,6 +118,14 @@ export default function AboutSection() {
           letter-spacing: -0.01em !important;
           display: block;
           margin-top: 8px;
+          overflow: visible;
+        }
+
+        /* ── TextRoll sits inside HoverRollSplitText flex container ──
+           Make each character unit clip its own roll animation        */
+        .about-headline [data-roll-unit],
+        .about-headline-accent [data-roll-unit] {
+          overflow: hidden;
         }
 
         /* Dark intro card */
@@ -342,7 +352,7 @@ export default function AboutSection() {
         }
         .process-item {
           padding: 0 32px 0 0;
-          border-right: 1px solid var(--line);
+          
           transition: transform 0.3s ease;
         }
         .process-item:first-child { padding-left: 0; }
@@ -419,9 +429,9 @@ export default function AboutSection() {
           {/* Hero: SplitText headings + dark card */}
           <div className="about-hero">
             <div>
-              {/* "We" — line 1 */}
+              {/* "We" — line 1, with TextRoll hover */}
               <SplitText
-                text="We"
+                text="We Make"
                 tag="div"
                 className="about-headline"
                 delay={45}
@@ -435,10 +445,12 @@ export default function AboutSection() {
                 textAlign="left"
                 onLetterAnimationComplete={handleAnimationComplete}
                 showCallback
+                hoverRoll
+                hoverRollDirection="center"
               />
 
-              {/* "Make" — line 2 */}
-              <SplitText
+              {/* "Make" — line 2, with TextRoll hover */}
+              {/* <SplitText
                 text="Make"
                 tag="div"
                 className="about-headline"
@@ -451,9 +463,11 @@ export default function AboutSection() {
                 threshold={0.1}
                 rootMargin="-60px"
                 textAlign="left"
-              />
+                hoverRoll
+                hoverRollDirection="center"
+              /> */}
 
-              {/* "Culture" — italic accent, line 3 */}
+              {/* "Culture" — italic accent, line 3, with TextRoll hover */}
               <SplitText
                 text="Culture"
                 tag="div"
@@ -461,12 +475,14 @@ export default function AboutSection() {
                 delay={35}
                 duration={1.4}
                 ease="power4.out"
-                splitType="chars"
+                splitType="words"
                 from={{ opacity: 0, y: 80, skewX: 8 }}
                 to={{ opacity: 1, y: 0, skewX: 0 }}
                 threshold={0.1}
                 rootMargin="-60px"
                 textAlign="left"
+                hoverRoll
+                hoverRollDirection="left"
               />
             </div>
 
@@ -536,23 +552,20 @@ export default function AboutSection() {
                 </blockquote>
                 <cite>— Jonathan Gilbert, Founder</cite>
               </div>
-
-             
             </div>
 
             {/* Right col */}
             <div className="about-right-col" data-reveal data-d="4">
-               <div className="about-tags" data-reveal data-d="6">
+              <div className="about-tags" data-reveal data-d="6">
                 {["Luxury", "AI Production", "3D & CGI", "Print & Film", "Editorial", "Paris"].map((t) => (
                   <span key={t} className="tag">{t}</span>
                 ))}
               </div>
-               <p className="about-paragraph" data-reveal data-d="5">
+              <p className="about-paragraph" data-reveal data-d="5">
                 Our studio partners with Louis Vuitton, Hermès, Dom Pérignon and
                 Chanel to tell stories that feel both timeless and radically now.
               </p>
 
-             
               <div className="v-marquee-wrap">
                 <div className="v-marquee">
                   {[

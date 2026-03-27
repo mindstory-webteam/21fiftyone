@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
+import type { ElementType } from "react";
+import { motion } from "framer-motion";
+import React from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 
-/* ─── Design tokens — defined locally in this file ─── */
+/* ─── Design tokens ─── */
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');`;
 
 const TOKENS = `
@@ -20,7 +22,7 @@ const TOKENS = `
   }
 `;
 
-/* ─── Data ──────────────────────────────────────────── */
+/* ─── Data ─── */
 const SLIDES = [
   {
     number: "01", title: "Quiet Peaks", subtitle: "Alpine Serenity",
@@ -50,12 +52,357 @@ const MARQUEE_ITEMS = [
   "Summit Reached","✦","Clean Living","✦",
 ];
 
+/* ═══════════════════════════════════════════════════════════
+   TEXT ROLL
+═══════════════════════════════════════════════════════════ */
+
+const ROLL_STAGGER = 0.035;
+
+interface TextRollProps {
+  children: string;
+  className?: string;
+  direction?: "left" | "right" | "center";
+}
+
+const TextRoll: React.FC<TextRollProps> = ({ children, className, direction = "left" }) => {
+  const chars = children.split("");
+  const getDelay = (i: number, total: number) => {
+    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
+    if (direction === "right") return ROLL_STAGGER * (total - 1 - i);
+    return ROLL_STAGGER * i;
+  };
+
+  return (
+    <motion.span
+      initial="initial"
+      whileHover="hovered"
+      className={`relative inline-block overflow-hidden cursor-pointer select-none ${className ?? ""}`}
+      style={{ lineHeight: 0.88, verticalAlign: "top" }}
+    >
+      <span aria-hidden style={{ display: "block" }}>
+        {chars.map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
+            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </span>
+      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
+        {chars.map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
+            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </span>
+    </motion.span>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════
+   TYPES
+═══════════════════════════════════════════════════════════ */
+
+type FromTo = {
+  opacity?: number;
+  y?: number;
+  x?: number;
+  scale?: number;
+  rotation?: number;
+  skewX?: number;
+  [key: string]: number | undefined;
+};
+
+interface SplitTextProps {
+  text: string;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  ease?: string;
+  splitType?: "chars" | "words" | "lines";
+  from?: FromTo;
+  to?: FromTo;
+  threshold?: number;
+  rootMargin?: string;
+  textAlign?: CSSProperties["textAlign"];
+  onLetterAnimationComplete?: () => void;
+  showCallback?: boolean;
+  tag?: ElementType;
+  hoverRoll?: boolean;
+  hoverRollDirection?: "left" | "right" | "center";
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOVER ROLL SPLIT TEXT (internal)
+═══════════════════════════════════════════════════════════ */
+
+interface HoverRollProps extends Omit<SplitTextProps, "hoverRoll"> {
+  hoverRollDirection?: "left" | "right" | "center";
+}
+
+function HoverRollSplitText({
+  text,
+  className = "",
+  delay = 50,
+  duration = 1.25,
+  ease = "power3.out",
+  splitType = "chars",
+  from = { opacity: 0, y: 40 },
+  to = { opacity: 1, y: 0 },
+  threshold = 0.1,
+  rootMargin = "-100px",
+  textAlign = "left",
+  onLetterAnimationComplete,
+  showCallback = false,
+  hoverRollDirection = "left",
+}: HoverRollProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const unitRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+
+  const units: string[] =
+    splitType === "chars"
+      ? text.split("")
+      : splitType === "words"
+      ? text.split(" ")
+      : text.split("\n");
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
+    if (!container || !targets.length) return;
+
+    gsap.set(targets, { ...from });
+
+    tlRef.current = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete();
+      },
+    });
+
+    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tlRef.current?.play();
+            observer.unobserve(container);
+          }
+        });
+      },
+      { threshold, rootMargin }
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      tlRef.current?.kill();
+    };
+  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={className}
+      style={{
+        textAlign,
+        lineHeight: "inherit",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: splitType === "chars" ? "0" : "0.25em",
+      }}
+      aria-label={text}
+    >
+      {units.map((unit, i) => {
+        if (unit === " " && splitType === "chars") {
+          return (
+            <span
+              key={i}
+              ref={(el) => { unitRefs.current[i] = el; }}
+              style={{ display: "inline-block" }}
+            >
+              &nbsp;
+            </span>
+          );
+        }
+        return (
+          <span
+            key={i}
+            ref={(el) => { unitRefs.current[i] = el; }}
+            style={{ display: "inline-block" }}
+          >
+            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SPLIT TEXT (standard mode — no hoverRoll)
+═══════════════════════════════════════════════════════════ */
+
+function SplitText({
+  text,
+  className = "",
+  delay = 50,
+  duration = 1.25,
+  ease = "power3.out",
+  splitType = "chars",
+  from = { opacity: 0, y: 40 },
+  to = { opacity: 1, y: 0 },
+  threshold = 0.1,
+  rootMargin = "-100px",
+  textAlign = "left",
+  onLetterAnimationComplete,
+  showCallback = false,
+  tag: Tag = "div",
+  hoverRoll = false,
+  hoverRollDirection = "left",
+}: SplitTextProps) {
+  const containerRef = useRef<HTMLElement>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+
+  if (hoverRoll) {
+    return (
+      <HoverRollSplitText
+        text={text}
+        className={className}
+        delay={delay}
+        duration={duration}
+        ease={ease}
+        splitType={splitType}
+        from={from}
+        to={to}
+        threshold={threshold}
+        rootMargin={rootMargin}
+        textAlign={textAlign}
+        onLetterAnimationComplete={onLetterAnimationComplete}
+        showCallback={showCallback}
+        tag={Tag}
+        hoverRollDirection={hoverRollDirection}
+      />
+    );
+  }
+
+  // standard innerHTML splitting
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const buildSpans = (): HTMLElement[] => {
+      container.innerHTML = "";
+
+      if (splitType === "chars") {
+        const words = text.split(" ");
+        const spans: HTMLElement[] = [];
+        words.forEach((word, wi) => {
+          const wordEl = document.createElement("span");
+          wordEl.style.display = "inline-block";
+          wordEl.style.whiteSpace = "nowrap";
+          word.split("").forEach((char) => {
+            const charEl = document.createElement("span");
+            charEl.textContent = char;
+            charEl.style.display = "inline-block";
+            charEl.style.willChange = "transform, opacity";
+            wordEl.appendChild(charEl);
+            spans.push(charEl);
+          });
+          container.appendChild(wordEl);
+          if (wi < words.length - 1) {
+            const space = document.createElement("span");
+            space.innerHTML = "&nbsp;";
+            space.style.display = "inline-block";
+            container.appendChild(space);
+          }
+        });
+        return spans;
+      }
+
+      if (splitType === "words") {
+        return text.split(" ").map((word, wi, arr) => {
+          const el = document.createElement("span");
+          el.textContent = word + (wi < arr.length - 1 ? "\u00A0" : "");
+          el.style.display = "inline-block";
+          el.style.willChange = "transform, opacity";
+          container.appendChild(el);
+          return el;
+        });
+      }
+
+      return text.split("\n").map((line) => {
+        const el = document.createElement("span");
+        el.textContent = line;
+        el.style.display = "block";
+        el.style.willChange = "transform, opacity";
+        container.appendChild(el);
+        return el;
+      });
+    };
+
+    const targets = buildSpans();
+    if (!targets.length) return;
+
+    gsap.set(targets, { ...from });
+
+    tlRef.current = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete();
+      },
+    });
+
+    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            tlRef.current?.play();
+            observer.unobserve(container);
+          }
+        });
+      },
+      { threshold, rootMargin }
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      tlRef.current?.kill();
+      if (container) container.innerHTML = text;
+    };
+  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
+
+  return (
+    <Tag
+      ref={containerRef as React.Ref<never>}
+      className={className}
+      style={{ textAlign, lineHeight: "inherit" }}
+      aria-label={text}
+    />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BENEFIT SECTION
+═══════════════════════════════════════════════════════════ */
+
 export default function BenefitSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const h0 = useRef<HTMLDivElement>(null);
-  const h1 = useRef<HTMLDivElement>(null);
-  const h2 = useRef<HTMLDivElement>(null);
-  const subRef = useRef<HTMLParagraphElement>(null);
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [current, setCurrent]     = useState(0);
@@ -75,44 +422,7 @@ export default function BenefitSection() {
     return () => { if (autoRef.current) clearInterval(autoRef.current); };
   }, [next]);
 
-  /* Char-by-char animation (reference style: y:60, skewX) */
-  useEffect(() => {
-    const splits: InstanceType<typeof SplitText>[] = [];
-
-    ([
-      [h0.current, 4, 0],
-      [h1.current, 4, 0.12],
-      [h2.current, 8, 0.24],
-    ] as [HTMLElement | null, number, number][]).forEach(([el, skewX, delay], i) => {
-      if (!el) return;
-      const s = new SplitText(el, { type: "chars", charsClass: "bs-char" });
-      splits.push(s);
-      gsap.set(s.chars, { opacity: 0, y: 60, skewX });
-      gsap.to(s.chars, {
-        opacity: 1, y: 0, skewX: 0,
-        stagger: i === 2 ? 0.035 : 0.04,
-        duration: i === 2 ? 1.4 : 1.25,
-        ease: i === 2 ? "power4.out" : "power3.out",
-        delay,
-        scrollTrigger: { trigger: el, start: "top 85%" },
-      });
-    });
-
-    if (subRef.current) {
-      const s = new SplitText(subRef.current, { type: "words", wordsClass: "bs-word" });
-      splits.push(s);
-      gsap.set(s.words, { opacity: 0, y: 20 });
-      gsap.to(s.words, {
-        opacity: 1, y: 0, stagger: 0.06, duration: 0.9,
-        ease: "power2.out", delay: 0.4,
-        scrollTrigger: { trigger: subRef.current, start: "top 85%" },
-      });
-    }
-
-    return () => splits.forEach(s => s.revert());
-  }, []);
-
-  /* Scroll reveal */
+  /* Scroll reveal for non-SplitText elements */
   useEffect(() => {
     const els = sectionRef.current?.querySelectorAll<HTMLElement>("[data-reveal]");
     if (!els) return;
@@ -169,7 +479,11 @@ export default function BenefitSection() {
           display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: end;
         }
 
-        .bs-headline {
+        /*
+          Headline wrappers — SplitText renders inside these.
+          We keep the same visual style as before.
+        */
+        .bs-headline-wrap {
           font-family: 'Anton', sans-serif;
           font-size: clamp(88px, 11vw, 158px);
           line-height: .88;
@@ -179,7 +493,7 @@ export default function BenefitSection() {
           display: block;
           overflow: hidden;
         }
-        .bs-headline-accent {
+        .bs-headline-accent-wrap {
           font-family: 'Playfair Display', serif;
           font-style: italic;
           font-size: clamp(64px, 8vw, 116px);
@@ -189,34 +503,6 @@ export default function BenefitSection() {
           display: block;
           margin-top: 8px;
           overflow: hidden;
-        }
-        .bs-char { display: inline-block; }
-
-        /* Dark intro card */
-        .bs-intro-card {
-          background: var(--black); padding: 48px 44px 44px;
-          position: relative; align-self: end;
-        }
-        .bs-intro-card::before {
-          content: ''; position: absolute; top: 0; left: 0;
-          width: 3px; height: 48px; background: var(--red);
-        }
-        .bs-sub {
-          font-size: 15px; line-height: 1.8; color: #b0a99e;
-          font-weight: 300; margin-bottom: 28px;
-        }
-        .bs-word { display: inline-block; }
-        .bs-card-stats {
-          display: flex; gap: 48px; padding-top: 28px;
-          border-top: 1px solid rgba(255,255,255,.08);
-        }
-        .bs-stat-num {
-          font-family: 'Anton', sans-serif; font-size: 44px;
-          line-height: 1; color: #fff; display: block;
-        }
-        .bs-stat-label {
-          font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
-          color: #666; margin-top: 6px; display: block;
         }
 
         /* Carousel */
@@ -356,20 +642,55 @@ export default function BenefitSection() {
 
           <div className="bs-header">
             <div>
-              <div className="bs-headline" ref={h0}>Step</div>
-              <div className="bs-headline" ref={h1}>Into</div>
-              <div className="bs-headline-accent" ref={h2}>Mountain Calm</div>
-            </div>
-            <div className="bs-intro-card" data-reveal data-d="2">
-              <p className="bs-sub" ref={subRef}>
-                Where altitude becomes attitude. Every peak we visit is a lesson
-                in patience, presence and the kind of peace that only nature
-                can teach. Scroll down and let the mountain show you the way.
-              </p>
-              <div className="bs-card-stats">
-                <div><span className="bs-stat-num">12+</span><span className="bs-stat-label">Retreats</span></div>
-                <div><span className="bs-stat-num">3.2k</span><span className="bs-stat-label">Climbers</span></div>
-                <div><span className="bs-stat-num">4yr</span><span className="bs-stat-label">Running</span></div>
+              {/* ── "Step" — char split, skewX entrance, hoverRoll left ── */}
+              <div className="bs-headline-wrap">
+                <SplitText
+                  text="Step Into"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 60, skewX: 4 }}
+                  to={{ opacity: 1, y: 0, skewX: 0 }}
+                  delay={40}
+                  duration={1.25}
+                  ease="power3.out"
+                  threshold={0.15}
+                  rootMargin="-80px"
+                  hoverRoll
+                  hoverRollDirection="left"
+                />
+              </div>
+
+              {/* ── "Into" — char split, skewX entrance, hoverRoll right ── */}
+              {/* <div className="bs-headline-wrap">
+                <SplitText
+                  text="Into"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 60, skewX: 4 }}
+                  to={{ opacity: 1, y: 0, skewX: 0 }}
+                  delay={40}
+                  duration={1.25}
+                  ease="power3.out"
+                  threshold={0.15}
+                  rootMargin="-80px"
+                  hoverRoll
+                  hoverRollDirection="right"
+                />
+              </div> */}
+
+              {/* ── "Mountain Calm" — accent / italic, words split, hoverRoll center ── */}
+              <div className="bs-headline-accent-wrap">
+                <SplitText
+                  text="Mountain Calm"
+                  splitType="words"
+                  from={{ opacity: 0, y: 80 }}
+                  to={{ opacity: 1, y: 0 }}
+                  delay={120}
+                  duration={1.4}
+                  ease="power4.out"
+                  threshold={0.15}
+                  rootMargin="-80px"
+                  hoverRoll
+                  hoverRollDirection="center"
+                />
               </div>
             </div>
           </div>

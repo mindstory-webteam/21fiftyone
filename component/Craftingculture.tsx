@@ -1,7 +1,179 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import BugSectionEffect from "./Bugsectioneffect";
+import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
+import type { ElementType } from "react";
+import { motion } from "framer-motion";
+import React from "react";
+import { gsap } from "gsap";
+
+/* ═══════════════════════════════════════════════════════════
+   TEXT ROLL
+═══════════════════════════════════════════════════════════ */
+
+const ROLL_STAGGER = 0.032;
+
+interface TextRollProps {
+  children: string;
+  className?: string;
+  direction?: "left" | "right" | "center";
+}
+
+const TextRoll: React.FC<TextRollProps> = ({ children, className, direction = "left" }) => {
+  const chars = children.split("");
+  const getDelay = (i: number, total: number) => {
+    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
+    if (direction === "right") return ROLL_STAGGER * (total - 1 - i);
+    return ROLL_STAGGER * i;
+  };
+  return (
+    <motion.span
+      initial="initial"
+      whileHover="hovered"
+      className={`relative inline-block overflow-hidden cursor-none select-none ${className ?? ""}`}
+      style={{ lineHeight: 0.88, verticalAlign: "top" }}
+    >
+      <span aria-hidden style={{ display: "block" }}>
+        {chars.map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
+            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </span>
+      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
+        {chars.map((l, i) => (
+          <motion.span
+            key={i}
+            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
+            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
+            className="inline-block"
+          >
+            {l === " " ? "\u00A0" : l}
+          </motion.span>
+        ))}
+      </span>
+    </motion.span>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════
+   SLIDE SPLIT TITLE
+   Triggered by `active` prop instead of IntersectionObserver,
+   because slides are sticky/opacity-switched, not scroll-revealed.
+═══════════════════════════════════════════════════════════ */
+
+interface SlideSplitTitleProps {
+  text: string;
+  active: boolean;
+  color: string;
+  className?: string;
+  delay?: number;           // ms stagger between words
+  duration?: number;        // gsap duration per word
+  ease?: string;
+  direction?: "left" | "right" | "center";
+}
+
+function SlideSplitTitle({
+  text,
+  active,
+  color,
+  className = "",
+  delay = 80,
+  duration = 0.9,
+  ease = "power3.out",
+  direction = "left",
+}: SlideSplitTitleProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const unitRefs     = useRef<(HTMLSpanElement | null)[]>([]);
+  const tlRef        = useRef<gsap.core.Timeline | null>(null);
+  const playedRef    = useRef(false);
+
+  // Split text into lines then words
+  const lines = text.split("\n");
+  const units: { word: string; line: number }[] = [];
+  lines.forEach((line, li) => {
+    line.split(" ").forEach((word) => {
+      if (word) units.push({ word, line: li });
+    });
+  });
+
+  useEffect(() => {
+    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
+    if (!targets.length) return;
+
+    // Set initial state
+    gsap.set(targets, { opacity: 0, y: 56, skewX: 6 });
+    playedRef.current = false;
+
+    return () => {
+      tlRef.current?.kill();
+    };
+  }, [text]);
+
+  useEffect(() => {
+    if (!active) {
+      // Reset when slide goes inactive so it re-animates next time
+      const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
+      tlRef.current?.kill();
+      gsap.set(targets, { opacity: 0, y: 56, skewX: 6 });
+      playedRef.current = false;
+      return;
+    }
+
+    if (playedRef.current) return;
+    playedRef.current = true;
+
+    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
+    if (!targets.length) return;
+
+    tlRef.current = gsap.timeline();
+    tlRef.current.to(targets, {
+      opacity: 1,
+      y: 0,
+      skewX: 0,
+      duration,
+      ease,
+      stagger: delay / 1000,
+    });
+  }, [active, duration, ease, delay]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={className}
+      style={{ color }}
+      aria-label={text}
+    >
+      {lines.map((line, li) => {
+        const lineWords = units
+          .map((u, i) => ({ ...u, idx: i }))
+          .filter((u) => u.line === li);
+
+        return (
+          <div key={li} style={{ display: "flex", flexWrap: "wrap", lineHeight: 0.88 }}>
+            {lineWords.map(({ word, idx }) => (
+              <span
+                key={idx}
+                ref={(el) => { unitRefs.current[idx] = el; }}
+                style={{ display: "inline-block", marginRight: "0.18em" }}
+              >
+                <TextRoll direction={direction}>{word}</TextRoll>
+              </span>
+            ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DATA & CONSTANTS
+═══════════════════════════════════════════════════════════ */
 
 const TOTAL = 5;
 
@@ -25,6 +197,7 @@ const SLIDES = [
       "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&q=80",
     ],
     cursorDark: false,
+    splitDir: "left",
   },
   {
     key: "s2",
@@ -40,6 +213,7 @@ const SLIDES = [
     poster:
       "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200&q=90",
     cursorDark: true,
+    splitDir: "right",
   },
   {
     key: "s3",
@@ -55,6 +229,7 @@ const SLIDES = [
     poster:
       "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=90",
     cursorDark: false,
+    splitDir: "center",
   },
   {
     key: "s4",
@@ -70,6 +245,7 @@ const SLIDES = [
     poster:
       "https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600&q=90",
     cursorDark: true,
+    splitDir: "left",
   },
   {
     key: "s5",
@@ -85,89 +261,56 @@ const SLIDES = [
       "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=90",
     smallTitle: true,
     cursorDark: false,
+    splitDir: "right",
   },
 ] as const;
 
-/* ─────────────────────────────────────────────────────
-   VideoPanel — memoised, stable ref, no re-mount on scroll
-───────────────────────────────────────────────────── */
-function VideoPanel({
-  video,
-  poster,
-  active,
-}: {
-  video: string;
-  poster: string;
-  active: boolean;
-}) {
-  const ref = useRef<HTMLVideoElement>(null);
+/* ═══════════════════════════════════════════════════════════
+   VIDEO PANEL
+═══════════════════════════════════════════════════════════ */
 
+function VideoPanel({ video, poster, active }: { video: string; poster: string; active: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (active) {
-      // Only play if not already playing
-      if (v.paused) v.play().catch(() => {});
-    } else {
-      v.pause();
-      v.currentTime = 0;
-    }
+    if (active) { if (v.paused) v.play().catch(() => {}); }
+    else { v.pause(); v.currentTime = 0; }
   }, [active]);
-
   return (
-    <div
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        width: "100%",
-        height: "100%",
-      }}
-    >
+    <div style={{ position: "relative", overflow: "hidden", width: "100%", height: "100%" }}>
       <video
-        ref={ref}
-        src={video}
-        poster={poster}
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          display: "block",
-        }}
+        ref={ref} src={video} poster={poster}
+        muted loop playsInline preload="metadata"
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────────────
-   Main component
-───────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   MAIN COMPONENT
+═══════════════════════════════════════════════════════════ */
+
 export default function CraftingCulture() {
   const [current, setCurrent] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef    = useRef<HTMLDivElement>(null);
   const cursorRef    = useRef<HTMLDivElement | null>(null);
 
-  /* ── Cursor: all DOM-direct, zero React re-renders ── */
   const targetRef     = useRef({ x: 0, y: 0 });
   const currentPosRef = useRef({ x: 0, y: 0 });
   const rafRef        = useRef<number>(0);
   const isOverTextRef = useRef(false);
 
-  /* rAF lerp loop — runs forever after mount */
+  /* rAF lerp cursor loop */
   useEffect(() => {
     const loop = () => {
       const el = cursorRef.current;
       if (el) {
-        const tx = targetRef.current.x;
-        const ty = targetRef.current.y;
-        const cx = currentPosRef.current.x;
-        const cy = currentPosRef.current.y;
-        const nx = cx + (tx - cx) * 0.14;
-        const ny = cy + (ty - cy) * 0.14;
+        const tx = targetRef.current.x, ty = targetRef.current.y;
+        const cx = currentPosRef.current.x, cy = currentPosRef.current.y;
+        const nx = cx + (tx - cx) * 0.14, ny = cy + (ty - cy) * 0.14;
         currentPosRef.current = { x: nx, y: ny };
         el.style.transform = `translate(${nx - 60}px, ${ny - 60}px)`;
       }
@@ -175,43 +318,34 @@ export default function CraftingCulture() {
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, []); // empty deps — runs once, loop is self-contained
+  }, []);
 
-  /* Single native mousemove on the sticky wrapper — no React synthetic overhead */
+  /* Cursor mouse tracking */
   useEffect(() => {
     const sticky = stickyRef.current;
     if (!sticky) return;
-
     const onMove = (e: MouseEvent) => {
       const r = sticky.getBoundingClientRect();
       targetRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-
-      /* Check if the mouse is actually over a .cc-text panel */
       const hit = document.elementFromPoint(e.clientX, e.clientY);
       const overText = !!(hit?.closest(".cc-text"));
-
       const el = cursorRef.current;
       if (!el) return;
-
       if (overText && !isOverTextRef.current) {
         isOverTextRef.current = true;
         el.style.opacity = "1";
-        // Read dark flag from the parent slide element
         const slideEl = hit?.closest("[data-cursor-dark]");
-        const isDark  = slideEl?.getAttribute("data-cursor-dark") === "true";
-        if (isDark) el.classList.add("cc-cursor-dark");
-        else        el.classList.remove("cc-cursor-dark");
+        const isDark = slideEl?.getAttribute("data-cursor-dark") === "true";
+        isDark ? el.classList.add("cc-cursor-dark") : el.classList.remove("cc-cursor-dark");
       } else if (!overText && isOverTextRef.current) {
         isOverTextRef.current = false;
         el.style.opacity = "0";
       }
     };
-
     const onLeave = () => {
       isOverTextRef.current = false;
       if (cursorRef.current) cursorRef.current.style.opacity = "0";
     };
-
     sticky.addEventListener("mousemove", onMove);
     sticky.addEventListener("mouseleave", onLeave);
     return () => {
@@ -220,7 +354,7 @@ export default function CraftingCulture() {
     };
   }, []);
 
-  /* ── Scroll → current slide ── */
+  /* Scroll → current slide */
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
@@ -246,10 +380,7 @@ export default function CraftingCulture() {
     const container = containerRef.current;
     if (!container) return;
     const h = container.offsetHeight - window.innerHeight;
-    window.scrollTo({
-      top: (idx / TOTAL) * h + container.offsetTop,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: (idx / TOTAL) * h + container.offsetTop, behavior: "smooth" });
   }, []);
 
   return (
@@ -257,65 +388,31 @@ export default function CraftingCulture() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&family=Barlow:wght@300;400;500;600&display=swap');
 
-        .cc-wrap *, .cc-wrap *::before, .cc-wrap *::after {
-          box-sizing: border-box; margin: 0; padding: 0;
-        }
-        .cc-wrap {
-          position: relative;
-          height: 500vh;
-          width: 100%;
-          font-family: 'Barlow', sans-serif;
-        }
+        .cc-wrap *, .cc-wrap *::before, .cc-wrap *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        .cc-wrap { position: relative; height: 500vh; width: 100%; font-family: 'Barlow', sans-serif; }
+        .cc-sticky { position: sticky; top: 0; height: 100vh; width: 100%; background: #f8f7f5; }
 
-        /* sticky container — no overflow:hidden (breaks sticky) */
-        .cc-sticky {
-          position: sticky;
-          top: 0;
-          height: 100vh;
-          width: 100%;
-          background: #f8f7f5;
-        }
-
-        /* ── Slides ── */
         .cc-slide {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          opacity: 0;
-          transition: opacity 0.6s ease;
-          display: grid;
-          grid-template-rows: 1fr;
-          pointer-events: none;
+          position: absolute; inset: 0; width: 100%; height: 100%;
+          opacity: 0; transition: opacity 0.6s ease;
+          display: grid; grid-template-rows: 1fr; pointer-events: none;
         }
-        .cc-slide.cc-active {
-          opacity: 1;
-          pointer-events: auto;
-        }
+        .cc-slide.cc-active { opacity: 1; pointer-events: auto; }
 
         .cc-text {
-          position: relative;
-          z-index: 2;
-          padding: 56px 52px 52px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          gap: 0;
-          cursor: none;
+          position: relative; z-index: 2; padding: 56px 52px 52px;
+          display: flex; flex-direction: column; justify-content: center;
+          gap: 0; cursor: none;
         }
 
         .cc-label {
-          font-family: 'Barlow', sans-serif;
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.34em;
-          text-transform: uppercase;
-          color: #d42b2b;
-          margin-bottom: 18px;
-          display: block;
+          font-family: 'Barlow', sans-serif; font-size: 9px; font-weight: 600;
+          letter-spacing: 0.34em; text-transform: uppercase; color: #d42b2b;
+          margin-bottom: 18px; display: block;
         }
 
-        .cc-title {
+        /* Title wrapper — preserves original sizing, SplitTitle renders inside */
+        .cc-title-wrap {
           font-family: 'Barlow Condensed', sans-serif;
           font-style: italic;
           font-weight: 900;
@@ -323,29 +420,24 @@ export default function CraftingCulture() {
           line-height: 0.88;
           letter-spacing: -0.03em;
           text-transform: uppercase;
-          white-space: pre-line;
           margin-bottom: 28px;
         }
-        .cc-title-sm { font-size: clamp(44px, 7vw, 100px) !important; }
+        .cc-title-wrap-sm { font-size: clamp(44px, 7vw, 100px) !important; }
+
+        /* SlideSplitTitle inner layout */
+        .cc-split-title { width: 100%; }
 
         .cc-subtitle {
-          font-family: 'Barlow', sans-serif;
-          font-size: 13.5px;
-          font-weight: 400;
-          line-height: 1.78;
-          max-width: 280px;
+          font-family: 'Barlow', sans-serif; font-size: 13.5px; font-weight: 400;
+          line-height: 1.78; max-width: 280px;
         }
 
         .cc-thumbs { display: flex; gap: 10px; margin-top: 28px; }
-        .cc-thumb {
-          width: 68px; height: 88px;
-          overflow: hidden; opacity: 0.72;
-          transition: opacity 0.3s; flex-shrink: 0; border-radius: 2px;
-        }
+        .cc-thumb { width: 68px; height: 88px; overflow: hidden; opacity: 0.72; transition: opacity 0.3s; flex-shrink: 0; border-radius: 2px; }
         .cc-thumb:hover { opacity: 1; }
         .cc-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-        /* Full bleed slide */
+        /* Full bleed */
         .cc-slide-fb { position: absolute; inset: 0; }
         .cc-fb-video { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
         .cc-fb-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -354,139 +446,55 @@ export default function CraftingCulture() {
           background: linear-gradient(to right, rgba(13,13,13,0.78) 36%, transparent 76%);
           z-index: 1;
         }
-        .cc-slide-fb .cc-text {
-          position: absolute;
-          top: 0; left: 0;
-          width: 50%; height: 100%;
-          z-index: 2;
-        }
+        .cc-slide-fb .cc-text { position: absolute; top: 0; left: 0; width: 50%; height: 100%; z-index: 2; }
 
-        /* ════════════════════════════════════════
-           EXPLORE CURSOR
-        ════════════════════════════════════════ */
+        /* Cursor */
         .cc-cursor-explore {
-          position: absolute;
-          top: 0; left: 0;
-          width: 120px; height: 120px;
-          pointer-events: none;
-          z-index: 9000;
-          opacity: 0;
-          will-change: transform, opacity;
-          transition: opacity 0.18s ease;
+          position: absolute; top: 0; left: 0; width: 120px; height: 120px;
+          pointer-events: none; z-index: 9000; opacity: 0;
+          will-change: transform, opacity; transition: opacity 0.18s ease;
         }
-
-        .cc-cursor-ring {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          overflow: visible;
-        }
-
-        .cc-cursor-circle {
-          fill: rgba(212,43,43,0.10);
-          stroke: #d42b2b;
-          stroke-width: 1;
-        }
+        .cc-cursor-ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+        .cc-cursor-circle { fill: rgba(212,43,43,0.10); stroke: #d42b2b; stroke-width: 1; }
         .cc-cursor-dash {
-          fill: none;
-          stroke: rgba(212,43,43,0.38);
-          stroke-width: 0.8;
-          stroke-dasharray: 5 9;
-          animation: cc-cursor-spin 6s linear infinite;
-          transform-origin: 60px 60px;
+          fill: none; stroke: rgba(212,43,43,0.38); stroke-width: 0.8;
+          stroke-dasharray: 5 9; animation: cc-cursor-spin 6s linear infinite; transform-origin: 60px 60px;
         }
-        @keyframes cc-cursor-spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-
-        /* dark variant */
-        .cc-cursor-dark .cc-cursor-circle {
-          fill: rgba(248,247,245,0.08);
-          stroke: rgba(248,247,245,0.75);
-        }
+        @keyframes cc-cursor-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .cc-cursor-dark .cc-cursor-circle { fill: rgba(248,247,245,0.08); stroke: rgba(248,247,245,0.75); }
         .cc-cursor-dark .cc-cursor-dash { stroke: rgba(248,247,245,0.30); }
         .cc-cursor-dark .cc-cursor-label { color: #f8f7f5; }
-
         .cc-cursor-label {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          color: #0d0d0d;
-          transition: color 0.2s ease;
+          position: absolute; inset: 0; display: flex; flex-direction: column;
+          align-items: center; justify-content: center; gap: 5px; color: #0d0d0d; transition: color 0.2s ease;
         }
-        .cc-cursor-word {
-          font-family: 'Barlow', sans-serif;
-          font-size: 8.5px;
-          font-weight: 600;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-        }
+        .cc-cursor-word { font-family: 'Barlow', sans-serif; font-size: 8.5px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; }
         .cc-cursor-arrow { opacity: 0.7; }
 
-        /* ── Bug isolation layer — sits above slides, below cursor ── */
-        .cc-bug-layer {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-          pointer-events: none;
-          z-index: 300;
-        }
-        /* Force BugSectionEffect child to fill the layer */
-        .cc-bug-layer > * {
-          position: absolute !important;
-          inset: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          pointer-events: none !important;
-        }
-
-        /* ── Nav dots ── */
+        /* Nav dots */
         .cc-dots {
           position: absolute; right: 28px; top: 50%;
-          transform: translateY(-50%);
-          z-index: 200;
+          transform: translateY(-50%); z-index: 200;
           display: flex; flex-direction: column; gap: 10px;
         }
-        .cc-dot {
-          width: 2px; height: 20px; border-radius: 2px;
-          background: rgba(0,0,0,0.12);
-          transition: height 0.35s ease, background 0.35s ease;
-          cursor: pointer;
-        }
+        .cc-dot { width: 2px; height: 20px; border-radius: 2px; background: rgba(0,0,0,0.12); transition: height 0.35s ease, background 0.35s ease; cursor: pointer; }
         .cc-dot.cc-on { height: 44px; background: #d42b2b; }
 
-        /* ── Scroll hint ── */
+        /* Scroll hint */
         .cc-hint {
-          position: absolute; bottom: 28px; left: 50%;
-          transform: translateX(-50%);
-          z-index: 200;
-          display: flex; flex-direction: column; align-items: center; gap: 8px;
+          position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+          z-index: 200; display: flex; flex-direction: column; align-items: center; gap: 8px;
           transition: opacity 0.5s; pointer-events: none;
         }
-        .cc-hint span {
-          font-family: 'Barlow', sans-serif; font-size: 8.5px; font-weight: 600;
-          letter-spacing: 0.32em; text-transform: uppercase; color: #888;
-        }
-        .cc-hint-line {
-          width: 1px; height: 40px; background: #ccc;
-          position: relative; overflow: hidden;
-        }
+        .cc-hint span { font-family: 'Barlow', sans-serif; font-size: 8.5px; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: #888; }
+        .cc-hint-line { width: 1px; height: 40px; background: #ccc; position: relative; overflow: hidden; }
         .cc-hint-line::after {
-          content: ''; position: absolute; top: -100%; left: 0;
-          width: 100%; height: 100%; background: #d42b2b;
-          animation: cc-drop 1.4s ease-in-out infinite;
+          content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
+          background: #d42b2b; animation: cc-drop 1.4s ease-in-out infinite;
         }
         @keyframes cc-drop { 0% { top: -100%; } 100% { top: 100%; } }
 
-        /* ── Counter ── */
+        /* Counter */
         .cc-ctr {
           position: absolute; bottom: 28px; right: 40px; z-index: 200;
           font-family: 'Barlow', sans-serif; font-size: 8.5px; font-weight: 600;
@@ -503,6 +511,24 @@ export default function CraftingCulture() {
             const isFull   = slide.layout === "fullbleed";
             const isLeft   = slide.layout === "split-left";
             const dark     = "cursorDark" in slide ? !!slide.cursorDark : false;
+            const dir      = (slide as any).splitDir as "left" | "right" | "center" ?? "left";
+            const isSmall  = "smallTitle" in slide && (slide as any).smallTitle;
+
+            /* Shared title element */
+            const TitleEl = (
+              <div className={`cc-title-wrap${isSmall ? " cc-title-wrap-sm" : ""}`}>
+                <SlideSplitTitle
+                  text={slide.title}
+                  active={isActive}
+                  color={slide.titleColor}
+                  className="cc-split-title"
+                  direction={dir}
+                  delay={70}
+                  duration={0.85}
+                  ease="power3.out"
+                />
+              </div>
+            );
 
             /* ── FULL BLEED ── */
             if (isFull) {
@@ -518,7 +544,7 @@ export default function CraftingCulture() {
                   <div className="cc-fb-overlay" />
                   <div className="cc-text" style={{ background: "transparent" }}>
                     <span className="cc-label">Detroit Studio</span>
-                    <h2 className="cc-title" style={{ color: slide.titleColor }}>{slide.title}</h2>
+                    {TitleEl}
                     <p className="cc-subtitle" style={{ color: slide.subtitleColor }}>{slide.subtitle}</p>
                   </div>
                 </div>
@@ -537,7 +563,7 @@ export default function CraftingCulture() {
                   <VideoPanel video={slide.video} poster={slide.poster} active={isActive} />
                   <div className="cc-text" style={{ background: slide.textBg }}>
                     <span className="cc-label">Detroit Studio</span>
-                    <h2 className="cc-title" style={{ color: slide.titleColor }}>{slide.title}</h2>
+                    {TitleEl}
                     <p className="cc-subtitle" style={{ color: slide.subtitleColor }}>{slide.subtitle}</p>
                   </div>
                 </div>
@@ -554,16 +580,11 @@ export default function CraftingCulture() {
               >
                 <div className="cc-text" style={{ background: slide.textBg }}>
                   <span className="cc-label">Detroit Studio</span>
-                  <h2
-                    className={`cc-title${"smallTitle" in slide && slide.smallTitle ? " cc-title-sm" : ""}`}
-                    style={{ color: slide.titleColor }}
-                  >
-                    {slide.title}
-                  </h2>
+                  {TitleEl}
                   <p className="cc-subtitle" style={{ color: slide.subtitleColor }}>{slide.subtitle}</p>
-                  {"thumbs" in slide && slide.thumbs && (
+                  {"thumbs" in slide && (slide as any).thumbs && (
                     <div className="cc-thumbs">
-                      {slide.thumbs.map((src, j) => (
+                      {(slide as any).thumbs.map((src: string, j: number) => (
                         <div key={j} className="cc-thumb">
                           <img src={src} alt="" loading="lazy" />
                         </div>
@@ -576,7 +597,7 @@ export default function CraftingCulture() {
             );
           })}
 
-          {/* Explore cursor — position:absolute inside .cc-sticky, pointer-events:none */}
+          {/* Explore cursor */}
           <div ref={cursorRef} className="cc-cursor-explore" aria-hidden>
             <svg className="cc-cursor-ring" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
               <circle cx="60" cy="60" r="54" className="cc-cursor-circle" />
@@ -590,21 +611,10 @@ export default function CraftingCulture() {
             </div>
           </div>
 
-          {/* Bug layer — fully pointer-events:none so it never intercepts mouse */}
-          {/* <div className="cc-bug-layer">
-            <BugSectionEffect bugCount={2} leafCount={0}>
-              <></>
-            </BugSectionEffect>
-          </div> */}
-
           {/* Nav dots */}
           <div className="cc-dots">
             {Array.from({ length: TOTAL }).map((_, i) => (
-              <div
-                key={i}
-                className={`cc-dot${i === current ? " cc-on" : ""}`}
-                onClick={() => scrollToSlide(i)}
-              />
+              <div key={i} className={`cc-dot${i === current ? " cc-on" : ""}`} onClick={() => scrollToSlide(i)} />
             ))}
           </div>
 
