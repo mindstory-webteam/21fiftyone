@@ -67,23 +67,6 @@ const RollLabel = ({ children, isHovered }: { children: string; isHovered: boole
 };
 
 /* ═══════════════════════════════════════════════════════════
-   ARROW
-═══════════════════════════════════════════════════════════ */
-const ArrowIcon = ({ isHovered }: { isHovered: boolean }) => (
-  <motion.svg width="38" height="14" viewBox="0 0 38 14" fill="none"
-    xmlns="http://www.w3.org/2000/svg" style={{ display: "block", flexShrink: 0 }}>
-    <motion.line x1="0" y1="7" x2="30" y2="7"
-      stroke="#c8372d" strokeWidth="1.6" strokeLinecap="round"
-      animate={isHovered ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-      transition={{ duration: 0.28, ease: "easeOut" }} />
-    <motion.path d="M23 1L30 7L23 13"
-      stroke="#c8372d" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
-      animate={isHovered ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-      transition={{ duration: 0.26, ease: "easeOut", delay: isHovered ? 0.1 : 0 }} />
-  </motion.svg>
-);
-
-/* ═══════════════════════════════════════════════════════════
    ROLL BUTTON
 ═══════════════════════════════════════════════════════════ */
 interface RollButtonProps {
@@ -123,11 +106,9 @@ export default function RollButton({
         textDecoration: "none",
         userSelect: "none",
         outline: "none",
-        /* ── White theme, red text ── */
-        background: "#ffffff",
+        background: "#f2ede6",
         color: "#c8372d",
-        border: "1.5px solid rgba(200,55,45,0.2)",
-        
+        border: "1px solid #c8372d",
         transition: "box-shadow 0.3s ease, background 0.25s ease",
       }}
     >
@@ -140,7 +121,7 @@ export default function RollButton({
           transition={isHovered
             ? { duration: 0.68, ease: [0.16, 1, 0.3, 1], times: [0, 0.44, 0.45, 1] }
             : { duration: 0.36, ease: "easeOut" }}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center",rotate: "90deg", }}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", rotate: "90deg" }}
         >
           <BugIcon />
         </motion.span>
@@ -149,17 +130,9 @@ export default function RollButton({
       {/* Divider */}
       <span style={{ width: 1, height: 22, background: "rgba(200,55,45,0.2)", flexShrink: 0, margin: "0 12px", borderRadius: 1 }} />
 
-      {/* Label + arrow */}
-      <span style={{ display: "flex", alignItems: "center" }}>
-        <RollLabel isHovered={isHovered}>{label}</RollLabel>
-        <motion.span
-          animate={isHovered ? { width: 48, opacity: 1, marginLeft: 12 } : { width: 0, opacity: 0, marginLeft: 0 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          style={{ display: "inline-flex", alignItems: "center", overflow: "hidden", flexShrink: 0 }}
-        >
-          <ArrowIcon isHovered={isHovered} />
-        </motion.span>
-      </span>
+      {/* Label only — no arrow */}
+      <RollLabel isHovered={isHovered}>{label}</RollLabel>
+
     </motion.span>
   );
 

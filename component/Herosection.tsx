@@ -245,24 +245,7 @@ const RollLabel = ({ children, isHovered }: { children: string; isHovered: boole
 };
 
 /* ═══════════════════════════════════════════
-   ARROW
-═══════════════════════════════════════════ */
-const ArrowIcon = ({ isHovered }: { isHovered: boolean }) => (
-  <motion.svg width="36" height="14" viewBox="0 0 36 14" fill="none"
-    xmlns="http://www.w3.org/2000/svg" style={{ display:"block", flexShrink:0 }}>
-    <motion.line x1="0" y1="7" x2="28" y2="7"
-      stroke="var(--cream)" strokeWidth="1.5" strokeLinecap="round"
-      animate={isHovered ? { pathLength:1, opacity:1 } : { pathLength:0, opacity:0 }}
-      transition={{ duration:0.28, ease:"easeOut" }} />
-    <motion.path d="M22 1L29 7L22 13"
-      stroke="var(--cream)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-      animate={isHovered ? { opacity:1, x:0 } : { opacity:0, x:-8 }}
-      transition={{ duration:0.26, ease:"easeOut", delay: isHovered ? 0.1 : 0 }} />
-  </motion.svg>
-);
-
-/* ═══════════════════════════════════════════
-   ROLL BUTTON  (dark/cream theme for hero)
+   ROLL BUTTON  (arrow removed)
 ═══════════════════════════════════════════ */
 const RollButton = ({ label, href }: { label: string; href?: string }) => {
   const [isHovered, setIsHovered] = React.useState(false);
@@ -281,7 +264,6 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
         textDecoration:"none", userSelect:"none", outline:"none",
         background:"", color:"var(--cream)",
         border:"2px solid rgba(200,55,45,0.4)",
-     
         transition:"box-shadow 0.3s ease",
       }}
     >
@@ -293,7 +275,7 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
           transition={isHovered
             ? { duration:0.68, ease:[0.16,1,0.3,1], times:[0,0.44,0.45,1] }
             : { duration:0.36, ease:"easeOut" }}
-          style={{ display:"flex", alignItems:"center", justifyContent:"center", rotate: "90deg", }}>
+          style={{ display:"flex", alignItems:"center", justifyContent:"center", rotate:"90deg" }}>
           <BugIcon />
         </motion.span>
       </span>
@@ -302,16 +284,8 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
       <span style={{ width:1, height:20, background:"rgba(242,237,230,0.25)",
         flexShrink:0, margin:"0 12px", borderRadius:1 }} />
 
-      {/* Label + arrow */}
-      <span style={{ display:"flex", alignItems:"center" }}>
-        <RollLabel isHovered={isHovered}>{label}</RollLabel>
-        <motion.span
-          animate={isHovered ? { width:44, opacity:1, marginLeft:10 } : { width:0, opacity:0, marginLeft:0 }}
-          transition={{ duration:0.3, ease:[0.16,1,0.3,1] }}
-          style={{ display:"inline-flex", alignItems:"center", overflow:"hidden", flexShrink:0 }}>
-          <ArrowIcon isHovered={isHovered} />
-        </motion.span>
-      </span>
+      {/* Label only — no arrow */}
+      <RollLabel isHovered={isHovered}>{label}</RollLabel>
     </motion.span>
   );
 
@@ -420,7 +394,6 @@ export default function Hero() {
     return () => ctx.revert();
   }, []);
 
-  /* eyebrow + sub + dots still use GSAP stagger — headings now use SplitText */
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(".hero-text-item",
@@ -442,7 +415,6 @@ export default function Hero() {
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root { --cream:#f2ede6; --black:#0c0c0c; --red:#c8372d; }
 
-        /* Headings — used by SplitText className */
         .d-h1 {
           font-family:'Anton',sans-serif !important;
           font-size:clamp(72px,10vw,148px) !important;
@@ -566,7 +538,7 @@ export default function Hero() {
               <div className="d-eyebrow">{slide.eyebrow}</div>
             </div>
 
-            {/* ── Heading with SplitText ── */}
+            {/* Heading with SplitText */}
             <div className="hero-heading">
               <SplitText
                 key={`line1-${currentIndex}`}
@@ -618,8 +590,6 @@ export default function Hero() {
             {/* Body */}
             <div className="hero-body">
               <p className="d-sub hero-text-item">{slide.sub}</p>
-
-              {/* ── RollButton replaces old detroit-btn ── */}
               <div className="hero-text-item">
                 <RollButton label={slide.cta} />
               </div>

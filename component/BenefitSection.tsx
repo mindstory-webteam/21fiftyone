@@ -7,8 +7,6 @@ import React from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-
-
 gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Design tokens ─── */
@@ -299,7 +297,6 @@ function SplitText({
     );
   }
 
-  // standard innerHTML splitting
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -400,6 +397,73 @@ function SplitText({
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MARQUEE TEXT CARD — auto-cycles through stat/quote items
+   with a vertical marquee scroll, clipped to heading space
+═══════════════════════════════════════════════════════════ */
+
+const CARD_ITEMS = [
+  { label: "Elevation",   value: "3,850m",         sub: "Above sea level" },
+  { label: "Temperature", value: "−12°C",           sub: "Summit avg · Winter" },
+  { label: "Purity",      value: "99.8%",           sub: "Clean air index" },
+  { label: "Silence",     value: "12 dB",           sub: "Measured at dawn" },
+  { label: "Snowfall",    value: "4.2m",            sub: "Annual accumulation" },
+  { label: "Sunrise",     value: "05:48",           sub: "Alpine golden hour" },
+  { label: "Visibility",  value: "∞",               sub: "On clear days" },
+  { label: "Founded",     value: "2021",            sub: "Est. in the Alps" },
+];
+
+function MarqueeTextCard() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
+
+  return (
+    <div
+      className="bs-mcard"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* top label */}
+      <div className="bs-mcard-top">
+        <span className="bs-mcard-badge">
+          <span className="bs-mcard-dot" />
+          Alpine Stats
+        </span>
+        <span className="bs-mcard-count">{CARD_ITEMS.length} entries</span>
+      </div>
+
+      {/* scrolling track — doubled for seamless loop */}
+      <div className="bs-mcard-viewport">
+        <div
+          ref={trackRef}
+          className="bs-mcard-track"
+          style={{ animationPlayState: paused ? "paused" : "running" }}
+        >
+          {[...CARD_ITEMS, ...CARD_ITEMS].map((item, i) => (
+            <div key={i} className="bs-mcard-item">
+              <span className="bs-mcard-label">{item.label}</span>
+              <span className="bs-mcard-value">{item.value}</span>
+              <span className="bs-mcard-sub">{item.sub}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* bottom divider rule */}
+      <div className="bs-mcard-bottom">
+        <span className="bs-mcard-ticker">
+          {CARD_ITEMS.map((it, i) => (
+            <React.Fragment key={i}>
+              <span>{it.value}</span>
+              {i < CARD_ITEMS.length - 1 && <span className="bs-mcard-sep">·</span>}
+            </React.Fragment>
+          ))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    BENEFIT SECTION
 ═══════════════════════════════════════════════════════════ */
 
@@ -424,7 +488,6 @@ export default function BenefitSection() {
     return () => { if (autoRef.current) clearInterval(autoRef.current); };
   }, [next]);
 
-  /* Scroll reveal for non-SplitText elements */
   useEffect(() => {
     const els = sectionRef.current?.querySelectorAll<HTMLElement>("[data-reveal]");
     if (!els) return;
@@ -479,13 +542,30 @@ export default function BenefitSection() {
         /* Header */
         .bs-header {
           max-width: 1280px; margin: 0 auto; padding: 0 64px 80px;
-        //   display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: end;
         }
 
+        /* ── Headline row with inline video card ── */
         /*
-          Headline wrappers — SplitText renders inside these.
-          We keep the same visual style as before.
+          Line 1: "Step Into" text  +  video card fills the rest of the line
+          The row is a flex container with a fixed natural height = the text block height.
+          The video card stretches to fill leftover width and is overflow:hidden (clipped).
         */
+        .bs-headline-row {
+          display: flex;
+          align-items: stretch;
+          gap: 20px;
+          overflow: hidden; /* clips the video card to this row's bounds */
+          /* height driven by the tallest child — the text sets it */
+        }
+
+        /* Text column — shrinks to its natural width, never grows */
+        .bs-headline-text-col {
+          flex: 0 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+
         .bs-headline-wrap {
           font-family: 'Anton', sans-serif;
           font-size: clamp(88px, 11vw, 158px);
@@ -507,6 +587,142 @@ export default function BenefitSection() {
           margin-top: 8px;
           overflow: hidden;
         }
+
+        /* ══ Marquee text card ══════════════════════════════════ */
+        .bs-mcard {
+          flex: 1 1 0;
+          overflow: hidden;
+          border-radius: 12px;
+          background: var(--black);
+          border: 1px solid rgba(255,255,255,0.07);
+          display: flex;
+          flex-direction: column;
+          opacity: 0;
+          transform: scale(0.96) translateY(12px);
+          animation: mcReveal .9s .55s cubic-bezier(.16,1,.3,1) forwards;
+          position: relative;
+        }
+        /* left red accent bar */
+        .bs-mcard::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0;
+          width: 2px; height: 100%;
+          background: linear-gradient(to bottom, var(--red), transparent);
+          z-index: 2;
+        }
+        @keyframes mcReveal {
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* top strip */
+        .bs-mcard-top {
+          flex: 0 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 18px 10px 20px;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .bs-mcard-badge {
+          display: flex; align-items: center; gap: 7px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px; font-weight: 500;
+          letter-spacing: .28em; text-transform: uppercase;
+          color: rgba(255,255,255,0.55);
+        }
+        .bs-mcard-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: var(--red);
+          box-shadow: 0 0 0 3px rgba(200,55,45,0.25);
+          animation: mcPulse 2s ease-in-out infinite;
+        }
+        @keyframes mcPulse {
+          0%,100% { box-shadow: 0 0 0 3px rgba(200,55,45,0.25); }
+          50%      { box-shadow: 0 0 0 7px rgba(200,55,45,0.06); }
+        }
+        .bs-mcard-count {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px; letter-spacing: .18em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.2);
+        }
+
+        /* scrolling viewport — flex: 1 fills the middle */
+        .bs-mcard-viewport {
+          flex: 1 1 0;
+          overflow: hidden;
+          position: relative;
+          /* top & bottom fade masks */
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
+        }
+
+        .bs-mcard-track {
+          display: flex;
+          flex-direction: column;
+          /* total height = items × item-height; animation shifts by 50% (one copy) */
+          animation: mcScroll 10s linear infinite;
+        }
+        @keyframes mcScroll {
+          0%   { transform: translateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+
+        /* individual stat item */
+        .bs-mcard-item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 0 20px;
+          /* height so viewport shows ~2.5 at a time */
+          min-height: 72px;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+          position: relative;
+          transition: background .25s;
+        }
+        .bs-mcard-item:hover { background: rgba(255,255,255,0.03); }
+
+        .bs-mcard-label {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 8px; font-weight: 500;
+          letter-spacing: .32em; text-transform: uppercase;
+          color: var(--red);
+          margin-bottom: 3px;
+        }
+        .bs-mcard-value {
+          font-family: 'Anton', sans-serif;
+          font-size: clamp(22px, 2.8vw, 36px);
+          letter-spacing: -.01em;
+          color: #fff;
+          line-height: 1;
+        }
+        .bs-mcard-sub {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px; font-weight: 300;
+          letter-spacing: .12em;
+          color: rgba(255,255,255,0.35);
+          margin-top: 3px;
+        }
+
+        /* bottom ticker strip */
+        .bs-mcard-bottom {
+          flex: 0 0 auto;
+          border-top: 1px solid rgba(255,255,255,0.06);
+          padding: 9px 20px;
+          overflow: hidden;
+        }
+        .bs-mcard-ticker {
+          display: flex; align-items: center; gap: 10px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 9px; font-weight: 500;
+          letter-spacing: .22em; text-transform: uppercase;
+          color: rgba(255,255,255,0.18);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .bs-mcard-sep { color: var(--red); opacity: .6; }
 
         /* Carousel */
         .bs-carousel {
@@ -621,17 +837,29 @@ export default function BenefitSection() {
         [data-reveal][data-d="2"] { transition-delay: .14s; }
         [data-reveal][data-d="3"] { transition-delay: .28s; }
 
+        /* Responsive */
         @media (max-width: 1000px) {
-          .bs-header { grid-template-columns: 1fr; padding: 0 28px 56px; }
+          .bs-header { padding: 0 28px 56px; }
           .bs-carousel { grid-template-columns: 1fr; padding: 0 28px 80px; }
           .bs-label-row { padding: 0 28px; }
           .bs-slide-nav { flex-direction: row; overflow-x: auto; }
           .bs-nav-item { flex-direction: column; align-items: flex-start; gap: 6px; min-width: 140px; }
           .bs-nav-arrow { display: none; }
+
+          /* On mobile the video card drops below the headline text */
+          .bs-headline-row {
+            flex-direction: column;
+          }
+          .bs-mcard {
+            flex: none;
+            height: 220px;
+            border-radius: 10px;
+          }
         }
         @media (max-width: 600px) {
           .bs-root::before { left: 24px; right: 24px; }
           .bs-slide-panel { padding: 36px 28px 32px; min-height: 380px; }
+          .bs-mcard { height: 160px; }
         }
       `}</style>
 
@@ -644,63 +872,54 @@ export default function BenefitSection() {
           </div>
 
           <div className="bs-header">
-            <div>
-              {/* ── "Step" — char split, skewX entrance, hoverRoll left ── */}
-              <div className="bs-headline-wrap">
-                <SplitText
-                  text="Step Into"
-                  splitType="chars"
-                  from={{ opacity: 0, y: 60, skewX: 4 }}
-                  to={{ opacity: 1, y: 0, skewX: 0 }}
-                  delay={40}
-                  duration={1.25}
-                  ease="power3.out"
-                  threshold={0.15}
-                  rootMargin="-80px"
-                  hoverRoll
-                  hoverRollDirection="left"
-                />
+            {/*
+              ── Heading row ──────────────────────────────────────────
+              Flex row: [text column] [video card — fills remaining width]
+              The row has overflow:hidden so the video is hard-clipped to
+              whatever space is left after the text. No fixed widths needed.
+            */}
+            <div className="bs-headline-row">
+
+              {/* LEFT: both headline lines stacked */}
+              <div className="bs-headline-text-col">
+                <div className="bs-headline-wrap">
+                  <SplitText
+                    text="Step Into"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 60, skewX: 4 }}
+                    to={{ opacity: 1, y: 0, skewX: 0 }}
+                    delay={40}
+                    duration={1.25}
+                    ease="power3.out"
+                    threshold={0.15}
+                    rootMargin="-80px"
+                    hoverRoll
+                    hoverRollDirection="left"
+                  />
+                </div>
+
+                <div className="bs-headline-accent-wrap">
+                  <SplitText
+                    text="Mountain Calm"
+                    splitType="words"
+                    from={{ opacity: 0, y: 80 }}
+                    to={{ opacity: 1, y: 0 }}
+                    delay={120}
+                    duration={1.4}
+                    ease="power4.out"
+                    threshold={0.15}
+                    rootMargin="-80px"
+                    hoverRoll
+                    hoverRollDirection="center"
+                  />
+                </div>
               </div>
 
-              {/* ── "Into" — char split, skewX entrance, hoverRoll right ── */}
-              {/* <div className="bs-headline-wrap">
-                <SplitText
-                  text="Into"
-                  splitType="chars"
-                  from={{ opacity: 0, y: 60, skewX: 4 }}
-                  to={{ opacity: 1, y: 0, skewX: 0 }}
-                  delay={40}
-                  duration={1.25}
-                  ease="power3.out"
-                  threshold={0.15}
-                  rootMargin="-80px"
-                  hoverRoll
-                  hoverRollDirection="right"
-                />
-              </div> */}
+              {/* RIGHT: marquee text card — clipped to the remaining width */}
+              <MarqueeTextCard />
 
-              {/* ── "Mountain Calm" — accent / italic, words split, hoverRoll center ── */}
-              <div className="bs-headline-accent-wrap">
-                <SplitText
-                  text="Mountain Calm"
-                  splitType="words"
-                  from={{ opacity: 0, y: 80 }}
-                  to={{ opacity: 1, y: 0 }}
-                  delay={120}
-                  duration={1.4}
-                  ease="power4.out"
-                  threshold={0.15}
-                  rootMargin="-80px"
-                  hoverRoll
-                  hoverRollDirection="center"
-                />
-              </div>
-              
-              
-         
             </div>
           </div>
-
 
           <div className="bs-carousel">
             <div
