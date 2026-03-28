@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import SplitText from "./Splittext"; // adjust path as needed
+import RollButton from "./Rollbutton";
 
 const handleAnimationComplete = () => {
   console.log("All letters have animated!");
@@ -301,7 +302,7 @@ export default function AboutSection() {
         /* Right col */
         .about-right-col { display: flex; flex-direction: column; gap: 32px; padding-top: 8px; }
         .v-marquee-wrap {
-          height: 260px;
+          height: 160px;
           overflow: hidden;
           border-left: 1px solid var(--line);
           padding-left: 24px;
@@ -581,20 +582,9 @@ export default function AboutSection() {
                 </div>
               </div>
 
-              <a href="#" className="about-cta">
-                View Our Work
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path
-                    d="M3 8h10M9 4l4 4-4 4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
+            <RollButton label="Connect us" href="/contact" />
 
-              <p style={{
+              {/* <p style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: "11px",
                 color: "var(--muted)",
@@ -603,7 +593,7 @@ export default function AboutSection() {
               }}>
                 We accept a limited number of new partners each quarter.{" "}
                 <strong style={{ color: "var(--black)" }}>2 slots open</strong> for Q3 2025.
-              </p>
+              </p> */}
             </div>
           </div>
 

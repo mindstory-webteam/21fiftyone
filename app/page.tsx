@@ -1,10 +1,14 @@
 
+import About1 from "@/component/About1";
 import AboutSection from "@/component/Aboutsection";
+
+
 import  BenefitSection  from "@/component/BenefitSection";
 import BreakTheMold from "@/component/Breakthemold";
 import CraftingCulture from "@/component/Craftingculture";
 
 import CreativeStrategySection from "@/component/Creativestrategysection";
+import Features from "@/component/Features";
 import FloatingNavbar from "@/component/Floatingnavbar";
 import Footer from "@/component/Footer";
 import HeroSection from "@/component/Herosection";
@@ -25,8 +29,12 @@ export default function Home() {
      
         <FloatingNavbar />
         <HeroSection />
-         <CraftingCulture />
+         {/* <CraftingCulture /> */}
+         <About1/> 
+         
           <AboutSection />
+           
+          <Features/>
        
         
         <BenefitSection />
