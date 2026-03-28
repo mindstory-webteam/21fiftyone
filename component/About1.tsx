@@ -4,13 +4,14 @@ import { useRef, useEffect, CSSProperties } from "react";
 import type { ElementType } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/all";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /* ════════════════════════════════════════════════════════
-   TEXT ROLL  (hover animation — character by character)
+   TEXT ROLL
 ════════════════════════════════════════════════════════ */
 const ROLL_STAGGER = 0.035;
 
@@ -42,7 +43,6 @@ const TextRoll = ({ children, direction = "left" }: TextRollProps) => {
         userSelect: "none",
       }}
     >
-      {/* visible row */}
       <span aria-hidden style={{ display: "block" }}>
         {chars.map((l, i) => (
           <motion.span
@@ -55,7 +55,6 @@ const TextRoll = ({ children, direction = "left" }: TextRollProps) => {
           </motion.span>
         ))}
       </span>
-      {/* hidden row — rolls up on hover */}
       <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
         {chars.map((l, i) => (
           <motion.span
@@ -73,7 +72,7 @@ const TextRoll = ({ children, direction = "left" }: TextRollProps) => {
 };
 
 /* ════════════════════════════════════════════════════════
-   SPLIT TEXT TYPES
+   TYPES
 ════════════════════════════════════════════════════════ */
 type FromTo = {
   opacity?: number;
@@ -164,7 +163,8 @@ function HoverRollSplitText({
       observer.disconnect();
       tlRef.current?.kill();
     };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   return (
     <div
@@ -206,9 +206,12 @@ function HoverRollSplitText({
 }
 
 /* ════════════════════════════════════════════════════════
-   STANDARD SPLIT TEXT  (no hover roll)
+   STANDARD SPLIT TEXT
+   FIX: hooks are always called — hoverRoll branch renders
+   a different component via a wrapper, not an early return
+   inside a component that also calls hooks.
 ════════════════════════════════════════════════════════ */
-function SplitText({
+function StandardSplitText({
   text,
   className = "",
   delay = 50,
@@ -223,32 +226,9 @@ function SplitText({
   onLetterAnimationComplete,
   showCallback = false,
   tag: Tag = "div",
-  hoverRoll = false,
-  hoverRollDirection = "left",
 }: SplitTextProps) {
   const containerRef = useRef<HTMLElement>(null);
   const tlRef        = useRef<gsap.core.Timeline | null>(null);
-
-  if (hoverRoll) {
-    return (
-      <HoverRollSplitText
-        text={text}
-        className={className}
-        delay={delay}
-        duration={duration}
-        ease={ease}
-        splitType={splitType}
-        from={from}
-        to={to}
-        threshold={threshold}
-        rootMargin={rootMargin}
-        textAlign={textAlign}
-        onLetterAnimationComplete={onLetterAnimationComplete}
-        showCallback={showCallback}
-        hoverRollDirection={hoverRollDirection}
-      />
-    );
-  }
 
   useEffect(() => {
     const container = containerRef.current;
@@ -333,7 +313,8 @@ function SplitText({
       tlRef.current?.kill();
       if (container) container.innerHTML = text;
     };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text]);
 
   return (
     <Tag
@@ -345,10 +326,16 @@ function SplitText({
   );
 }
 
+/* Public SplitText — routes to the correct implementation */
+function SplitText(props: SplitTextProps) {
+  if (props.hoverRoll) {
+    return <HoverRollSplitText {...props} />;
+  }
+  return <StandardSplitText {...props} />;
+}
+
 /* ════════════════════════════════════════════════════════
-   GLOBAL STYLES
-   NOTE: All CSS lives here. No <style> tags in JSX.
-         GSAP animation code lives only in useGSAP().
+   STYLES (unchanged from original)
 ════════════════════════════════════════════════════════ */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -364,10 +351,8 @@ const STYLES = `
   #about {
     background: var(--ab-cream);
     font-family: 'DM Sans', sans-serif;
-    
   }
 
-  /* label row */
   .ab-label-row {
     display: flex;
     justify-content: space-between;
@@ -375,8 +360,7 @@ const STYLES = `
     padding: 0 0 24px;
     border-bottom: 1px solid var(--ab-line);
     margin-bottom: 48px;
-    margin-top:100px;
-    
+    margin-top: 100px;
     opacity: 0;
     transform: translateY(16px);
     animation: abFadeUp 0.8s 0.1s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -391,7 +375,6 @@ const STYLES = `
     text-transform: uppercase; color: var(--ab-muted);
   }
 
-  /* SplitText headline styles */
   .ab-headline {
     font-family: 'Anton', sans-serif !important;
     font-size: clamp(80px, 11vw, 158px) !important;
@@ -416,7 +399,6 @@ const STYLES = `
     justify-content: center;
   }
 
-  /* sub copy */
   .ab-sub-wrap {
     opacity: 0;
     transform: translateY(20px);
@@ -438,7 +420,6 @@ const STYLES = `
     margin: 0 auto;
   }
 
-  /* ── Clip section: flex-center so the card sits in the middle ── */
   #clip {
     position: relative;
     display: flex;
@@ -446,11 +427,6 @@ const STYLES = `
     justify-content: center;
   }
 
-  /*
-   * ── LARGE rounded card, centered with CSS transform.
-   * Increased from 520×360 to 780×520 (bigger video).
-   * GSAP only animates width / height / borderRadius / boxShadow.
-   */
   .mask-clip-path {
     position: absolute;
     top: 50%;
@@ -464,7 +440,6 @@ const STYLES = `
     will-change: width, height, border-radius;
   }
 
-  /* stone video — fills the card/fullscreen */
   .stone-video {
     position: absolute;
     top: 0;
@@ -476,7 +451,6 @@ const STYLES = `
     pointer-events: none;
   }
 
-  /* scroll overlay */
   .ab-scroll-overlay {
     position: absolute;
     bottom: 48px; left: 52px; right: 52px;
@@ -505,7 +479,6 @@ const STYLES = `
     text-shadow: 0 2px 16px rgba(0,0,0,0.4);
   }
 
-  /* marquee */
   .ab-marquee-wrap {
     width: 100%; background: var(--ab-black);
     overflow: hidden; padding: 22px 0;
@@ -530,7 +503,6 @@ const STYLES = `
     padding: 0 12px; letter-spacing: 0;
   }
 
-  /* keyframes */
   @keyframes abFadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -540,7 +512,6 @@ const STYLES = `
     to   { transform: translateX(-50%); }
   }
 
-  /* responsive */
   @media (max-width: 900px) {
     .ab-scroll-overlay { bottom: 28px; left: 28px; right: 28px; }
     .mask-clip-path { width: 560px; height: 380px; }
@@ -565,85 +536,106 @@ const MARQUEE_RAW = [
    ABOUT COMPONENT
 ════════════════════════════════════════════════════════ */
 const About1 = () => {
-  /* inject styles once — NO <style> tags in JSX */
+  const clipRef   = useRef<HTMLDivElement>(null);
+  const maskRef   = useRef<HTMLDivElement>(null);
+  const videoRef  = useRef<HTMLVideoElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  /* Inject global styles once */
   useEffect(() => {
     const id = "ab-global-styles";
-    if (!document.getElementById(id)) {
-      const el = document.createElement("style");
-      el.id = id;
-      el.textContent = STYLES;
-      document.head.appendChild(el);
-    }
+    if (document.getElementById(id)) return;
+    const el = document.createElement("style");
+    el.id = id;
+    el.textContent = STYLES;
+    document.head.appendChild(el);
+    return () => { document.getElementById(id)?.remove(); };
   }, []);
 
-  /* ── GSAP scroll — all animation code lives here, nowhere else ── */
-  useGSAP(() => {
-    const clipAnimation = gsap.timeline({
+  /* GSAP scroll animation — plain useEffect, no useGSAP needed */
+  useEffect(() => {
+    const clip    = clipRef.current;
+    const mask    = maskRef.current;
+    const video   = videoRef.current;
+    const overlay = overlayRef.current;
+    if (!clip || !mask || !video || !overlay) return;
+
+    // Ensure ScrollTrigger is ready
+    ScrollTrigger.refresh();
+
+    const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: "#clip",
+        trigger: clip,
         start: "center center",
         end: "+=800 center",
         scrub: 0.5,
         pin: true,
         pinSpacing: true,
+        // Prevent flicker on fast scrolls
+        anticipatePin: 1,
       },
     });
 
-    clipAnimation
-      /*
-       * ① Expand the large card to fullscreen.
-       *    fromTo so GSAP knows the exact start state.
-       *    CSS translate(-50%,-50%) keeps it centered automatically.
-       */
+    tl
+      /* ① Expand card to fullscreen using numeric vw/vh units */
       .fromTo(
-        ".mask-clip-path",
+        mask,
         {
-          width: "780px",
-          height: "520px",
-          borderRadius: "16px",
+          width: mask.offsetWidth,
+          height: mask.offsetHeight,
+          borderRadius: 16,
           boxShadow: "0 24px 64px rgba(12,12,12,0.28), 0 4px 16px rgba(12,12,12,0.14)",
         },
         {
-          width: "100vw",
-          height: "100vh",
+          width: window.innerWidth,
+          height: window.innerHeight,
           borderRadius: 0,
           boxShadow: "none",
           ease: "power2.out",
         }
       )
-      // ② Scale stone video in sync with expanding clip
+      /* ② Scale video in sync */
       .fromTo(
-        ".stone-video",
+        video,
         { scale: 1.6, opacity: 0.85 },
         { scale: 1,   opacity: 1,    ease: "power2.out" },
         "<"
       )
-      // ③ Fade in overlay text
+      /* ③ Fade in overlay text */
       .fromTo(
-        ".scroll-text",
+        overlay,
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1, ease: "power2.out" },
         "-=0.5"
       );
-  });
+
+    return () => {
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
+  }, []);
+
+  /* Update numeric pixel targets on window resize */
+  useEffect(() => {
+    const handleResize = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const doubled = [...MARQUEE_RAW, ...MARQUEE_RAW];
 
   return (
-    <div id="about" className="min-h-screen w-screen ">
+    <div id="about" className="min-h-screen w-screen">
 
       {/* ── Top text block ── */}
       <div className="relative mb-8 mt-86 flex flex-col items-center gap-5 px-4">
 
-        {/* Label row */}
         <div className="ab-label-row w-full max-w-5xl">
           <span className="ab-label-l">Welcome to Zentry</span>
           <span className="ab-label-r">Est. 2024 — Metagame Layer</span>
         </div>
 
-        {/* ── SplitText hero ── */}
         <div style={{ width: "100%", maxWidth: "1100px" }}>
-
           <SplitText
             text="Discover World's"
             tag="div"
@@ -679,7 +671,6 @@ const About1 = () => {
           />
         </div>
 
-        {/* Sub copy */}
         <div className="ab-sub-wrap text-center">
           <p className="ab-sub-main">
             The Game of Games begins — your life, now an epic MMORPG
@@ -692,19 +683,11 @@ const About1 = () => {
       </div>
 
       {/* ── Scroll clip section ── */}
-      <div
-        className="h-dvh w-screen"
-        id="clip"
-      >
-        {/*
-          .mask-clip-path starts as a large 780×520 rounded card.
-          CSS keeps it centered via transform: translate(-50%, -50%).
-          GSAP ScrollTrigger expands only width/height/borderRadius → fullscreen.
-        */}
-        <div className="mask-clip-path about-image">
+      <div className="h-dvh w-screen" id="clip" ref={clipRef}>
+        <div className="mask-clip-path about-image" ref={maskRef}>
 
-          {/* ── Stone video (sole foreground layer) ── */}
           <video
+            ref={videoRef}
             className="stone-video"
             src="/videos/video-1.webm"
             autoPlay
@@ -713,10 +696,9 @@ const About1 = () => {
             playsInline
           />
 
-          {/* Scroll-in overlay */}
-          <div className="scroll-text ab-scroll-overlay">
+          <div ref={overlayRef} className="scroll-text ab-scroll-overlay" style={{ opacity: 0 }}>
             <div className="ab-overlay-big">
-              World's<br />Largest
+              World s<br />Largest
             </div>
             <div className="ab-overlay-accent">
               A unified Play Economy —<br />
