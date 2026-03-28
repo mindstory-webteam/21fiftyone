@@ -724,7 +724,7 @@ const Features = () => {
           </BentoTilt>
 
           {/* Accent card — dark bg, "More coming" */}
-          <BentoTilt className="sv-bento-cell accent" style={{}}>
+          <BentoTilt className="sv-bento-cell accent">
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
               <h2 className="sv-accent-title">
                 Mo<b>r</b>e<br />Comin<b>g</b><br />So<b>o</b>n.
