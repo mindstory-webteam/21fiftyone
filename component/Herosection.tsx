@@ -18,7 +18,7 @@ const VIDEOS = [
   "/videos/video-1.webm",
   "/videos/video-2.webm",
   "/videos/video-3.webm",
-  "/videos/video-4.webm",
+  "/videos/video-1.webm",
 ];
 const getVideo = (i: number) =>
   VIDEOS[((i % VIDEOS.length) + VIDEOS.length) % VIDEOS.length];
