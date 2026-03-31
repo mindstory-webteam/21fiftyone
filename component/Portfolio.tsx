@@ -94,7 +94,7 @@ interface MasonryItem {
   tag: string;
   industry: string;
   link: string;
-  type: "reel" | "youtube" | string;
+  type: "reel" | "youtube";
   
   x: number;
   y: number;
@@ -135,7 +135,7 @@ function buildMasonry(items: typeof portfolioData, containerW: number): MasonryI
       colHeights[bestCol]     = y + totalH + GAP;
       colHeights[bestCol + 1] = y + totalH + GAP;
 
-      result.push({ ...item, x, y, w, h: YT_IFRAME_H, type: item.type as "reel" | "youtube" });
+      result.push({ ...item, x, y, w, h: YT_IFRAME_H });
     } else {
       // shortest column
       const col = colHeights.indexOf(Math.min(...colHeights));
@@ -144,7 +144,7 @@ function buildMasonry(items: typeof portfolioData, containerW: number): MasonryI
       const totalH = REEL_IFRAME_H + FOOTER_H;
 
       colHeights[col] = y + totalH + GAP;
-      result.push({ ...item, x, y, w: colW, h: REEL_IFRAME_H, type: item.type as "reel" | "youtube" });
+      result.push({ ...item, x, y, w: colW, h: REEL_IFRAME_H });
     }
   }
 
