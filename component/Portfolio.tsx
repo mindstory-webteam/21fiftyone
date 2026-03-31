@@ -462,7 +462,7 @@ const Portfolio = () => {
           <div className="pf-empty">
             <p className="pf-empty-h">No Works Found</p>
             <p className="pf-empty-p">Try a different category or industry combination.</p>
-            <RollButton label="Clear Filters" href="#" onClick={(e: React.MouseEvent) => { e.preventDefault(); setFilter("all"); setIndustryFilter("all"); }} />
+            <RollButton label="Clear Filters" href="#" onClick={() => { setFilter("all"); setIndustryFilter("all"); }} />
           </div>
         ) : (
           <div ref={gridWrapRef} className="pf-canvas" style={{ height: canvasH }}>
