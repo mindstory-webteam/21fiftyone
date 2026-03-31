@@ -139,14 +139,31 @@ function FooterNavLink({ label, href }: { label: string; href: string }) {
   );
 }
 
-function SocialRollLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
+// ── CHANGED: icons-only inline social icon button (no label, no column layout)
+function SocialIconLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   const [hov, setHov] = useState(false);
   return (
-    <Link href={href} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
-      <span style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${hov ? B.red : "rgba(12,12,12,0.14)"}`, display: "inline-flex", alignItems: "center", justifyContent: "center", color: hov ? B.red : B.muted, flexShrink: 0, transition: "border-color 0.25s ease, color 0.25s ease, background 0.25s ease", background: hov ? "rgba(200,55,45,0.06)" : "transparent" }}>
-        {icon}
-      </span>
-      <SplitText text={label} color={hov ? B.black : B.muted} hoverColor={B.black} fontSize={10.5} fontFamily="'Montserrat', sans-serif" fontWeight={500} letterSpacing="0.12em" direction="left" staggerMs={18} durationMs={320} />
+    <Link
+      href={href}
+      aria-label={label}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        textDecoration: "none",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 28,
+        height: 28,
+        borderRadius: "50%",
+        border: `1px solid ${hov ? B.red : "rgba(12,12,12,0.14)"}`,
+        color: hov ? B.red : B.muted,
+        flexShrink: 0,
+        transition: "border-color 0.25s ease, color 0.25s ease, background 0.25s ease",
+        background: hov ? "rgba(200,55,45,0.06)" : "transparent",
+      }}
+    >
+      {icon}
     </Link>
   );
 }
@@ -188,7 +205,9 @@ export default function Footer() {
         .ft-brand-email:hover { opacity: 0.7; }
 
         .ft-socials-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: ${B.muted}; margin-bottom: 14px; display: block; }
-        .ft-socials-row { display: flex; flex-direction: column; gap: 8px; }
+
+        /* ── CHANGED: inline row of icon-only buttons ── */
+        .ft-socials-row { display: flex; flex-direction: row; gap: 10px; align-items: center; }
 
         .ft-nav-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
         .ft-col-heading { font-size: 9px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: ${B.black}; margin: 0 0 24px; display: flex; align-items: center; gap: 10px; }
@@ -198,22 +217,13 @@ export default function Footer() {
         /* ── WORDMARK HALF-CUT IMAGE ── */
         .ft-wordmark-section {
           width: 100%;
-          border-bottom: 1px solid ${B.line};
           overflow: hidden;
-          /* The image itself is already half-cropped, 
-             but we clip even more via max-height to match screenshot */
           line-height: 0;
         }
         .ft-wordmark-img {
           width: 100%;
           height: auto;
           display: block;
-          /* 
-            The image has ~60% of the letters visible.
-            We additionally clip the very bottom using max-height
-            so the letters appear cut off by the page edge,
-            exactly like in the screenshot.
-          */
           max-height: 15vw;
           object-fit: cover;
           object-position: top left;
@@ -228,6 +238,7 @@ export default function Footer() {
           align-items: center;
           justify-content: space-between;
           gap: 20px;
+          border-top: 1px solid ${B.line};
         }
         .ft-copyright { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: ${B.muted}; }
         .ft-status { display: inline-flex; align-items: center; gap: 7px; font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: ${B.muted}; }
@@ -270,9 +281,10 @@ export default function Footer() {
               hello@21fiftyone.com
             </Link>
             <span className="ft-socials-label">Follow Us</span>
+            {/* ── CHANGED: icon-only inline row ── */}
             <div className="ft-socials-row">
               {SOCIAL_LINKS.map((s) => (
-                <SocialRollLink key={s.label} href={s.href} label={s.label} icon={s.icon} />
+                <SocialIconLink key={s.label} href={s.href} label={s.label} icon={s.icon} />
               ))}
             </div>
           </div>
@@ -293,23 +305,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ── WORDMARK HALF-CUT IMAGE ── */}
-        {/*
-          Place wordmark-halfcut.png in your /public/images/ folder.
-          The image is 3540×291px — full letters with bottom ~40% cropped.
-          The max-height CSS crops it further so it bleeds off the page bottom,
-          exactly matching the screenshot.
-        */}
-        <div className="ft-wordmark-section">
-          <img
-            src={WORDMARK_SRC}
-            alt="21FiftyOne"
-            className="ft-wordmark-img"
-            draggable={false}
-          />
-        </div>
-
-        {/* ── BOTTOM BAR ── */}
+        {/* ── CHANGED: bottom bar now sits ABOVE the wordmark ── */}
         <div className="ft-bottom">
           <span className="ft-copyright">
             &copy; {new Date().getFullYear()} 21FiftyOne. All rights reserved.
@@ -318,6 +314,16 @@ export default function Footer() {
             <span className="ft-status-dot" />
             Mumbai, IN &mdash; Est. 2016
           </span>
+        </div>
+
+        {/* ── WORDMARK HALF-CUT IMAGE (now the very last element) ── */}
+        <div className="ft-wordmark-section">
+          <img
+            src={WORDMARK_SRC}
+            alt="21FiftyOne"
+            className="ft-wordmark-img"
+            draggable={false}
+          />
         </div>
 
       </footer>
