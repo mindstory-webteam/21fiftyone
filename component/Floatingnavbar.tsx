@@ -696,13 +696,16 @@ export default function FloatingNavbar() {
     const socialsAt = panelAt + panelDur * 0.36;
     if (tagline)      tl.to(tagline,     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt);
     if (socialTitle)  tl.to(socialTitle, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt + 0.06);
-    if (socialLinks.length) {
-      tl.to(socialLinks, {
-        y: 0, opacity: 1, duration: 0.48, ease: "power3.out",
-        stagger: { each: 0.07 },
-        onComplete: () => gsap.set(socialLinks, { clearProps: "opacity" }),
-      }, socialsAt + 0.12);
-    }
+    if (socialLinks.length) tl.to(socialLinks, {
+  y: 0,
+  opacity: 1,
+  duration: 0.48,
+  ease: "power3.out",
+  stagger: { each: 0.07 },
+  onComplete: () => {
+    gsap.set(socialLinks, { clearProps: "opacity" });
+  }
+});
 
     openTlRef.current = tl;
     return tl;
