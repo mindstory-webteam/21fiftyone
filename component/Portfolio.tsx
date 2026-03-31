@@ -9,7 +9,7 @@ import { gsap } from "gsap";
 /* ─────────────────────────────────────────────────────────────
    DATA
 ───────────────────────────────────────────────────────────── */
-const portfolioData = [
+const portfolioData: { id: number; category: string; tag: string; link: string; industry: string; type: "reel" | "youtube" }[] = [
   { id: 1,  category: 'ai',        tag: 'AI',        link: 'https://www.instagram.com/reel/DVQrpwIANXE/embed',       industry: 'education&edTech',           type: 'reel' },
   { id: 2,  category: 'ai',        tag: 'AI',        link: 'https://www.instagram.com/reel/DVi55nOkmyT/embed',       industry: 'food&beverage',              type: 'reel' },
   { id: 3,  category: 'anchor',    tag: 'Anchor',    link: 'https://www.instagram.com/reel/DNQG2Xqu3mt/embed',       industry: 'fashion&lifestyle',          type: 'reel' },
@@ -135,7 +135,7 @@ function buildMasonry(items: typeof portfolioData, containerW: number): MasonryI
       colHeights[bestCol]     = y + totalH + GAP;
       colHeights[bestCol + 1] = y + totalH + GAP;
 
-      result.push({ ...item, x, y, w, h: YT_IFRAME_H });
+      result.push({ ...item, x, y, w, h: YT_IFRAME_H, type: item.type as "reel" | "youtube" });
     } else {
       // shortest column
       const col = colHeights.indexOf(Math.min(...colHeights));
@@ -144,7 +144,7 @@ function buildMasonry(items: typeof portfolioData, containerW: number): MasonryI
       const totalH = REEL_IFRAME_H + FOOTER_H;
 
       colHeights[col] = y + totalH + GAP;
-      result.push({ ...item, x, y, w: colW, h: REEL_IFRAME_H });
+      result.push({ ...item, x, y, w: colW, h: REEL_IFRAME_H, type: item.type as "reel" | "youtube" });
     }
   }
 
