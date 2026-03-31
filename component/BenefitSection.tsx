@@ -76,7 +76,7 @@ const TextRoll: React.FC<TextRollProps> = ({ children, className, direction = "l
     <motion.span
       initial="initial"
       whileHover="hovered"
-      className={`relative inline-block overflow-hidden cursor-pointer select-none ${className ?? ""}`}
+      className={`relative inline-block  cursor-pointer select-none ${className ?? ""}`}
       style={{ lineHeight: 0.88, verticalAlign: "top" }}
     >
       <span aria-hidden style={{ display: "block" }}>

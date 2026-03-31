@@ -1,285 +1,513 @@
 "use client";
 
-const NAV_LINKS = {
-  Services: ["Branding", "Web Design", "Development", "Strategy"],
-  Resources: ["Privacy", "Terms", "Careers", "Instagram"],
+import { useState } from "react";
+import Link from "next/link";
+
+const B = {
+  red:   "#c8372d",
+  cream: "#f2ede6",
+  black: "#0c0c0c",
+  muted: "#8a8480",
+  line:  "rgba(12,12,12,0.10)",
 };
 
-const SOCIAL_ICONS = [
+const LOGO_SRC = "/logo/2151-logo.png";
+
+const NAV_COLS = [
   {
-    label: "Share",
-    path: "M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z",
+    heading: "Services",
+    links: [
+      { label: "Branding",    href: "/services" },
+      { label: "Web Design",  href: "/services" },
+      { label: "Development", href: "/services" },
+      { label: "Strategy",    href: "/services" },
+    ],
   },
   {
-    label: "Website",
-    path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z",
+    heading: "Studio",
+    links: [
+      { label: "About",   href: "/about"  },
+      { label: "Studio",  href: "/studio" },
+      { label: "Careers", href: "#"       },
+      { label: "Contact", href: "#"       },
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Privacy", href: "#" },
+      { label: "Terms",   href: "#" },
+      { label: "Cookies", href: "#" },
+    ],
   },
 ];
+
+const SOCIAL_LINKS = [
+  {
+    label: "Instagram",
+    href: "https://instagram.com",
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+      </svg>
+    ),
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com",
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+    ),
+  },
+  {
+    label: "Behance",
+    href: "https://behance.net",
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7.5 11.5c.83 0 1.5-.67 1.5-1.5S8.33 8.5 7.5 8.5H4v3h3.5zm.25 2H4v3.5h3.75c.97 0 1.75-.78 1.75-1.75S8.72 13.5 7.75 13.5zM2 7h6.5c1.93 0 3.5 1.34 3.5 3 0 1.01-.51 1.91-1.29 2.46C11.87 13.05 12.5 14.2 12.5 15.5c0 2.07-1.68 3.75-3.75 3.75H2V7zm14.5 2.5c-1.38 0-2.5.78-2.86 1.9h5.72c-.36-1.12-1.48-1.9-2.86-1.9zM22 14h-7.5c.23 1.28 1.37 2.25 2.75 2.25.87 0 1.64-.41 2.13-1.05l1.93.93C20.53 17.38 19.1 18 17.5 18c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5v1zm-6.5-5H21v-1.5h-5.5V9z"/>
+      </svg>
+    ),
+  },
+];
+
+interface SplitTextProps {
+  text:           string;
+  color?:         string;
+  hoverColor?:    string;
+  fontSize?:      string | number;
+  fontFamily?:    string;
+  fontWeight?:    number;
+  letterSpacing?: string;
+  textTransform?: React.CSSProperties["textTransform"];
+  lineHeight?:    string | number;
+  direction?:     "left" | "center" | "right";
+  staggerMs?:     number;
+  durationMs?:    number;
+}
+
+function SplitText({
+  text,
+  color          = "inherit",
+  hoverColor,
+  fontSize       = "inherit",
+  fontFamily     = "inherit",
+  fontWeight     = 500,
+  letterSpacing  = "inherit",
+  textTransform  = "uppercase",
+  lineHeight     = 1,
+  direction      = "left",
+  staggerMs      = 28,
+  durationMs     = 400,
+}: SplitTextProps) {
+  const chars  = text.split("");
+  const total  = chars.length;
+  const easing = "cubic-bezier(.16,1,.3,1)";
+
+  function delay(i: number) {
+    if (direction === "left")  return i * staggerMs;
+    if (direction === "right") return (total - 1 - i) * staggerMs;
+    const mid = (total - 1) / 2;
+    return Math.abs(i - mid) * staggerMs;
+  }
+
+  return (
+    <span
+      aria-label={text}
+      style={{
+        display: "inline-flex",
+        flexWrap: "nowrap",
+        fontSize,
+        fontFamily,
+        fontWeight,
+        letterSpacing,
+        textTransform,
+        lineHeight,
+        color,
+      }}
+    >
+      {chars.map((ch, i) => (
+        <span
+          key={i}
+          style={{
+            display: "inline-block",
+            position: "relative",
+            overflow: "hidden",
+            lineHeight,
+          }}
+        >
+          <span
+            className="ft-char-real"
+            style={{
+              display: "block",
+              transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms`,
+            }}
+          >
+            {ch === " " ? "\u00A0" : ch}
+          </span>
+          <span
+            aria-hidden
+            className="ft-char-ghost"
+            style={{
+              display: "block",
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              whiteSpace: "pre",
+              transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms`,
+              color: hoverColor ?? color,
+            }}
+          >
+            {ch === " " ? "\u00A0" : ch}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function FooterNavLink({ label, href }: { label: string; href: string }) {
+  return (
+    <Link href={href} style={{ textDecoration: "none", display: "inline-block" }}>
+      <SplitText
+        text={label}
+        color="rgba(12,12,12,0.42)"
+        hoverColor={B.red}
+        fontSize={10.5}
+        fontFamily="'Montserrat', sans-serif"
+        fontWeight={500}
+        letterSpacing="0.12em"
+        direction="left"
+        staggerMs={18}
+        durationMs={320}
+      />
+    </Link>
+  );
+}
+
+function SocialRollLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, padding: "4px 0" }}
+    >
+      {/* Icon bubble */}
+      <span
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          border: `1px solid ${hov ? B.red : "rgba(12,12,12,0.14)"}`,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: hov ? B.red : B.muted,
+          flexShrink: 0,
+          transition: "border-color 0.25s ease, color 0.25s ease, background 0.25s ease",
+          background: hov ? "rgba(200,55,45,0.06)" : "transparent",
+        }}
+      >
+        {icon}
+      </span>
+
+      {/* Label with split-text roll */}
+      <SplitText
+        text={label}
+        color={hov ? B.black : B.muted}
+        hoverColor={B.black}
+        fontSize={10.5}
+        fontFamily="'Montserrat', sans-serif"
+        fontWeight={500}
+        letterSpacing="0.12em"
+        direction="left"
+        staggerMs={18}
+        durationMs={320}
+      />
+    </Link>
+  );
+}
+
+function WordmarkHover() {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <div
+      className="ft-wordmark-wrap"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <span
+        className="ft-wordmark"
+        style={{ color: hov ? B.red : B.black }}
+      >
+        21Fifty
+        <span style={{ color: hov ? B.black : B.red }}>One</span>
+      </span>
+    </div>
+  );
+}
 
 export default function Footer() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Barlow:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-        /* ── CSS Variables ── */
-        .footer {
-          --color-bg: #f8f7f5;
-          --color-border: #e2e0dc;
-          --color-ink: #0d0d0d;
-          --color-muted: #888;
-          --color-faint: #b0aba4;
-          --color-accent: #d42b2b;
-          --font-serif: 'Cormorant Garamond', Georgia, serif;
-          --font-sans: 'Barlow', sans-serif;
-
+        .ft-footer {
           width: 100%;
-          background: var(--color-bg);
-          border-top: 1px solid var(--color-border);
-          font-family: var(--font-sans);
+          background: ${B.cream};
+          border-top: 1px solid ${B.line};
+          font-family: 'Montserrat', sans-serif;
+          position: relative;
+          overflow: hidden;
         }
 
-        /* ── Main Grid ── */
-        .footer-main {
-          max-width: 1180px;
+        a:hover .ft-char-real  { transform: translateY(-100%); }
+        a:hover .ft-char-ghost { transform: translateY(-100%); }
+
+        .ft-top {
+          max-width: 1280px;
           margin: 0 auto;
-          padding: 72px 64px 60px;
+          padding: 80px 64px 64px;
           display: grid;
-          grid-template-columns: 260px 1fr 1fr 1fr;
-          gap: 48px;
+          grid-template-columns: 280px 1fr;
+          gap: 80px;
           align-items: start;
+          border-bottom: 1px solid ${B.line};
         }
 
-        /* ── Brand Column ── */
-        .footer-brand-logo {
-          font-family: var(--font-serif);
-          font-size: 22px;
-          font-weight: 600;
-          color: var(--color-ink);
-          letter-spacing: -0.02em;
-          margin-bottom: 18px;
+        .ft-brand-logo {
           display: block;
+          margin-bottom: 20px;
           text-decoration: none;
         }
-        .footer-brand-logo:hover {
-          opacity: 0.8;
-        }
-
-        .footer-brand-tagline {
-          font-size: 12.5px;
-          color: var(--color-muted);
-          line-height: 1.65;
-          max-width: 200px;
-          margin: 0 0 28px;
-        }
-
-        .footer-socials {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-        }
-
-        .footer-social-btn {
-          width: 32px;
+        .ft-brand-logo img {
           height: 32px;
-          border: 1px solid var(--color-border);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--color-muted);
+          width: auto;
+          display: block;
+          object-fit: contain;
+        }
+        .ft-brand-tagline {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 300;
+          line-height: 1.75;
+          color: ${B.muted};
+          margin: 0 0 28px;
+          max-width: 220px;
+        }
+        .ft-brand-email {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
           text-decoration: none;
-          transition: border-color 0.2s ease, color 0.2s ease;
-          flex-shrink: 0;
-          cursor: pointer;
+          color: ${B.red};
+          transition: opacity 0.2s ease;
+          margin-bottom: 32px;
         }
-        .footer-social-btn:hover {
-          border-color: var(--color-accent);
-          color: var(--color-accent);
-        }
-        .footer-social-btn svg {
-          width: 13px;
-          height: 13px;
-          fill: currentColor;
+        .ft-brand-email:hover { opacity: 0.7; }
+
+        .ft-socials-label {
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: ${B.muted};
+          margin-bottom: 14px;
           display: block;
         }
-
-        /* ── Nav Columns ── */
-        .footer-col-label {
-          font-size: 8.5px;
-          font-weight: 600;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--color-ink);
-          margin: 0 0 22px;
+        .ft-socials-row {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
 
-        .footer-col-links {
+        .ft-nav-cols {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 40px;
+        }
+        .ft-col-heading {
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: ${B.black};
+          margin: 0 0 24px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .ft-col-heading::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: ${B.red};
+          opacity: 0.25;
+        }
+        .ft-col-links {
           list-style: none;
           padding: 0;
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 13px;
+          gap: 14px;
         }
 
-        .footer-col-links a {
-          font-size: 11.5px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--color-muted);
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
-        .footer-col-links a:hover {
-          color: var(--color-accent);
-        }
-
-        /* ── Contact Column ── */
-        .footer-contact-address {
-          font-size: 12.5px;
-          color: var(--color-muted);
-          line-height: 1.7;
-          margin: 0 0 14px;
-        }
-
-        .footer-contact-email {
-          font-size: 12.5px;
-          font-weight: 500;
-          color: var(--color-accent);
-          text-decoration: none;
-          transition: opacity 0.2s ease;
-        }
-        .footer-contact-email:hover {
-          opacity: 0.75;
-        }
-
-        /* ── Bottom Bar ── */
-        .footer-bottom {
-          max-width: 1180px;
+        /* ── WORDMARK ── */
+        .ft-wordmark-wrap {
+          max-width: 1280px;
           margin: 0 auto;
-          padding: 20px 64px 28px;
+          padding: 0 48px;
+          overflow: hidden;
+          cursor: default;
+        }
+        .ft-wordmark {
+          font-family: 'Anton', sans-serif;
+          font-size: clamp(80px, 13vw, 200px);
+          line-height: 0.88;
+          letter-spacing: -0.02em;
+          text-transform: uppercase;
+          display: block;
+          padding: 48px 0 0;
+          user-select: none;
+          white-space: nowrap;
+          transition: color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .ft-wordmark span {
+          transition: color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ft-bottom {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 20px 64px 32px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-top: 1px solid var(--color-border);
+          gap: 20px;
         }
-
-        .footer-copyright {
-          font-size: 9.5px;
+        .ft-copyright {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
           letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: var(--color-faint);
+          color: ${B.muted};
         }
-
-        .footer-badge {
-          display: flex;
+        .ft-status {
+          display: inline-flex;
           align-items: center;
-          gap: 10px;
-        }
-
-        .footer-badge-box {
-          width: 28px;
-          height: 20px;
-          background: #c8c4bc;
-          border-radius: 2px;
-        }
-
-        .footer-badge-text {
-          font-size: 9.5px;
-          font-weight: 600;
-          letter-spacing: 0.18em;
+          gap: 7px;
+          font-family: 'Montserrat', sans-serif;
+          font-size: 9px;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: var(--color-faint);
+          color: ${B.muted};
+        }
+        .ft-status-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: ${B.red};
+          animation: ft-pulse 2.4s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+        @keyframes ft-pulse {
+          0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(200,55,45,0.55); }
+          50%      { opacity:.7; box-shadow:0 0 0 5px rgba(200,55,45,0); }
         }
 
-        /* ── Responsive ── */
         @media (max-width: 960px) {
-          .footer-main {
-            grid-template-columns: 1fr 1fr;
-            gap: 48px 40px;
-            padding: 56px 32px 48px;
-          }
-          .footer-bottom {
-            padding: 18px 32px 24px;
-          }
-        }
-
-        @media (max-width: 560px) {
-          .footer-main {
+          .ft-top {
             grid-template-columns: 1fr;
-            gap: 40px;
-            padding: 48px 24px 40px;
+            gap: 52px;
+            padding: 60px 40px 48px;
           }
-          .footer-bottom {
+          .ft-bottom { padding: 18px 40px 28px; }
+          .ft-wordmark-wrap { padding: 0 32px; }
+        }
+        @media (max-width: 640px) {
+          .ft-top { padding: 48px 28px 40px; }
+          .ft-nav-cols { grid-template-columns: 1fr 1fr; gap: 36px; }
+          .ft-bottom {
+            padding: 18px 28px 24px;
             flex-direction: column;
             align-items: flex-start;
-            gap: 14px;
-            padding: 18px 24px 24px;
           }
+          .ft-wordmark-wrap { padding: 0 20px; }
+        }
+        @media (max-width: 420px) {
+          .ft-nav-cols { grid-template-columns: 1fr; }
         }
       `}</style>
 
-      <footer className="footer">
+      <footer className="ft-footer">
 
-        {/* ── Main Grid ── */}
-        <div className="footer-main">
-
-          {/* Brand */}
-          <div className="footer-brand">
-            <a href="/app/page.tsx" className="footer-brand-logo">21FiftyOne</a>
-            <p className="footer-brand-tagline">
+        <div className="ft-top">
+          <div>
+            <Link href="/" className="ft-brand-logo">
+              <img src={LOGO_SRC} alt="21FiftyOne" />
+            </Link>
+            <p className="ft-brand-tagline">
               Elevating brands through the art of digital alchemy and technical precision.
             </p>
-            <div className="footer-socials">
-              {SOCIAL_ICONS.map(({ label, path }) => (
-                <a key={label} href="#" className="footer-social-btn" aria-label={label}>
-                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d={path} />
-                  </svg>
-                </a>
+            <Link href="mailto:hello@21fiftyone.com" className="ft-brand-email">
+              hello@21fiftyone.com
+            </Link>
+            <span className="ft-socials-label">Follow Us</span>
+            <div className="ft-socials-row">
+              {SOCIAL_LINKS.map((s) => (
+                <SocialRollLink key={s.label} href={s.href} label={s.label} icon={s.icon} />
               ))}
             </div>
           </div>
 
-          {/* Nav Columns */}
-          {Object.entries(NAV_LINKS).map(([heading, links]) => (
-            <div key={heading}>
-              <p className="footer-col-label">{heading}</p>
-              <ul className="footer-col-links">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a href="#">{link}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          {/* Contact */}
-          <div>
-            <p className="footer-col-label">Contact</p>
-            <p className="footer-contact-address">
-              Studio 2151, Creative District<br />
-              New York, NY 10001
-            </p>
-            <a href="mailto:hello@21fiftyone.com" className="footer-contact-email">
-              hello@21fiftyone.com
-            </a>
+          <div className="ft-nav-cols">
+            {NAV_COLS.map((col) => (
+              <div key={col.heading}>
+                <p className="ft-col-heading">{col.heading}</p>
+                <ul className="ft-col-links">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <FooterNavLink label={link.label} href={link.href} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-
         </div>
 
-        {/* ── Bottom Bar ── */}
-        <div className="footer-bottom">
-          <span className="footer-copyright">
-            © {new Date().getFullYear()} 21FiftyOne. All rights reserved.
+        {/* ── WORDMARK with hover color-swap ── */}
+        <WordmarkHover />
+
+        <div className="ft-bottom">
+          <span className="ft-copyright">
+            &copy; {new Date().getFullYear()} 21FiftyOne. All rights reserved.
           </span>
-          <div className="footer-badge">
-            <div className="footer-badge-box" aria-hidden="true" />
-            <span className="footer-badge-text">The White Alchemist</span>
-          </div>
+          <span className="ft-status">
+            <span className="ft-status-dot" />
+            Paris, FR &mdash; Est. 2021
+          </span>
         </div>
 
       </footer>
