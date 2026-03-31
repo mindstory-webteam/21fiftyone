@@ -13,16 +13,11 @@ const B = {
 
 const LOGO_SRC = "/logo/2151-logo.png";
 
+// ── Place wordmark-halfcut.png inside /public/images/ ──
+const WORDMARK_SRC = "/logo/2151-logo.png";
+
 const NAV_COLS = [
-  {
-    heading: "Services",
-    links: [
-      { label: "Branding",    href: "/services" },
-      { label: "Web Design",  href: "/services" },
-      { label: "Development", href: "/services" },
-      { label: "Strategy",    href: "/services" },
-    ],
-  },
+  
   {
     heading: "Studio",
     links: [
@@ -76,6 +71,7 @@ const SOCIAL_LINKS = [
   },
 ];
 
+/* ─── internal SplitText (no external dep needed) ─── */
 interface SplitTextProps {
   text:           string;
   color?:         string;
@@ -119,50 +115,14 @@ function SplitText({
   return (
     <span
       aria-label={text}
-      style={{
-        display: "inline-flex",
-        flexWrap: "nowrap",
-        fontSize,
-        fontFamily,
-        fontWeight,
-        letterSpacing,
-        textTransform,
-        lineHeight,
-        color,
-      }}
+      style={{ display: "inline-flex", flexWrap: "nowrap", fontSize, fontFamily, fontWeight, letterSpacing, textTransform, lineHeight, color }}
     >
       {chars.map((ch, i) => (
-        <span
-          key={i}
-          style={{
-            display: "inline-block",
-            position: "relative",
-            overflow: "hidden",
-            lineHeight,
-          }}
-        >
-          <span
-            className="ft-char-real"
-            style={{
-              display: "block",
-              transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms`,
-            }}
-          >
+        <span key={i} style={{ display: "inline-block", position: "relative", overflow: "hidden", lineHeight }}>
+          <span className="ft-char-real" style={{ display: "block", transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms` }}>
             {ch === " " ? "\u00A0" : ch}
           </span>
-          <span
-            aria-hidden
-            className="ft-char-ghost"
-            style={{
-              display: "block",
-              position: "absolute",
-              top: "100%",
-              left: 0,
-              whiteSpace: "pre",
-              transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms`,
-              color: hoverColor ?? color,
-            }}
-          >
+          <span aria-hidden className="ft-char-ghost" style={{ display: "block", position: "absolute", top: "100%", left: 0, whiteSpace: "pre", transition: `transform ${durationMs}ms ${easing} ${delay(i)}ms`, color: hoverColor ?? color }}>
             {ch === " " ? "\u00A0" : ch}
           </span>
         </span>
@@ -174,93 +134,20 @@ function SplitText({
 function FooterNavLink({ label, href }: { label: string; href: string }) {
   return (
     <Link href={href} style={{ textDecoration: "none", display: "inline-block" }}>
-      <SplitText
-        text={label}
-        color="rgba(12,12,12,0.42)"
-        hoverColor={B.red}
-        fontSize={10.5}
-        fontFamily="'Montserrat', sans-serif"
-        fontWeight={500}
-        letterSpacing="0.12em"
-        direction="left"
-        staggerMs={18}
-        durationMs={320}
-      />
+      <SplitText text={label} color="rgba(12,12,12,0.42)" hoverColor={B.red} fontSize={10.5} fontFamily="'Montserrat', sans-serif" fontWeight={500} letterSpacing="0.12em" direction="left" staggerMs={18} durationMs={320} />
     </Link>
   );
 }
 
-function SocialRollLink({
-  href,
-  label,
-  icon,
-}: {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}) {
+function SocialRollLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   const [hov, setHov] = useState(false);
-
   return (
-    <Link
-      href={href}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, padding: "4px 0" }}
-    >
-      {/* Icon bubble */}
-      <span
-        style={{
-          width: 28,
-          height: 28,
-          borderRadius: "50%",
-          border: `1px solid ${hov ? B.red : "rgba(12,12,12,0.14)"}`,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: hov ? B.red : B.muted,
-          flexShrink: 0,
-          transition: "border-color 0.25s ease, color 0.25s ease, background 0.25s ease",
-          background: hov ? "rgba(200,55,45,0.06)" : "transparent",
-        }}
-      >
+    <Link href={href} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, padding: "4px 0" }}>
+      <span style={{ width: 28, height: 28, borderRadius: "50%", border: `1px solid ${hov ? B.red : "rgba(12,12,12,0.14)"}`, display: "inline-flex", alignItems: "center", justifyContent: "center", color: hov ? B.red : B.muted, flexShrink: 0, transition: "border-color 0.25s ease, color 0.25s ease, background 0.25s ease", background: hov ? "rgba(200,55,45,0.06)" : "transparent" }}>
         {icon}
       </span>
-
-      {/* Label with split-text roll */}
-      <SplitText
-        text={label}
-        color={hov ? B.black : B.muted}
-        hoverColor={B.black}
-        fontSize={10.5}
-        fontFamily="'Montserrat', sans-serif"
-        fontWeight={500}
-        letterSpacing="0.12em"
-        direction="left"
-        staggerMs={18}
-        durationMs={320}
-      />
+      <SplitText text={label} color={hov ? B.black : B.muted} hoverColor={B.black} fontSize={10.5} fontFamily="'Montserrat', sans-serif" fontWeight={500} letterSpacing="0.12em" direction="left" staggerMs={18} durationMs={320} />
     </Link>
-  );
-}
-
-function WordmarkHover() {
-  const [hov, setHov] = useState(false);
-
-  return (
-    <div
-      className="ft-wordmark-wrap"
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-    >
-      <span
-        className="ft-wordmark"
-        style={{ color: hov ? B.red : B.black }}
-      >
-        21Fifty
-        <span style={{ color: hov ? B.black : B.red }}>One</span>
-      </span>
-    </div>
   );
 }
 
@@ -282,6 +169,7 @@ export default function Footer() {
         a:hover .ft-char-real  { transform: translateY(-100%); }
         a:hover .ft-char-ghost { transform: translateY(-100%); }
 
+        /* ── TOP GRID ── */
         .ft-top {
           max-width: 1280px;
           margin: 0 auto;
@@ -293,110 +181,45 @@ export default function Footer() {
           border-bottom: 1px solid ${B.line};
         }
 
-        .ft-brand-logo {
-          display: block;
-          margin-bottom: 20px;
-          text-decoration: none;
-        }
-        .ft-brand-logo img {
-          height: 32px;
-          width: auto;
-          display: block;
-          object-fit: contain;
-        }
-        .ft-brand-tagline {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 300;
-          line-height: 1.75;
-          color: ${B.muted};
-          margin: 0 0 28px;
-          max-width: 220px;
-        }
-        .ft-brand-email {
-          display: inline-block;
-          font-size: 10px;
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          text-decoration: none;
-          color: ${B.red};
-          transition: opacity 0.2s ease;
-          margin-bottom: 32px;
-        }
+        .ft-brand-logo { display: block; margin-bottom: 20px; text-decoration: none; }
+        .ft-brand-logo img { height: 32px; width: auto; display: block; object-fit: contain; }
+        .ft-brand-tagline { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; line-height: 1.75; color: ${B.muted}; margin: 0 0 28px; max-width: 220px; }
+        .ft-brand-email { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: ${B.red}; transition: opacity 0.2s ease; margin-bottom: 32px; }
         .ft-brand-email:hover { opacity: 0.7; }
 
-        .ft-socials-label {
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: ${B.muted};
-          margin-bottom: 14px;
-          display: block;
-        }
-        .ft-socials-row {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
+        .ft-socials-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: ${B.muted}; margin-bottom: 14px; display: block; }
+        .ft-socials-row { display: flex; flex-direction: column; gap: 8px; }
 
-        .ft-nav-cols {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 40px;
-        }
-        .ft-col-heading {
-          font-size: 9px;
-          font-weight: 600;
-          letter-spacing: 0.3em;
-          text-transform: uppercase;
-          color: ${B.black};
-          margin: 0 0 24px;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .ft-col-heading::after {
-          content: '';
-          flex: 1;
-          height: 1px;
-          background: ${B.red};
-          opacity: 0.25;
-        }
-        .ft-col-links {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
+        .ft-nav-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .ft-col-heading { font-size: 9px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; color: ${B.black}; margin: 0 0 24px; display: flex; align-items: center; gap: 10px; }
+        .ft-col-heading::after { content: ''; flex: 1; height: 1px; background: ${B.red}; opacity: 0.25; }
+        .ft-col-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
 
-        /* ── WORDMARK ── */
-        .ft-wordmark-wrap {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 0 48px;
+        /* ── WORDMARK HALF-CUT IMAGE ── */
+        .ft-wordmark-section {
+          width: 100%;
+          border-bottom: 1px solid ${B.line};
           overflow: hidden;
-          cursor: default;
+          /* The image itself is already half-cropped, 
+             but we clip even more via max-height to match screenshot */
+          line-height: 0;
         }
-        .ft-wordmark {
-          font-family: 'Anton', sans-serif;
-          font-size: clamp(80px, 13vw, 200px);
-          line-height: 0.88;
-          letter-spacing: -0.02em;
-          text-transform: uppercase;
+        .ft-wordmark-img {
+          width: 100%;
+          height: auto;
           display: block;
-          padding: 48px 0 0;
-          user-select: none;
-          white-space: nowrap;
-          transition: color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .ft-wordmark span {
-          transition: color 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+          /* 
+            The image has ~60% of the letters visible.
+            We additionally clip the very bottom using max-height
+            so the letters appear cut off by the page edge,
+            exactly like in the screenshot.
+          */
+          max-height: 15vw;
+          object-fit: cover;
+          object-position: top left;
         }
 
+        /* ── BOTTOM BAR ── */
         .ft-bottom {
           max-width: 1280px;
           margin: 0 auto;
@@ -406,62 +229,35 @@ export default function Footer() {
           justify-content: space-between;
           gap: 20px;
         }
-        .ft-copyright {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: ${B.muted};
-        }
-        .ft-status {
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-          font-family: 'Montserrat', sans-serif;
-          font-size: 9px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: ${B.muted};
-        }
-        .ft-status-dot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: ${B.red};
-          animation: ft-pulse 2.4s ease-in-out infinite;
-          flex-shrink: 0;
-        }
+        .ft-copyright { font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: ${B.muted}; }
+        .ft-status { display: inline-flex; align-items: center; gap: 7px; font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: ${B.muted}; }
+        .ft-status-dot { width: 5px; height: 5px; border-radius: 50%; background: ${B.red}; animation: ft-pulse 2.4s ease-in-out infinite; flex-shrink: 0; }
         @keyframes ft-pulse {
           0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(200,55,45,0.55); }
           50%      { opacity:.7; box-shadow:0 0 0 5px rgba(200,55,45,0); }
         }
 
+        /* ── RESPONSIVE ── */
         @media (max-width: 960px) {
-          .ft-top {
-            grid-template-columns: 1fr;
-            gap: 52px;
-            padding: 60px 40px 48px;
-          }
+          .ft-top { grid-template-columns: 1fr; gap: 52px; padding: 60px 40px 48px; }
           .ft-bottom { padding: 18px 40px 28px; }
-          .ft-wordmark-wrap { padding: 0 32px; }
+          .ft-wordmark-img { max-height: 22vw; }
         }
         @media (max-width: 640px) {
           .ft-top { padding: 48px 28px 40px; }
           .ft-nav-cols { grid-template-columns: 1fr 1fr; gap: 36px; }
-          .ft-bottom {
-            padding: 18px 28px 24px;
-            flex-direction: column;
-            align-items: flex-start;
-          }
-          .ft-wordmark-wrap { padding: 0 20px; }
+          .ft-bottom { padding: 18px 28px 24px; flex-direction: column; align-items: flex-start; }
+          .ft-wordmark-img { max-height: 28vw; }
         }
         @media (max-width: 420px) {
           .ft-nav-cols { grid-template-columns: 1fr; }
+          .ft-wordmark-img { max-height: 36vw; }
         }
       `}</style>
 
       <footer className="ft-footer">
 
+        {/* ── TOP GRID ── */}
         <div className="ft-top">
           <div>
             <Link href="/" className="ft-brand-logo">
@@ -497,16 +293,30 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ── WORDMARK with hover color-swap ── */}
-        <WordmarkHover />
+        {/* ── WORDMARK HALF-CUT IMAGE ── */}
+        {/*
+          Place wordmark-halfcut.png in your /public/images/ folder.
+          The image is 3540×291px — full letters with bottom ~40% cropped.
+          The max-height CSS crops it further so it bleeds off the page bottom,
+          exactly matching the screenshot.
+        */}
+        <div className="ft-wordmark-section">
+          <img
+            src={WORDMARK_SRC}
+            alt="21FiftyOne"
+            className="ft-wordmark-img"
+            draggable={false}
+          />
+        </div>
 
+        {/* ── BOTTOM BAR ── */}
         <div className="ft-bottom">
           <span className="ft-copyright">
             &copy; {new Date().getFullYear()} 21FiftyOne. All rights reserved.
           </span>
           <span className="ft-status">
             <span className="ft-status-dot" />
-            Paris, FR &mdash; Est. 2021
+            Mumbai, IN &mdash; Est. 2016
           </span>
         </div>
 

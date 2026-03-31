@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
 import type { ElementType } from "react";
 import { motion } from "framer-motion";
 import React from "react";
+import Link from "next/link";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -334,7 +335,13 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
     </motion.span>
   );
 
-  if (href) return <a href={href} style={{ textDecoration: "none" }}>{inner}</a>;
+  if (href) {
+  return (
+    <Link href={href} style={{ textDecoration: "none" }}>
+      {inner}
+    </Link>
+  );
+}
   return <button type="button" style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}>{inner}</button>;
 };
 
@@ -697,7 +704,7 @@ export default function Hero() {
             <div className="hero-body">
               <p className="d-sub hero-text-item">{slide.sub}</p>
               <div className="hero-text-item">
-                <RollButton label={slide.cta} />
+                <RollButton label={slide.cta}  href="/studio" />
               </div>
             </div>
 

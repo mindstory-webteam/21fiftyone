@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -528,15 +529,21 @@ export default function BreakTheMold() {
 
           {/* CTAs */}
           <div className={`btm-cta-wrap${visible ? " show" : ""}`}>
-            <button type="button" className="btm-btn-primary">
-              Connect With The Studio
-              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-                <path d="M1 5H13M9 1L13 5L9 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            <Link href="/contact">
+              <button  type="button" className="btm-btn-primary">
+                Connect With The Studio
+                <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                  <path d="M1 5H13M9 1L13 5L9 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </Link>
+
+            <Link href="/studio">
             <button type="button" className="btm-btn-ghost">
               View Our Work
             </button>
+            </Link>
+            
           </div>
 
         </div>

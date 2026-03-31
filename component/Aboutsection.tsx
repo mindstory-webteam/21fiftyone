@@ -582,7 +582,7 @@ export default function AboutSection() {
                 </div>
               </div>
 
-            <RollButton label="Connect us" href="/contact" />
+            <RollButton label="About Us" href="/projects"/>
 
               {/* <p style={{
                 fontFamily: "'DM Sans', sans-serif",

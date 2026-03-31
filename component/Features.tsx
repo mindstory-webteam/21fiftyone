@@ -522,10 +522,12 @@ const BentoTilt = ({ children, className="" }: { children: React.ReactNode; clas
    EXPLORE CIRCLE BUTTON
 ════════════════════════════════════════════════════════ */
 const ExploreBtn = () => (
-  <div className="sv-explore-btn">
-    <span className="sv-explore-label">Explore</span>
-    <span className="sv-explore-arrow">↗</span>
-  </div>
+  <Link href="/services" className="sv-explore-btn">
+    <div className="sv-explore-btn">
+      <span className="sv-explore-label">Explore</span>
+      <span className="sv-explore-arrow">↗</span>
+    </div>
+  </Link>
 );
 
 /* ════════════════════════════════════════════════════════
@@ -620,7 +622,7 @@ const Features = () => {
                 build work that stands apart in a world full of noise.
               </p>
             </div>
-            <RollButton label="view Serives" href="/contact" />
+            <RollButton label="view Services" href="/services" />
           </div>
         </div>
 
