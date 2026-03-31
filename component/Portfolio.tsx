@@ -94,8 +94,8 @@ interface MasonryItem {
   tag: string;
   industry: string;
   link: string;
-  type: 'reel' | 'youtube';
-  // computed layout
+  type: "reel" | "youtube" | string;
+  
   x: number;
   y: number;
   w: number;
