@@ -402,14 +402,12 @@ function SplitText({
 ═══════════════════════════════════════════════════════════ */
 
 const CARD_ITEMS = [
-  { label: "Elevation",   value: "3,850m",         sub: "Above sea level" },
-  { label: "Temperature", value: "−12°C",           sub: "Summit avg · Winter" },
-  { label: "Purity",      value: "99.8%",           sub: "Clean air index" },
-  { label: "Silence",     value: "12 dB",           sub: "Measured at dawn" },
-  { label: "Snowfall",    value: "4.2m",            sub: "Annual accumulation" },
-  { label: "Sunrise",     value: "05:48",           sub: "Alpine golden hour" },
-  { label: "Visibility",  value: "∞",               sub: "On clear days" },
-  { label: "Founded",     value: "2021",            sub: "Est. in the Alps" },
+  { label: "Shoot Time",   value: "05:48 hrs",         sub: "Golden hour captured with precision and intent." },
+  { label: "Frame Clarity", value: "∞",           sub: "Every detail refined — no compromise on visual quality." },
+  { label: "Locations Covered",      value: "99.8%",           sub: "Clean air index" },
+  { label: "Silence",     value: "12 +",           sub: "From studio-controlled sets to real-world environments." },
+  { label: "Output Quality",    value: "4K • 8K • HDR",            sub: "Engineered for cinematic impact across every screen." },
+ 
 ];
 
 function MarqueeTextCard() {
