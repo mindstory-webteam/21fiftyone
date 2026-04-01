@@ -620,8 +620,8 @@ export default function AboutSection() {
 
           {/* Label row */}
           <div className="about-label-row" data-reveal>
-            <span className="about-label">Detroit Studio</span>
-            <span className="about-label-right">Est. 2021 — Paris</span>
+            <span className="about-label">21FIFTYONE</span>
+            <span className="about-label-right">21FIFTYONE</span>
           </div>
 
           {/* Hero: SplitText headings + dark card */}
@@ -643,6 +643,9 @@ export default function AboutSection() {
                 onLetterAnimationComplete={handleAnimationComplete}
                 showCallback
                 hoverRoll
+                 autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                 hoverRollDirection="center"
               />
 
@@ -660,6 +663,9 @@ export default function AboutSection() {
                 rootMargin="-60px"
                 textAlign="left"
                 hoverRoll
+                 autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                 hoverRollDirection="left"
               />
             </div>
@@ -706,13 +712,19 @@ export default function AboutSection() {
                 Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
                 In a world full of content, we focus on creating visuals that stand out, connect emotionally, and stay memorable.
               </p>
+               <p className="about-paragraph" data-reveal data-d="4">
+                Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
+               
+              </p>
 
               <div className="about-quote-block" data-reveal data-d="5">
                 <blockquote>
-                  &ldquo;We don&rsquo;t build campaigns. We engineer cultural
-                  moments that outlive the season.&rdquo;
+                  &ldquo;We don’t just create visuals.
+We craft stories that stay, long after the moment fades
+
+&rdquo;
                 </blockquote>
-                <cite>— Jonathan Gilbert, Founder</cite>
+                <cite>21fifty one</cite>
               </div>
             </div>
 

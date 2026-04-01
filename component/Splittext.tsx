@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, CSSProperties } from "react";
 import type { ElementType } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimation, AnimationControls } from "framer-motion";
 import React from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -39,76 +39,148 @@ interface SplitTextProps {
   tag?: ElementType;
   hoverRoll?: boolean;
   hoverRollDirection?: "left" | "right" | "center";
+  /* ── auto-roll props ── */
+  autoRoll?: boolean;           // enable timed auto-roll
+  autoRollInterval?: number;    // ms between rolls (default 2500)
+  autoRollDuration?: number;    // ms for the roll animation (default 400)
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TEXT ROLL — hover roll-up animation per character
-   Pure presentational: no hooks, no side effects.
+   HELPERS
 ═══════════════════════════════════════════════════════════ */
 const ROLL_STAGGER = 0.035;
 
-export const TextRoll: React.FC<{
-  children: string;
-  direction?: "left" | "right" | "center";
-}> = ({ children, direction = "left" }) => {
-  const chars = children.split("");
+function getDelay(i: number, total: number, direction: "left" | "right" | "center") {
+  if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
+  if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
+  return ROLL_STAGGER * i;
+}
 
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
+/* ═══════════════════════════════════════════════════════════
+   TEXT ROLL CHAR — individual character with auto + hover roll
+═══════════════════════════════════════════════════════════ */
+interface TextRollCharProps {
+  char: string;
+  delay: number;
+  duration: number;
+  controls: AnimationControls;
+}
+
+const TextRollChar: React.FC<TextRollCharProps> = ({ char, delay, duration, controls }) => {
+  const easing = "easeInOut";
+  const ch = char === " " ? "\u00A0" : char;
 
   return (
-    <motion.span
-      initial="initial"
-      whileHover="hovered"
-      style={{
-        position: "relative",
-        display: "inline-block",
-        overflow: "hidden",
-        cursor: "pointer",
-        lineHeight: 0.88,
-        verticalAlign: "top",
-        userSelect: "none",
-      }}
-    >
-      {/* visible row — scrolls up on hover */}
-      <span aria-hidden style={{ display: "block" }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-
-      {/* hidden row — slides in from below */}
-      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-    </motion.span>
+    <span style={{ display: "inline-block", position: "relative", overflow: "hidden", lineHeight: 0.88, verticalAlign: "top" }}>
+      {/* visible row */}
+      <motion.span
+        style={{ display: "block" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "0%",    transition: { ease: easing, duration: duration / 1000, delay } },
+          rolling: { y: "-100%", transition: { ease: easing, duration: duration / 1000, delay } },
+          reset:   { y: "100%",  transition: { duration: 0 } },
+        }}
+      >
+        {ch}
+      </motion.span>
+      {/* hidden row slides up from below */}
+      <motion.span
+        aria-hidden
+        style={{ display: "block", position: "absolute", inset: 0, whiteSpace: "pre" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "100%",  transition: { ease: easing, duration: duration / 1000, delay } },
+          rolling: { y: "0%",    transition: { ease: easing, duration: duration / 1000, delay } },
+          reset:   { y: "200%",  transition: { duration: 0 } },
+        }}
+      >
+        {ch}
+      </motion.span>
+    </span>
   );
 };
 
 /* ═══════════════════════════════════════════════════════════
-   HOVER ROLL SPLIT TEXT  (leaf — only called when hoverRoll=true)
-   Scroll-reveals each unit with GSAP, then each unit has
-   TextRoll hover via Framer Motion.
-   ⚠  No conditional hooks — useEffect always runs here.
+   TEXT ROLL UNIT — wraps a word/char unit, owns the controls
+   and manages both auto-roll timer and hover trigger.
+═══════════════════════════════════════════════════════════ */
+interface TextRollUnitProps {
+  children: string;
+  direction?: "left" | "right" | "center";
+  autoRoll?: boolean;
+  autoRollInterval?: number;
+  autoRollDuration?: number;
+}
+
+export const TextRoll: React.FC<TextRollUnitProps> = ({
+  children,
+  direction = "left",
+  autoRoll = false,
+  autoRollInterval = 2500,
+  autoRollDuration = 400,
+}) => {
+  const chars    = children.split("");
+  const total    = chars.length;
+  const controls = useAnimation();
+  const hovering = useRef(false);
+  const rolling  = useRef(false);
+
+  const doRoll = async () => {
+    if (rolling.current) return;
+    rolling.current = true;
+    await controls.start("rolling");
+    // instant reset to below
+    await controls.start("reset");
+    await controls.start("idle");
+    rolling.current = false;
+  };
+
+  /* auto-roll timer */
+  useEffect(() => {
+    if (!autoRoll) return;
+    const id = setInterval(() => {
+      if (!hovering.current) doRoll();
+    }, autoRollInterval);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRoll, autoRollInterval]);
+
+  const handleMouseEnter = () => {
+    hovering.current = true;
+    doRoll();
+  };
+  const handleMouseLeave = () => {
+    hovering.current = false;
+  };
+
+  return (
+    <span
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        display: "inline-flex",
+        cursor: "pointer",
+        userSelect: "none",
+        verticalAlign: "top",
+      }}
+    >
+      {chars.map((ch, i) => (
+        <TextRollChar
+          key={i}
+          char={ch}
+          controls={controls}
+          delay={getDelay(i, total, direction)}
+          duration={autoRollDuration}
+        />
+      ))}
+    </span>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════
+   HOVER ROLL SPLIT TEXT
+   Scroll-reveals each unit with GSAP, each unit has TextRoll.
 ═══════════════════════════════════════════════════════════ */
 function HoverRollSplitText({
   text,
@@ -125,6 +197,9 @@ function HoverRollSplitText({
   onLetterAnimationComplete,
   showCallback = false,
   hoverRollDirection = "left",
+  autoRoll = false,
+  autoRollInterval = 2500,
+  autoRollDuration = 400,
 }: Omit<SplitTextProps, "tag">) {
   const containerRef = useRef<HTMLDivElement>(null);
   const unitRefs     = useRef<(HTMLSpanElement | null)[]>([]);
@@ -165,7 +240,6 @@ function HoverRollSplitText({
       io.disconnect();
       tlRef.current?.kill();
     };
-  // text is the only dep that meaningfully changes between mounts
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
@@ -179,12 +253,10 @@ function HoverRollSplitText({
         lineHeight: "inherit",
         display: "flex",
         flexWrap: "wrap",
-        // chars: no gap; words/lines: small space between units
         gap: splitType === "chars" ? "0" : "0.25em",
       }}
     >
       {units.map((unit, i) => {
-        // preserve explicit space characters in char-split mode
         if (unit === " " && splitType === "chars") {
           return (
             <span
@@ -202,7 +274,14 @@ function HoverRollSplitText({
             ref={(el) => { unitRefs.current[i] = el; }}
             style={{ display: "inline-block" }}
           >
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
+            <TextRoll
+              direction={hoverRollDirection}
+              autoRoll={autoRoll}
+              autoRollInterval={autoRollInterval + i * 120} /* stagger each unit slightly */
+              autoRollDuration={autoRollDuration}
+            >
+              {unit}
+            </TextRoll>
           </span>
         );
       })}
@@ -211,9 +290,7 @@ function HoverRollSplitText({
 }
 
 /* ═══════════════════════════════════════════════════════════
-   STANDARD SPLIT TEXT  (leaf — only called when hoverRoll=false)
-   Uses innerHTML DOM splitting so GSAP can target each span.
-   ⚠  No conditional hooks — useEffect always runs here.
+   STANDARD SPLIT TEXT  (no hover roll)
 ═══════════════════════════════════════════════════════════ */
 function StandardSplitText({
   text,
@@ -238,7 +315,6 @@ function StandardSplitText({
     const container = containerRef.current;
     if (!container) return;
 
-    /* Build span elements from text, respecting splitType */
     const buildSpans = (): HTMLElement[] => {
       container.innerHTML = "";
 
@@ -281,7 +357,6 @@ function StandardSplitText({
         });
       }
 
-      // lines
       return text.split("\n").map((line) => {
         const el = document.createElement("span");
         el.textContent      = line;
@@ -319,7 +394,6 @@ function StandardSplitText({
     return () => {
       io.disconnect();
       tlRef.current?.kill();
-      // restore plain text so next mount starts clean
       if (container) container.innerHTML = text;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -336,9 +410,7 @@ function StandardSplitText({
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PUBLIC ENTRY POINT — pure router, zero hooks of its own.
-   React's rules of hooks are satisfied because the two leaf
-   components always call their hooks unconditionally.
+   PUBLIC ENTRY POINT
 ═══════════════════════════════════════════════════════════ */
 export default function SplitText(props: SplitTextProps) {
   if (props.hoverRoll) {

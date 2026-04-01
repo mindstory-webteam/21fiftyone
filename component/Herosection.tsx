@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
 import type { ElementType } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimation, AnimationControls } from "framer-motion";
 import React from "react";
 import Link from "next/link";
 
@@ -16,17 +16,15 @@ if (typeof window !== "undefined") {
    VIDEOS
 ═══════════════════════════════════════════ */
 const VIDEOS = [
-  
   "/videos/banner/7011667_Film_Filming_1280x720.webm",
   "/videos/banner/0_Ladybug_Insect_1280x720.webm",
   "/videos/banner/7011716_Filming_Directing_1280x720.webm",
-
 ];
 const getVideo = (i: number) =>
   VIDEOS[((i % VIDEOS.length) + VIDEOS.length) % VIDEOS.length];
 
 /* ═══════════════════════════════════════════
-   SPLIT TEXT
+   SPLIT TEXT TYPES
 ═══════════════════════════════════════════ */
 type FromTo = {
   opacity?: number; y?: number; x?: number;
@@ -41,57 +39,126 @@ interface SplitTextProps {
   onLetterAnimationComplete?: () => void; showCallback?: boolean;
   tag?: ElementType; hoverRoll?: boolean;
   hoverRollDirection?: "left" | "right" | "center";
+  autoRoll?: boolean;
+  autoRollInterval?: number;
+  autoRollDuration?: number;
 }
 
+/* ═══════════════════════════════════════════
+   TEXT ROLL — per-char with auto + hover
+═══════════════════════════════════════════ */
 const ROLL_STAGGER = 0.035;
 
-const TextRoll: React.FC<{ children: string; direction?: "left" | "right" | "center" }> = ({
-  children, direction = "left",
-}) => {
-  const chars = children.split("");
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
+function getRollDelay(i: number, total: number, direction: "left" | "right" | "center") {
+  if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
+  if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
+  return ROLL_STAGGER * i;
+}
+
+interface TextRollCharProps {
+  char: string;
+  delay: number;
+  duration: number;
+  controls: AnimationControls;
+}
+
+const TextRollChar: React.FC<TextRollCharProps> = ({ char, delay, duration, controls }) => {
+  const ch = char === " " ? "\u00A0" : char;
   return (
-    <motion.span initial="initial" whileHover="hovered"
-      style={{ position: "relative", display: "inline-block", overflow: "hidden",
-        cursor: "pointer", lineHeight: 0.88, verticalAlign: "top", userSelect: "none" }}>
-      <span aria-hidden style={{ display: "block" }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}>
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}>
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-    </motion.span>
+    <span style={{ display: "inline-block", position: "relative", overflow: "hidden", lineHeight: 0.88, verticalAlign: "top" }}>
+      <motion.span
+        style={{ display: "block" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "0%",    transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          rolling: { y: "-100%", transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          reset:   { y: "100%",  transition: { duration: 0 } },
+        }}
+      >{ch}</motion.span>
+      <motion.span
+        aria-hidden
+        style={{ display: "block", position: "absolute", inset: 0, whiteSpace: "pre" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "100%",  transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          rolling: { y: "0%",    transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          reset:   { y: "200%",  transition: { duration: 0 } },
+        }}
+      >{ch}</motion.span>
+    </span>
   );
 };
 
-/* ── HoverRoll variant ── */
+interface TextRollUnitProps {
+  children: string;
+  direction?: "left" | "right" | "center";
+  autoRoll?: boolean;
+  autoRollInterval?: number;
+  autoRollDuration?: number;
+}
+
+const TextRoll: React.FC<TextRollUnitProps> = ({
+  children,
+  direction = "left",
+  autoRoll = false,
+  autoRollInterval = 2500,
+  autoRollDuration = 400,
+}) => {
+  const chars    = children.split("");
+  const total    = chars.length;
+  const controls = useAnimation();
+  const hovering = useRef(false);
+  const rolling  = useRef(false);
+
+  const doRoll = useCallback(async () => {
+    if (rolling.current) return;
+    rolling.current = true;
+    await controls.start("rolling");
+    await controls.start("reset");
+    await controls.start("idle");
+    rolling.current = false;
+  }, [controls]);
+
+  useEffect(() => {
+    if (!autoRoll) return;
+    const id = setInterval(() => {
+      if (!hovering.current) doRoll();
+    }, autoRollInterval);
+    return () => clearInterval(id);
+  }, [autoRoll, autoRollInterval, doRoll]);
+
+  return (
+    <span
+      onMouseEnter={() => { hovering.current = true;  doRoll(); }}
+      onMouseLeave={() => { hovering.current = false; }}
+      style={{ display: "inline-flex", cursor: "pointer", userSelect: "none", verticalAlign: "top" }}
+    >
+      {chars.map((ch, i) => (
+        <TextRollChar
+          key={i}
+          char={ch}
+          controls={controls}
+          delay={getRollDelay(i, total, direction)}
+          duration={autoRollDuration}
+        />
+      ))}
+    </span>
+  );
+};
+
+/* ═══════════════════════════════════════════
+   HOVER ROLL SPLIT TEXT
+═══════════════════════════════════════════ */
 function HoverRollSplitText({
   text, className = "", delay = 50, duration = 1.25, ease = "power3.out",
   splitType = "chars", from = { opacity: 0, y: 40 }, to = { opacity: 1, y: 0 },
   threshold = 0.1, rootMargin = "-100px", textAlign = "left",
   onLetterAnimationComplete, showCallback = false, hoverRollDirection = "left",
-}: SplitTextProps) {
+  autoRoll = false, autoRollInterval = 2500, autoRollDuration = 400,
+}: Omit<SplitTextProps, "tag">) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const unitRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const unitRefs     = useRef<(HTMLSpanElement | null)[]>([]);
+  const tlRef        = useRef<gsap.core.Timeline | null>(null);
 
   const units: string[] =
     splitType === "chars" ? text.split("") :
@@ -100,7 +167,7 @@ function HoverRollSplitText({
 
   useEffect(() => {
     const container = containerRef.current;
-    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
+    const targets   = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
     if (!container || !targets.length) return;
 
     gsap.set(targets, { ...from });
@@ -117,7 +184,6 @@ function HoverRollSplitText({
       { threshold, rootMargin }
     );
     observer.observe(container);
-
     return () => { observer.disconnect(); tlRef.current?.kill(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
@@ -131,7 +197,14 @@ function HoverRollSplitText({
           return <span key={i} ref={el => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>&nbsp;</span>;
         return (
           <span key={i} ref={el => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
+            <TextRoll
+              direction={hoverRollDirection}
+              autoRoll={autoRoll}
+              autoRollInterval={autoRollInterval + i * 150}
+              autoRollDuration={autoRollDuration}
+            >
+              {unit}
+            </TextRoll>
           </span>
         );
       })}
@@ -139,7 +212,9 @@ function HoverRollSplitText({
   );
 }
 
-/* ── Standard variant ── */
+/* ═══════════════════════════════════════════
+   STANDARD SPLIT TEXT
+═══════════════════════════════════════════ */
 function StandardSplitText({
   text, className = "", delay = 50, duration = 1.25, ease = "power3.out",
   splitType = "chars", from = { opacity: 0, y: 40 }, to = { opacity: 1, y: 0 },
@@ -216,7 +291,6 @@ function StandardSplitText({
       { threshold, rootMargin }
     );
     observer.observe(container);
-
     return () => {
       observer.disconnect();
       tlRef.current?.kill();
@@ -231,10 +305,6 @@ function StandardSplitText({
   );
 }
 
-/*
- * FIX: hooks violation — original called useEffect after an early return.
- * Now SplitText is a pure router; hooks only live in leaf components.
- */
 function SplitText(props: SplitTextProps) {
   if (props.hoverRoll) return <HoverRollSplitText {...props} />;
   return <StandardSplitText {...props} />;
@@ -248,7 +318,7 @@ const BugIcon = () => (
     <path d="M115.49,155.76c-16.27-1.68-29.01-16.13-29.06-33.74-.06-17.62,12.59-32.14,28.84-33.93.6-.06,1.13.11,1.58.51.45.4.68.92.68,1.52l.13,39.47c0,1.28,2.05,1.27,2.04,0l-.13-39.47c0-.6.23-1.12.67-1.52.45-.4.98-.58,1.58-.52,16.27,1.68,29.01,16.13,29.06,33.74.06,17.62-12.59,32.14-28.84,33.93" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
     <path d="M120.62,133.05c-3.28-1.05-6.78.75-7.84,4.03-1.05,3.27.75,6.78,4.03,7.84,3.28,1.05,6.78-.75,7.84-4.03,1.05-3.28-.75-6.78-4.03-7.84h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
     <path d="M140.93,129.07c-1.05,3.27-4.56,5.08-7.84,4.03-3.28-1.05-5.08-4.56-4.03-7.84,1.05-3.27,4.56-5.08,7.84-4.03,3.28,1.05,5.08,4.56,4.03,7.84h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
-    <path d="M96.43,129.21c-1.08-3.27.7-6.79,3.97-7.86,3.27-1.07,6.79.71,7.86,3.97,1.08,3.27-.7,6.79-3.97,7.86-3.27,1.07-6.79-.71-7.86-3.97h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
+    <path d="M96.43,129.21c-1.08-3.27.7-6.79,3.97-7.86,3.27-1.07,6.79.71,7.86,3.97,1.08,3.27-.7,6.79-3.97,7.86-3.27-1.07-6.79-.71-7.86-3.97h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
     <path d="M104.84,103.03c2.78-2.03,6.67-1.43,8.7,1.35,2.03,2.78,1.43,6.67-1.35,8.71-2.78,2.03-6.67,1.43-8.7-1.35-2.03-2.78-1.43-6.67,1.35-8.7h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
     <path d="M132.35,102.94c2.79,2.01,3.42,5.9,1.41,8.69-2.02,2.79-5.91,3.42-8.7,1.41-2.79-2.02-3.42-5.91-1.41-8.7,2.01-2.79,5.91-3.42,8.69-1.41h0Z" style={{ fill: "#e41e26", fillRule: "evenodd" }} />
     <path d="M118.5,73.16c2.04,0,4,.42,5.8,1.2.64.28,1.38.03,1.73-.58.48-.86,1.17-1.6,2.04-2.13.92-.57,1.96-.87,3-.89.13,0,.27,0,.41,0,.46.02.87-.07,1.28-.29.28-.15.6-.24.94-.24,1.1,0,1.99.88,2,1.99s-.89,1.99-1.99,1.99c-.77,0-1.44-.43-1.77-1.07-.28-.53-.83-.81-1.42-.72-.56.09-1.09.29-1.59.59-.67.41-1.19.99-1.54,1.66,0,.01-.01.02-.02.04-.3.59-.14,1.28.37,1.69,2.94,2.31,5.03,5.65,5.63,9.34.27,1.68-1.22,2.99-2.78,2.34-3.73-1.57-7.79-2.43-12.05-2.42s-8.32.9-12.03,2.49c-1.57.67-3.06-.64-2.8-2.32.57-3.69,2.65-7.05,5.57-9.37.51-.41.66-1.11.36-1.69,0-.01-.01-.02-.02-.04-.35-.67-.88-1.24-1.55-1.65-.49-.3-1.04-.5-1.59-.58-.59-.09-1.14.19-1.41.72-.33.64-1,1.07-1.76,1.08-1.1,0-1.99-.88-1.99-1.98s.88-1.99,1.98-2c.34,0,.66.08.94.23.41.22.82.31,1.28.28.14,0,.28-.01.41,0,1.04.02,2.08.31,3.01.87.87.53,1.57,1.27,2.06,2.12.35.61,1.09.85,1.73.57,1.79-.79,3.76-1.23,5.79-1.24h0Z" style={{ fill: "#fff", fillRule: "evenodd" }} />
@@ -312,10 +382,8 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
         textDecoration: "none", userSelect: "none", outline: "none",
         background: "", color: "var(--cream)",
         border: "2px solid rgba(200,55,45,0.4)",
-        transition: "box-shadow 0.3s ease",
       }}
     >
-      {/* Bug track */}
       <span style={{ position: "relative", display: "flex", alignItems: "center",
         width: 55, height: 34, flexShrink: 0, overflow: "hidden", marginRight: 2 }}>
         <motion.span
@@ -327,22 +395,13 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
           <BugIcon />
         </motion.span>
       </span>
-
-      {/* Divider */}
       <span style={{ width: 1, height: 20, background: "rgba(242,237,230,0.25)",
         flexShrink: 0, margin: "0 12px", borderRadius: 1 }} />
-
       <RollLabel isHovered={isHovered}>{label}</RollLabel>
     </motion.span>
   );
 
-  if (href) {
-  return (
-    <Link href={href} style={{ textDecoration: "none" }}>
-      {inner}
-    </Link>
-  );
-}
+  if (href) return <Link href={href} style={{ textDecoration: "none" }}>{inner}</Link>;
   return <button type="button" style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}>{inner}</button>;
 };
 
@@ -388,19 +447,14 @@ export default function Hero() {
   const nextIndex = (currentIndex + 1) % VIDEOS.length;
 
   const slides = [
-    { eyebrow: "21FIFTYONE — Paris",      line1: "We",    line2: "Make",  accent: "Culture.",    sub: "AI Production House · Luxury & Editorial",      cta: "View Our Work" },
-    { eyebrow: "120+ Projects Delivered", line1: "Human", line2: "Meets", accent: "Machine.",    sub: "Where artistry meets AI precision",              cta: "Our Process"   },
-    { eyebrow: "48 Luxury Brands",        line1: "Every", line2: "Frame", accent: "Deliberate.", sub: "Louis Vuitton · Hermès · Chanel · Dom Pérignon", cta: "Case Studies"  },
-    { eyebrow: "Est. 2021 — Paris",       line1: "Born",  line2: "From",  accent: "Obsession.",  sub: "We engineer cultural moments that last",          cta: "About Us"      },
+    { eyebrow: "",      line1: "We",    line2: "Make",  accent: "Culture.",    sub: "AI Production House · Luxury & Editorial",      cta: "View Our Work" },
+    { eyebrow: "", line1: "Human", line2: "Meets", accent: "Machine.",    sub: "Where artistry meets AI precision",              cta: "Our Process"   },
+    { eyebrow: "",        line1: "Every", line2: "Frame", accent: "Deliberate.", sub: "Louis Vuitton · Hermès · Chanel · Dom Pérignon", cta: "Case Studies"  },
+    { eyebrow: "",       line1: "Born",  line2: "From",  accent: "Obsession.",  sub: "We engineer cultural moments that last",          cta: "About Us"      },
   ];
   const slide = slides[currentIndex % slides.length];
 
-  /* ── Mini card: hide before first paint — inline style, not useEffect ──
-     FIX: original used useEffect for gsap.set which ran AFTER paint, flashing the card. */
-  const miniCardInitStyle: React.CSSProperties = {
-    opacity: 0,
-    transform: "scale(0.9) translateY(16px)",
-  };
+  const miniCardInitStyle: React.CSSProperties = { opacity: 0, transform: "scale(0.9) translateY(16px)" };
 
   const handleMiniClick = useCallback(() => {
     setHasClicked(true);
@@ -419,7 +473,6 @@ export default function Hero() {
     gsap.to(miniHintRef.current, { opacity: 1, duration: 0.4, delay: 0.1, overwrite: "auto" });
   }, []);
 
-  /* ── Mini preview video: always shows the NEXT video ── */
   useEffect(() => {
     const mv = miniVdRef.current;
     if (!mv) return;
@@ -428,100 +481,45 @@ export default function Hero() {
     mv.play().catch(() => {});
   }, [nextIndex]);
 
-  /* ── Transition animation: expand next video to fullscreen ──
-     FIX 1: nextVdRef src was incorrectly set to currentIndex (same as bg).
-             It must load getVideo(currentIndex) which is now the *newly set* slide.
-     FIX 2: removed gsap.context() — it was reverting mid-animation on React
-             strict-mode double-invoke, killing the tween before completion.
-             Plain timeline + manual kill in cleanup is safer here. */
   useEffect(() => {
     if (!hasClicked) return;
-
     const nv = nextVdRef.current;
     const bg = bgVdRef.current;
     if (!nv) return;
-
-    // Load the incoming video
     nv.src = getVideo(currentIndex);
     nv.load();
-
-    // Reset position before animating
-    gsap.set(nv, {
-      visibility: "visible",
-      width: 240, height: 240,
-      xPercent: -50, yPercent: -50,
-      top: "50%", left: "50%",
-      clearProps: "none",
-    });
-
+    gsap.set(nv, { visibility: "visible", width: 240, height: 240, xPercent: -50, yPercent: -50, top: "50%", left: "50%" });
     const tl = gsap.timeline();
     tl.to(nv, {
-      width: "100%", height: "100%",
-      xPercent: 0, yPercent: 0,
-      top: 0, left: 0,
-      duration: 0.95,
-      ease: "power2.inOut",
+      width: "100%", height: "100%", xPercent: 0, yPercent: 0, top: 0, left: 0,
+      duration: 0.95, ease: "power2.inOut",
       onStart() { nv.play().catch(() => {}); },
       onComplete() {
-        if (bg) {
-          bg.src = getVideo(currentIndex);
-          bg.load();
-          bg.play().catch(() => {});
-        }
-        // Hide and reset transition video
-        gsap.set(nv, {
-          visibility: "hidden",
-          clearProps: "width,height,top,left,xPercent,yPercent",
-        });
+        if (bg) { bg.src = getVideo(currentIndex); bg.load(); bg.play().catch(() => {}); }
+        gsap.set(nv, { visibility: "hidden", clearProps: "width,height,top,left,xPercent,yPercent" });
       },
     });
-
     return () => { tl.kill(); };
   }, [currentIndex, hasClicked]);
 
-  /* ── Scroll clip path ──
-     FIX: scoped to heroRef container so it doesn't bleed on re-renders,
-          and uses `overwrite: true` to prevent stacking ScrollTriggers. */
   useEffect(() => {
     const frame = heroRef.current?.querySelector<HTMLElement>("#video-frame");
     if (!frame) return;
-
-    gsap.set(frame, {
-      clipPath: "polygon(14% 0,72% 0,88% 90%,0 95%)",
-      borderRadius: "0% 0% 40% 10%",
-    });
-
+    gsap.set(frame, { clipPath: "polygon(14% 0,72% 0,88% 90%,0 95%)", borderRadius: "0% 0% 40% 10%" });
     const st = ScrollTrigger.create({
-      trigger: frame,
-      start: "center center",
-      end: "bottom center",
-      scrub: true,
-      animation: gsap.from(frame, {
-        clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)",
-        borderRadius: "0% 0% 0% 0%",
-        ease: "power1.inOut",
-      }),
+      trigger: frame, start: "center center", end: "bottom center", scrub: true,
+      animation: gsap.from(frame, { clipPath: "polygon(0% 0%,100% 0%,100% 100%,0% 100%)", borderRadius: "0% 0% 0% 0%", ease: "power1.inOut" }),
     });
-
     return () => { st.kill(); };
   }, []);
 
-  /* ── Slide text entrance ──
-     FIX: scoped with a containerRef selector so stale DOM nodes from
-          previous slides are never targeted. */
   useEffect(() => {
     const container = heroRef.current;
     if (!container) return;
-
     const items = container.querySelectorAll<HTMLElement>(".hero-text-item");
     if (!items.length) return;
-
     const tl = gsap.timeline();
-    tl.fromTo(items,
-      { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.72, ease: "power3.out", stagger: 0.09 }
-    );
-
+    tl.fromTo(items, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.72, ease: "power3.out", stagger: 0.09 });
     return () => { tl.kill(); };
   }, [currentIndex]);
 
@@ -632,11 +630,9 @@ export default function Hero() {
       <div ref={heroRef} style={{ position: "relative", height: "100dvh", width: "auto", overflow: "hidden" }}>
         <div id="video-frame" style={{ position: "relative", zIndex: 10, height: "100dvh", width: "100vw", overflow: "hidden", background: "var(--black)" }}>
 
-          {/* BG video */}
           <video ref={bgVdRef} src={getVideo(currentIndex)} autoPlay loop muted playsInline
             style={{ position: "absolute", inset: 0, zIndex: 1, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.65) contrast(1.1) brightness(.52)" }} />
 
-          {/* Transition video — hidden by default, shown only during transition */}
           <video ref={nextVdRef} loop muted playsInline
             style={{ position: "absolute", top: "50%", left: "50%", zIndex: 22, visibility: "hidden", width: 240, height: 240, objectFit: "cover", transform: "translate(-50%,-50%)", filter: "saturate(.82) contrast(1.06)" }} />
 
@@ -644,12 +640,10 @@ export default function Hero() {
           <div className="d-backdrop" />
           <div style={{ position: "absolute", inset: 0, zIndex: 30, pointerEvents: "none", boxShadow: "inset 0 0 120px rgba(200,55,45,.05),inset 0 0 0 1px rgba(200,55,45,.08)" }} />
 
-          {/* Ghost inside */}
           <h1 className="d-ghost" style={{ position: "absolute", bottom: 16, right: 16, zIndex: 40 }}>21FIFTYONE</h1>
 
           {/* ══ LEFT COLUMN ══ */}
           <div className="hero-col-left">
-
             <div className="hero-eyebrow-row hero-text-item">
               <div className="d-eyebrow">{slide.eyebrow}</div>
             </div>
@@ -660,52 +654,40 @@ export default function Hero() {
                 text={slide.line1}
                 className="d-h1"
                 splitType="chars"
-                delay={28}
-                duration={1.0}
-                ease="power3.out"
-                from={{ opacity: 0, y: 60, skewX: -4 }}
-                to={{ opacity: 1, y: 0, skewX: 0 }}
-                threshold={0}
-                rootMargin="0px"
-                hoverRoll
-                hoverRollDirection="left"
+                delay={28} duration={1.0} ease="power3.out"
+                from={{ opacity: 0, y: 60, skewX: -4 }} to={{ opacity: 1, y: 0, skewX: 0 }}
+                threshold={0} rootMargin="0px"
+                hoverRoll hoverRollDirection="left"
+                autoRoll autoRollInterval={5000} autoRollDuration={420}
               />
               <SplitText
                 key={`line2-${currentIndex}`}
                 text={slide.line2}
                 className="d-h1"
                 splitType="chars"
-                delay={28}
-                duration={1.0}
-                ease="power3.out"
-                from={{ opacity: 0, y: 60, skewX: -4 }}
-                to={{ opacity: 1, y: 0, skewX: 0 }}
-                threshold={0}
-                rootMargin="0px"
-                hoverRoll
-                hoverRollDirection="left"
+                delay={28} duration={1.0} ease="power3.out"
+                from={{ opacity: 0, y: 60, skewX: -4 }} to={{ opacity: 1, y: 0, skewX: 0 }}
+                threshold={0} rootMargin="0px"
+                hoverRoll hoverRollDirection="left"
+                autoRoll autoRollInterval={5400} autoRollDuration={420}
               />
               <SplitText
                 key={`accent-${currentIndex}`}
                 text={slide.accent}
                 className="d-h1-accent"
                 splitType="words"
-                delay={90}
-                duration={1.1}
-                ease="power4.out"
-                from={{ opacity: 0, y: 72, skewX: 6 }}
-                to={{ opacity: 1, y: 0, skewX: 0 }}
-                threshold={0}
-                rootMargin="0px"
-                hoverRoll
-                hoverRollDirection="left"
+                delay={90} duration={1.1} ease="power4.out"
+                from={{ opacity: 0, y: 72, skewX: 6 }} to={{ opacity: 1, y: 0, skewX: 0 }}
+                threshold={0} rootMargin="0px"
+                hoverRoll hoverRollDirection="left"
+                autoRoll autoRollInterval={3800} autoRollDuration={420}
               />
             </div>
 
             <div className="hero-body">
               <p className="d-sub hero-text-item">{slide.sub}</p>
               <div className="hero-text-item">
-                <RollButton label={slide.cta}  href="/studio" />
+                <RollButton label={slide.cta} href="/studio" />
               </div>
             </div>
 
@@ -719,7 +701,6 @@ export default function Hero() {
                 {String(currentIndex + 1).padStart(2, "0")} / {String(VIDEOS.length).padStart(2, "0")}
               </span>
             </div>
-
           </div>
 
           {/* ══ RIGHT PREVIEW ZONE ══ */}
@@ -743,7 +724,6 @@ export default function Hero() {
 
         </div>
 
-        {/* Ghost outside */}
         <h1 className="d-ghost d-ghost-dark" style={{ position: "absolute", bottom: 16, right: 16 }}>21FIFTYONE</h1>
       </div>
     </>

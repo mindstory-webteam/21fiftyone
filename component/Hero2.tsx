@@ -410,7 +410,7 @@ export default function Hero2() {
         {/* Top label bar */}
         <div className="hero2-top-bar">
           <span className="hero2-studio-label">21FiftyOne Studio</span>
-          <span className="hero2-year-label">Est. 2021 — Paris</span>
+          <span className="hero2-year-label">21FIFTYONE</span>
         </div>
 
         <div className="hero2-inner">
@@ -431,11 +431,14 @@ export default function Hero2() {
             textAlign="left"
             hoverRoll
             hoverRollDirection="center"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
           />
 
           {/* Line 2: "Alchemists" italic red */}
           <SplitText
-            text="Storytellers"
+            text="STORY TELLERS"
             tag="div"
             className="hero2-line-accent"
             delay={35}
@@ -449,6 +452,9 @@ export default function Hero2() {
             textAlign="left"
             hoverRoll
             hoverRollDirection="left"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
           />
 
           {/* Line 3: "OF DIGITAL NOIR." */}
@@ -467,6 +473,9 @@ export default function Hero2() {
             textAlign="left"
             hoverRoll
             hoverRollDirection="center"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
           />
 
           {/* ── LOWER: image + text ── */}

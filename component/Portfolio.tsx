@@ -408,8 +408,12 @@ const Portfolio = () => {
       <div className="pf-hdr">
         <div className="pf-hdr-left">
           <span className="pf-eyebrow" data-reveal>VISUAL PRODUCTION</span>
-          <SplitText text="Our Best" tag="div" className="pf-h1" delay={38} duration={1.2} ease="power3.out" splitType="chars" from={{ opacity: 0, y: 70 }} to={{ opacity: 1, y: 0 }} threshold={0.05} rootMargin="-20px" textAlign="left" hoverRoll hoverRollDirection="center" />
-          <SplitText text="Work." tag="div" className="pf-h1-accent" delay={30} duration={1.4} ease="power4.out" splitType="chars" from={{ opacity: 0, y: 80, skewX: 6 }} to={{ opacity: 1, y: 0, skewX: 0 }} threshold={0.05} rootMargin="-20px" textAlign="left" hoverRoll hoverRollDirection="left" />
+          <SplitText text="Our Best" tag="div" className="pf-h1" delay={38} duration={1.2} ease="power3.out" splitType="chars" from={{ opacity: 0, y: 70 }} to={{ opacity: 1, y: 0 }} threshold={0.05} rootMargin="-20px" textAlign="left" hoverRoll hoverRollDirection="center" autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620} />
+          <SplitText text="Work." tag="div" className="pf-h1-accent" delay={30} duration={1.4} ease="power4.out" splitType="chars" from={{ opacity: 0, y: 80, skewX: 6 }} to={{ opacity: 1, y: 0, skewX: 0 }} threshold={0.05} rootMargin="-20px" textAlign="left" hoverRoll hoverRollDirection="left" autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620} />
           <p className="pf-hdr-desc" data-reveal data-d="1">
            A curated selection of our finest visual productions—crafted with precision, driven by storytelling, and designed to elevate every brand we collaborate with
           </p>

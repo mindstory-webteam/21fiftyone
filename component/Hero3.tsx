@@ -2,220 +2,23 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
-import type { ElementType } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import React from "react";
+import Link from "next/link";
+import SplitText from "./Splittext"; // ← external import
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 /* ═══════════════════════════════════════════
-   SINGLE VIDEO  ← only change from original
+   SINGLE VIDEO
 ═══════════════════════════════════════════ */
-const VIDEO_SRC = "/videos/video-1.webm"; // ← swap your video path here
+const VIDEO_SRC = "/videos/video-1.webm";
 
 /* ═══════════════════════════════════════════
-   SPLIT TEXT
-═══════════════════════════════════════════ */
-type FromTo = {
-  opacity?: number; y?: number; x?: number;
-  scale?: number; rotation?: number; skewX?: number;
-  [key: string]: number | undefined;
-};
-interface SplitTextProps {
-  text: string; className?: string; delay?: number; duration?: number;
-  ease?: string; splitType?: "chars" | "words" | "lines";
-  from?: FromTo; to?: FromTo; threshold?: number; rootMargin?: string;
-  textAlign?: CSSProperties["textAlign"];
-  onLetterAnimationComplete?: () => void; showCallback?: boolean;
-  tag?: ElementType; hoverRoll?: boolean;
-  hoverRollDirection?: "left" | "right" | "center";
-}
-
-const ROLL_STAGGER = 0.035;
-
-const TextRoll: React.FC<{ children: string; direction?: "left" | "right" | "center" }> = ({
-  children, direction = "left",
-}) => {
-  const chars = children.split("");
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
-  return (
-    <motion.span initial="initial" whileHover="hovered"
-      style={{ position: "relative", display: "inline-block", overflow: "hidden",
-        cursor: "pointer", lineHeight: 0.88, verticalAlign: "top", userSelect: "none" }}>
-      <span aria-hidden style={{ display: "block" }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}>
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}>
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-    </motion.span>
-  );
-};
-
-function HoverRollSplitText({
-  text, className = "", delay = 50, duration = 1.25, ease = "power3.out",
-  splitType = "chars", from = { opacity: 0, y: 40 }, to = { opacity: 1, y: 0 },
-  threshold = 0.1, rootMargin = "-100px", textAlign = "left",
-  onLetterAnimationComplete, showCallback = false, hoverRollDirection = "left",
-}: SplitTextProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const unitRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  const units: string[] =
-    splitType === "chars" ? text.split("") :
-    splitType === "words" ? text.split(" ") :
-    text.split("\n");
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
-    if (!container || !targets.length) return;
-    gsap.set(targets, { ...from });
-    tlRef.current = gsap.timeline({
-      paused: true,
-      onComplete: () => { if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete(); },
-    });
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach(e => {
-        if (e.isIntersecting) { tlRef.current?.play(); observer.unobserve(container); }
-      }),
-      { threshold, rootMargin }
-    );
-    observer.observe(container);
-    return () => { observer.disconnect(); tlRef.current?.kill(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text]);
-
-  return (
-    <div ref={containerRef} className={className} aria-label={text}
-      style={{ textAlign, lineHeight: "inherit", display: "flex", flexWrap: "wrap",
-        gap: splitType === "chars" ? "0" : "0.2em" }}>
-      {units.map((unit, i) => {
-        if (unit === " " && splitType === "chars")
-          return <span key={i} ref={el => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>&nbsp;</span>;
-        return (
-          <span key={i} ref={el => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-function StandardSplitText({
-  text, className = "", delay = 50, duration = 1.25, ease = "power3.out",
-  splitType = "chars", from = { opacity: 0, y: 40 }, to = { opacity: 1, y: 0 },
-  threshold = 0.1, rootMargin = "-100px", textAlign = "left",
-  onLetterAnimationComplete, showCallback = false, tag: Tag = "div",
-}: SplitTextProps) {
-  const containerRef = useRef<HTMLElement>(null);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const buildSpans = (): HTMLElement[] => {
-      container.innerHTML = "";
-      if (splitType === "chars") {
-        const spans: HTMLElement[] = [];
-        text.split(" ").forEach((word, wi, arr) => {
-          const wordEl = document.createElement("span");
-          wordEl.style.display = "inline-block";
-          wordEl.style.whiteSpace = "nowrap";
-          word.split("").forEach(char => {
-            const el = document.createElement("span");
-            el.textContent = char;
-            el.style.display = "inline-block";
-            el.style.willChange = "transform, opacity";
-            wordEl.appendChild(el);
-            spans.push(el);
-          });
-          container.appendChild(wordEl);
-          if (wi < arr.length - 1) {
-            const sp = document.createElement("span");
-            sp.innerHTML = "&nbsp;";
-            sp.style.display = "inline-block";
-            container.appendChild(sp);
-          }
-        });
-        return spans;
-      }
-      if (splitType === "words") {
-        return text.split(" ").map((word, wi, arr) => {
-          const el = document.createElement("span");
-          el.textContent = word + (wi < arr.length - 1 ? "\u00A0" : "");
-          el.style.display = "inline-block";
-          el.style.willChange = "transform, opacity";
-          container.appendChild(el);
-          return el;
-        });
-      }
-      return text.split("\n").map(line => {
-        const el = document.createElement("span");
-        el.textContent = line;
-        el.style.display = "block";
-        el.style.willChange = "transform, opacity";
-        container.appendChild(el);
-        return el;
-      });
-    };
-    const targets = buildSpans();
-    if (!targets.length) return;
-    gsap.set(targets, { ...from });
-    tlRef.current = gsap.timeline({ paused: true });
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach(e => {
-        if (e.isIntersecting) { tlRef.current?.play(); observer.unobserve(container); }
-      }),
-      { threshold, rootMargin }
-    );
-    observer.observe(container);
-    return () => {
-      observer.disconnect();
-      tlRef.current?.kill();
-      if (container) container.innerHTML = text;
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text]);
-
-  return (
-    <Tag ref={containerRef as React.Ref<never>} className={className}
-      style={{ textAlign, lineHeight: "inherit" }} aria-label={text} />
-  );
-}
-
-function SplitText(props: SplitTextProps) {
-  if (props.hoverRoll) return <HoverRollSplitText {...props} />;
-  return <StandardSplitText {...props} />;
-}
-
-/* ═══════════════════════════════════════════
-   BUG SVG  (identical to original)
+   BUG SVG
 ═══════════════════════════════════════════ */
 const BugIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256.28 244.89" width="64" height="64" aria-hidden>
@@ -237,7 +40,7 @@ const BugIcon = () => (
 );
 
 /* ═══════════════════════════════════════════
-   ROLL LABEL  (identical to original)
+   ROLL LABEL
 ═══════════════════════════════════════════ */
 const RBSTAGGER = 0.028;
 const RollLabel = ({ children, isHovered }: { children: string; isHovered: boolean }) => {
@@ -267,7 +70,7 @@ const RollLabel = ({ children, isHovered }: { children: string; isHovered: boole
 };
 
 /* ═══════════════════════════════════════════
-   ROLL BUTTON  (identical to original)
+   ROLL BUTTON
 ═══════════════════════════════════════════ */
 const RollButton = ({ label, href }: { label: string; href?: string }) => {
   const [isHovered, setIsHovered] = React.useState(false);
@@ -309,7 +112,7 @@ const RollButton = ({ label, href }: { label: string; href?: string }) => {
 };
 
 /* ═══════════════════════════════════════════
-   3-D TILT WRAPPER  (identical to original)
+   3-D TILT WRAPPER
 ═══════════════════════════════════════════ */
 const VideoPreview = ({ children }: { children: React.ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -333,7 +136,7 @@ const VideoPreview = ({ children }: { children: React.ReactNode }) => {
 };
 
 /* ═══════════════════════════════════════════
-   HERO  — single video, everything else same
+   HERO
 ═══════════════════════════════════════════ */
 export default function Hero3() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -349,8 +152,12 @@ export default function Hero3() {
 
   const SLIDES_COUNT = 1;
   const slides = [
-    { eyebrow: "21FIFTYONE — Paris",      line1: "WE",    line2: "CREATE",  accent: "Visual",    sub: "A creative production house crafting cinematic stories, brand films, and digital content that captivate, connect, and leave a lasting impression.",      cta: "Contact Us" },
-  
+    {
+      eyebrow: "21FIFTYONE — Paris",
+      line1: "WE", line2: "CREATE", accent: "Visual",
+      sub: "A creative production house crafting cinematic stories, brand films, and digital content that captivate, connect, and leave a lasting impression.",
+      cta: "Contact Us",
+    },
   ];
   const slide = slides[currentIndex % SLIDES_COUNT];
 
@@ -373,7 +180,7 @@ export default function Hero3() {
     gsap.to(miniHintRef.current, { opacity: 1, duration: 0.4, delay: 0.1, overwrite: "auto" });
   }, []);
 
-  /* Mini preview: always the same single video */
+  /* Mini preview */
   useEffect(() => {
     const mv = miniVdRef.current;
     if (!mv) return;
@@ -382,7 +189,7 @@ export default function Hero3() {
     mv.play().catch(() => {});
   }, []);
 
-  /* Slide transition: expand from center — video stays the same, only text changes */
+  /* Slide transition */
   useEffect(() => {
     if (!hasClicked) return;
     const nv = nextVdRef.current;
@@ -417,7 +224,7 @@ export default function Hero3() {
     return () => { tl.kill(); };
   }, [currentIndex, hasClicked]);
 
-  /* Scroll clip path (identical to original) */
+  /* Scroll clip path */
   useEffect(() => {
     const frame = heroRef.current?.querySelector<HTMLElement>("#video-frame");
     if (!frame) return;
@@ -436,7 +243,7 @@ export default function Hero3() {
     return () => { st.kill(); };
   }, []);
 
-  /* Slide text entrance (identical to original) */
+  /* Slide text entrance */
   useEffect(() => {
     const container = heroRef.current;
     if (!container) return;
@@ -551,14 +358,14 @@ export default function Hero3() {
         video { will-change:transform; }
       `}</style>
 
-      <div ref={heroRef} style={{ position: "relative", height: "100dvh", width: "auto", overflow: "hidden",  }}>
+      <div ref={heroRef} style={{ position: "relative", height: "100dvh", width: "auto", overflow: "hidden" }}>
         <div id="video-frame" style={{ position: "relative", zIndex: 10, height: "100dvh", width: "100vw", overflow: "hidden", background: "var(--black)" }}>
 
-          {/* ── SINGLE BG VIDEO ── */}
+          {/* ── BG VIDEO ── */}
           <video ref={bgVdRef} src={VIDEO_SRC} autoPlay loop muted playsInline
             style={{ position: "absolute", inset: 0, zIndex: 1, width: "100%", height: "100%", objectFit: "cover", filter: "saturate(.65) contrast(1.1) brightness(.52)" }} />
 
-          {/* Transition video — used for the expand-from-center animation between slides */}
+          {/* Transition video */}
           <video ref={nextVdRef} loop muted playsInline
             style={{ position: "absolute", top: "50%", left: "50%", zIndex: 22, visibility: "hidden", width: 240, height: 240, objectFit: "cover", transform: "translate(-50%,-50%)", filter: "saturate(.82) contrast(1.06)" }} />
 
@@ -648,7 +455,7 @@ export default function Hero3() {
 
           </div>
 
-          {/* ══ RIGHT PREVIEW ZONE ══ */}
+          {/* ══ RIGHT PREVIEW ZONE (commented out) ══ */}
           {/* <div className="preview-zone" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onClick={handleMiniClick}>
             <div className="preview-hint" ref={miniHintRef}>Next slide</div>
             <div className="preview-card" ref={miniCardRef} style={miniCardInitStyle}>

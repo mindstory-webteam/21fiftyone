@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, CSSProperties } from "react";
-import type { ElementType } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState, useCallback } from "react";
 import React from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import SplitText from "./Splittext"; // ← external import
 
 /* ─── Design tokens ─── */
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');`;
@@ -47,367 +42,20 @@ const SLIDES = [
 ];
 
 const MARQUEE_ITEMS = [
-  "Film Production","✦","Commercial / Ad","✦","Corporate Film","✦",
-  "Event / Experience","✦","AI Content","✦","Photography","✦"
-
+  "Film Production", "✦", "Commercial / Ad", "✦", "Corporate Film", "✦",
+  "Event / Experience", "✦", "AI Content", "✦", "Photography", "✦",
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   TEXT ROLL
-═══════════════════════════════════════════════════════════ */
-
-const ROLL_STAGGER = 0.035;
-
-interface TextRollProps {
-  children: string;
-  className?: string;
-  direction?: "left" | "right" | "center";
-}
-
-const TextRoll: React.FC<TextRollProps> = ({ children, className, direction = "left" }) => {
-  const chars = children.split("");
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right") return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
-
-  return (
-    <motion.span
-      initial="initial"
-      whileHover="hovered"
-      className={`relative inline-block  cursor-pointer select-none ${className ?? ""}`}
-      style={{ lineHeight: 0.88, verticalAlign: "top" }}
-    >
-      <span aria-hidden style={{ display: "block" }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            className="inline-block"
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            className="inline-block"
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-    </motion.span>
-  );
-};
-
-/* ═══════════════════════════════════════════════════════════
-   TYPES
-═══════════════════════════════════════════════════════════ */
-
-type FromTo = {
-  opacity?: number;
-  y?: number;
-  x?: number;
-  scale?: number;
-  rotation?: number;
-  skewX?: number;
-  [key: string]: number | undefined;
-};
-
-interface SplitTextProps {
-  text: string;
-  className?: string;
-  delay?: number;
-  duration?: number;
-  ease?: string;
-  splitType?: "chars" | "words" | "lines";
-  from?: FromTo;
-  to?: FromTo;
-  threshold?: number;
-  rootMargin?: string;
-  textAlign?: CSSProperties["textAlign"];
-  onLetterAnimationComplete?: () => void;
-  showCallback?: boolean;
-  tag?: ElementType;
-  hoverRoll?: boolean;
-  hoverRollDirection?: "left" | "right" | "center";
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HOVER ROLL SPLIT TEXT (internal)
-═══════════════════════════════════════════════════════════ */
-
-interface HoverRollProps extends Omit<SplitTextProps, "hoverRoll"> {
-  hoverRollDirection?: "left" | "right" | "center";
-}
-
-function HoverRollSplitText({
-  text,
-  className = "",
-  delay = 50,
-  duration = 1.25,
-  ease = "power3.out",
-  splitType = "chars",
-  from = { opacity: 0, y: 40 },
-  to = { opacity: 1, y: 0 },
-  threshold = 0.1,
-  rootMargin = "-100px",
-  textAlign = "left",
-  onLetterAnimationComplete,
-  showCallback = false,
-  hoverRollDirection = "left",
-}: HoverRollProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const unitRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  const units: string[] =
-    splitType === "chars"
-      ? text.split("")
-      : splitType === "words"
-      ? text.split(" ")
-      : text.split("\n");
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const targets = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
-    if (!container || !targets.length) return;
-
-    gsap.set(targets, { ...from });
-
-    tlRef.current = gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete();
-      },
-    });
-
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            tlRef.current?.play();
-            observer.unobserve(container);
-          }
-        });
-      },
-      { threshold, rootMargin }
-    );
-
-    observer.observe(container);
-
-    return () => {
-      observer.disconnect();
-      tlRef.current?.kill();
-    };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
-
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{
-        textAlign,
-        lineHeight: "inherit",
-        display: "flex",
-        flexWrap: "wrap",
-        gap: splitType === "chars" ? "0" : "0.25em",
-      }}
-      aria-label={text}
-    >
-      {units.map((unit, i) => {
-        if (unit === " " && splitType === "chars") {
-          return (
-            <span
-              key={i}
-              ref={(el) => { unitRefs.current[i] = el; }}
-              style={{ display: "inline-block" }}
-            >
-              &nbsp;
-            </span>
-          );
-        }
-        return (
-          <span
-            key={i}
-            ref={(el) => { unitRefs.current[i] = el; }}
-            style={{ display: "inline-block" }}
-          >
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   SPLIT TEXT (standard mode — no hoverRoll)
-═══════════════════════════════════════════════════════════ */
-
-function SplitText({
-  text,
-  className = "",
-  delay = 50,
-  duration = 1.25,
-  ease = "power3.out",
-  splitType = "chars",
-  from = { opacity: 0, y: 40 },
-  to = { opacity: 1, y: 0 },
-  threshold = 0.1,
-  rootMargin = "-100px",
-  textAlign = "left",
-  onLetterAnimationComplete,
-  showCallback = false,
-  tag: Tag = "div",
-  hoverRoll = false,
-  hoverRollDirection = "left",
-}: SplitTextProps) {
-  const containerRef = useRef<HTMLElement>(null);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  if (hoverRoll) {
-    return (
-      <HoverRollSplitText
-        text={text}
-        className={className}
-        delay={delay}
-        duration={duration}
-        ease={ease}
-        splitType={splitType}
-        from={from}
-        to={to}
-        threshold={threshold}
-        rootMargin={rootMargin}
-        textAlign={textAlign}
-        onLetterAnimationComplete={onLetterAnimationComplete}
-        showCallback={showCallback}
-        tag={Tag}
-        hoverRollDirection={hoverRollDirection}
-      />
-    );
-  }
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const buildSpans = (): HTMLElement[] => {
-      container.innerHTML = "";
-
-      if (splitType === "chars") {
-        const words = text.split(" ");
-        const spans: HTMLElement[] = [];
-        words.forEach((word, wi) => {
-          const wordEl = document.createElement("span");
-          wordEl.style.display = "inline-block";
-          wordEl.style.whiteSpace = "nowrap";
-          word.split("").forEach((char) => {
-            const charEl = document.createElement("span");
-            charEl.textContent = char;
-            charEl.style.display = "inline-block";
-            charEl.style.willChange = "transform, opacity";
-            wordEl.appendChild(charEl);
-            spans.push(charEl);
-          });
-          container.appendChild(wordEl);
-          if (wi < words.length - 1) {
-            const space = document.createElement("span");
-            space.innerHTML = "&nbsp;";
-            space.style.display = "inline-block";
-            container.appendChild(space);
-          }
-        });
-        return spans;
-      }
-
-      if (splitType === "words") {
-        return text.split(" ").map((word, wi, arr) => {
-          const el = document.createElement("span");
-          el.textContent = word + (wi < arr.length - 1 ? "\u00A0" : "");
-          el.style.display = "inline-block";
-          el.style.willChange = "transform, opacity";
-          container.appendChild(el);
-          return el;
-        });
-      }
-
-      return text.split("\n").map((line) => {
-        const el = document.createElement("span");
-        el.textContent = line;
-        el.style.display = "block";
-        el.style.willChange = "transform, opacity";
-        container.appendChild(el);
-        return el;
-      });
-    };
-
-    const targets = buildSpans();
-    if (!targets.length) return;
-
-    gsap.set(targets, { ...from });
-
-    tlRef.current = gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete();
-      },
-    });
-
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay / 1000 });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            tlRef.current?.play();
-            observer.unobserve(container);
-          }
-        });
-      },
-      { threshold, rootMargin }
-    );
-
-    observer.observe(container);
-
-    return () => {
-      observer.disconnect();
-      tlRef.current?.kill();
-      if (container) container.innerHTML = text;
-    };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
-
-  return (
-    <Tag
-      ref={containerRef as React.Ref<never>}
-      className={className}
-      style={{ textAlign, lineHeight: "inherit" }}
-      aria-label={text}
-    />
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MARQUEE TEXT CARD — auto-cycles through stat/quote items
-   with a vertical marquee scroll, clipped to heading space
+   MARQUEE TEXT CARD
 ═══════════════════════════════════════════════════════════ */
 
 const CARD_ITEMS = [
-  { label: "Shoot Time",   value: "05:48 hrs",         sub: "Golden hour captured with precision and intent." },
-  { label: "Frame Clarity", value: "∞",           sub: "Every detail refined — no compromise on visual quality." },
-  { label: "Locations Covered",      value: "99.8%",           sub: "Clean air index" },
-  { label: "Silence",     value: "12 +",           sub: "From studio-controlled sets to real-world environments." },
-  { label: "Output Quality",    value: "4K • 8K • HDR",            sub: "Engineered for cinematic impact across every screen." },
- 
+  { label: "Shoot Time",        value: "05:48 hrs",      sub: "Golden hour captured with precision and intent." },
+  { label: "Frame Clarity",     value: "∞",              sub: "Every detail refined — no compromise on visual quality." },
+  { label: "Locations Covered", value: "99.8%",          sub: "Clean air index" },
+  { label: "Silence",           value: "12 +",           sub: "From studio-controlled sets to real-world environments." },
+  { label: "Output Quality",    value: "4K • 8K • HDR",  sub: "Engineered for cinematic impact across every screen." },
 ];
 
 function MarqueeTextCard() {
@@ -420,7 +68,6 @@ function MarqueeTextCard() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* top label */}
       <div className="bs-mcard-top">
         <span className="bs-mcard-badge">
           <span className="bs-mcard-dot" />
@@ -429,7 +76,6 @@ function MarqueeTextCard() {
         <span className="bs-mcard-count">{CARD_ITEMS.length} entries</span>
       </div>
 
-      {/* scrolling track — doubled for seamless loop */}
       <div className="bs-mcard-viewport">
         <div
           ref={trackRef}
@@ -446,7 +92,6 @@ function MarqueeTextCard() {
         </div>
       </div>
 
-      {/* bottom divider rule */}
       <div className="bs-mcard-bottom">
         <span className="bs-mcard-ticker">
           {CARD_ITEMS.map((it, i) => (
@@ -467,7 +112,7 @@ function MarqueeTextCard() {
 
 export default function BenefitSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoRef    = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [current, setCurrent]     = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -528,7 +173,6 @@ export default function BenefitSection() {
         }
         .bs-section { padding: 120px 0 0; position: relative; }
 
-        /* Label row */
         .bs-label-row {
           max-width: 1280px; margin: 0 auto; padding: 0 64px;
           display: flex; justify-content: space-between; align-items: center;
@@ -537,33 +181,22 @@ export default function BenefitSection() {
         .bs-label-l { font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: var(--red); }
         .bs-label-r { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
 
-        /* Header */
         .bs-header {
           max-width: 1280px; margin: 0 auto; padding: 0 64px 80px;
         }
 
-        /* ── Headline row with inline video card ── */
-        /*
-          Line 1: "Step Into" text  +  video card fills the rest of the line
-          The row is a flex container with a fixed natural height = the text block height.
-          The video card stretches to fill leftover width and is overflow:hidden (clipped).
-        */
         .bs-headline-row {
           display: flex;
           align-items: stretch;
           gap: 20px;
-          overflow: hidden; /* clips the video card to this row's bounds */
-          /* height driven by the tallest child — the text sets it */
+          overflow: hidden;
         }
-
-        /* Text column — shrinks to its natural width, never grows */
         .bs-headline-text-col {
           flex: 0 0 auto;
           display: flex;
           flex-direction: column;
           gap: 0;
         }
-
         .bs-headline-wrap {
           font-family: 'Anton', sans-serif;
           font-size: clamp(88px, 11vw, 158px);
@@ -586,7 +219,7 @@ export default function BenefitSection() {
           overflow: hidden;
         }
 
-        /* ══ Marquee text card ══════════════════════════════════ */
+        /* ── Marquee text card ── */
         .bs-mcard {
           flex: 1 1 0;
           overflow: hidden;
@@ -600,7 +233,6 @@ export default function BenefitSection() {
           animation: mcReveal .9s .55s cubic-bezier(.16,1,.3,1) forwards;
           position: relative;
         }
-        /* left red accent bar */
         .bs-mcard::before {
           content: '';
           position: absolute;
@@ -612,8 +244,6 @@ export default function BenefitSection() {
         @keyframes mcReveal {
           to { opacity: 1; transform: scale(1) translateY(0); }
         }
-
-        /* top strip */
         .bs-mcard-top {
           flex: 0 0 auto;
           display: flex;
@@ -645,70 +275,53 @@ export default function BenefitSection() {
           text-transform: uppercase;
           color: rgba(255,255,255,0.2);
         }
-
-        /* scrolling viewport — flex: 1 fills the middle */
         .bs-mcard-viewport {
           flex: 1 1 0;
           overflow: hidden;
           position: relative;
-          /* top & bottom fade masks */
           -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
           mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%);
         }
-
         .bs-mcard-track {
           display: flex;
           flex-direction: column;
-          /* total height = items × item-height; animation shifts by 50% (one copy) */
           animation: mcScroll 10s linear infinite;
         }
         @keyframes mcScroll {
           0%   { transform: translateY(0); }
           100% { transform: translateY(-50%); }
         }
-
-        /* individual stat item */
         .bs-mcard-item {
           display: flex;
           flex-direction: column;
           justify-content: center;
           padding: 0 20px;
-          /* height so viewport shows ~2.5 at a time */
           min-height: 72px;
           border-bottom: 1px solid rgba(255,255,255,0.04);
           position: relative;
           transition: background .25s;
         }
         .bs-mcard-item:hover { background: rgba(255,255,255,0.03); }
-
         .bs-mcard-label {
           font-family: 'DM Sans', sans-serif;
           font-size: 8px; font-weight: 500;
           letter-spacing: .32em; text-transform: uppercase;
-          color: var(--red);
-          margin-bottom: 3px;
+          color: var(--red); margin-bottom: 3px;
         }
         .bs-mcard-value {
           font-family: 'Anton', sans-serif;
           font-size: clamp(22px, 2.8vw, 36px);
-          letter-spacing: -.01em;
-          color: #fff;
-          line-height: 1;
+          letter-spacing: -.01em; color: #fff; line-height: 1;
         }
         .bs-mcard-sub {
           font-family: 'DM Sans', sans-serif;
-          font-size: 9px; font-weight: 300;
-          letter-spacing: .12em;
-          color: rgba(255,255,255,0.35);
-          margin-top: 3px;
+          font-size: 9px; font-weight: 300; letter-spacing: .12em;
+          color: rgba(255,255,255,0.35); margin-top: 3px;
         }
-
-        /* bottom ticker strip */
         .bs-mcard-bottom {
           flex: 0 0 auto;
           border-top: 1px solid rgba(255,255,255,0.06);
-          padding: 9px 20px;
-          overflow: hidden;
+          padding: 9px 20px; overflow: hidden;
         }
         .bs-mcard-ticker {
           display: flex; align-items: center; gap: 10px;
@@ -716,9 +329,7 @@ export default function BenefitSection() {
           font-size: 9px; font-weight: 500;
           letter-spacing: .22em; text-transform: uppercase;
           color: rgba(255,255,255,0.18);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .bs-mcard-sep { color: var(--red); opacity: .6; }
 
@@ -843,16 +454,8 @@ export default function BenefitSection() {
           .bs-slide-nav { flex-direction: row; overflow-x: auto; }
           .bs-nav-item { flex-direction: column; align-items: flex-start; gap: 6px; min-width: 140px; }
           .bs-nav-arrow { display: none; }
-
-          /* On mobile the video card drops below the headline text */
-          .bs-headline-row {
-            flex-direction: column;
-          }
-          .bs-mcard {
-            flex: none;
-            height: 220px;
-            border-radius: 10px;
-          }
+          .bs-headline-row { flex-direction: column; }
+          .bs-mcard { flex: none; height: 220px; border-radius: 10px; }
         }
         @media (max-width: 600px) {
           .bs-root::before { left: 24px; right: 24px; }
@@ -866,16 +469,10 @@ export default function BenefitSection() {
 
           <div className="bs-label-row" data-reveal>
             <span className="bs-label-l">Mountain Experience</span>
-            <span className="bs-label-r">Est. 2021 — Alps</span>
+            <span className="bs-label-r">21FIFTYONE</span>
           </div>
 
           <div className="bs-header">
-            {/*
-              ── Heading row ──────────────────────────────────────────
-              Flex row: [text column] [video card — fills remaining width]
-              The row has overflow:hidden so the video is hard-clipped to
-              whatever space is left after the text. No fixed widths needed.
-            */}
             <div className="bs-headline-row">
 
               {/* LEFT: both headline lines stacked */}
@@ -892,6 +489,9 @@ export default function BenefitSection() {
                     threshold={0.15}
                     rootMargin="-80px"
                     hoverRoll
+                    autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                     hoverRollDirection="left"
                   />
                 </div>
@@ -909,11 +509,14 @@ export default function BenefitSection() {
                     rootMargin="-80px"
                     hoverRoll
                     hoverRollDirection="center"
+                    autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                   />
                 </div>
               </div>
 
-              {/* RIGHT: marquee text card — clipped to the remaining width */}
+              {/* RIGHT: marquee text card */}
               <MarqueeTextCard />
 
             </div>
@@ -934,7 +537,8 @@ export default function BenefitSection() {
               <div className="bs-dot-row">
                 {SLIDES.map((_, i) => (
                   <button
-                    key={i} className="bs-dot"
+                    key={i}
+                    className="bs-dot"
                     onClick={() => { if (autoRef.current) clearInterval(autoRef.current); goTo(i); }}
                     style={{
                       width: i === current ? "28px" : "8px",
@@ -965,7 +569,9 @@ export default function BenefitSection() {
           <div className="bs-marquee-wrap">
             <div className="bs-marquee-track">
               {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-                <span key={i} className={`bs-marquee-item${item === "✦" ? " dot" : ""}`}>{item}</span>
+                <span key={i} className={`bs-marquee-item${item === "✦" ? " dot" : ""}`}>
+                  {item}
+                </span>
               ))}
             </div>
           </div>

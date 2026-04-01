@@ -392,6 +392,9 @@ export default function FivePillarsSection() {
               textAlign="center"
               hoverRoll
               hoverRollDirection="center"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
 
             {/* Line 2 — Playfair italic: "Pillars" */}
@@ -410,6 +413,9 @@ export default function FivePillarsSection() {
               textAlign="center"
               hoverRoll
               hoverRollDirection="center"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
           </div>
 

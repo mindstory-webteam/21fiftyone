@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useEffect, CSSProperties } from "react";
+import { useRef, useEffect, useCallback, CSSProperties } from "react";
 import type { ElementType } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimation, AnimationControls } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -11,63 +11,104 @@ if (typeof window !== "undefined") {
 }
 
 /* ════════════════════════════════════════════════════════
-   TEXT ROLL
+   TEXT ROLL — auto + hover
 ════════════════════════════════════════════════════════ */
 const ROLL_STAGGER = 0.035;
 
-interface TextRollProps {
-  children: string;
-  direction?: "left" | "right" | "center";
+function getRollDelay(i: number, total: number, direction: "left" | "right" | "center") {
+  if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
+  if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
+  return ROLL_STAGGER * i;
 }
 
-const TextRoll = ({ children, direction = "left" }: TextRollProps) => {
-  const chars = children.split("");
+interface TextRollCharProps {
+  char: string;
+  delay: number;
+  duration: number;
+  controls: AnimationControls;
+}
 
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
+const TextRollChar = ({ char, delay, duration, controls }: TextRollCharProps) => {
+  const ch = char === " " ? "\u00A0" : char;
+  return (
+    <span style={{ display: "inline-block", position: "relative", overflow: "hidden", lineHeight: 0.88, verticalAlign: "top" }}>
+      <motion.span
+        style={{ display: "block" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "0%",    transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          rolling: { y: "-100%", transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          reset:   { y: "100%",  transition: { duration: 0 } },
+        }}
+      >{ch}</motion.span>
+      <motion.span
+        aria-hidden
+        style={{ display: "block", position: "absolute", inset: 0, whiteSpace: "pre" }}
+        animate={controls}
+        variants={{
+          idle:    { y: "100%",  transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          rolling: { y: "0%",    transition: { ease: "easeInOut", duration: duration / 1000, delay } },
+          reset:   { y: "200%",  transition: { duration: 0 } },
+        }}
+      >{ch}</motion.span>
+    </span>
+  );
+};
+
+interface TextRollUnitProps {
+  children: string;
+  direction?: "left" | "right" | "center";
+  autoRoll?: boolean;
+  autoRollInterval?: number;
+  autoRollDuration?: number;
+}
+
+const TextRoll = ({
+  children,
+  direction = "left",
+  autoRoll = false,
+  autoRollInterval = 2500,
+  autoRollDuration = 400,
+}: TextRollUnitProps) => {
+  const chars    = children.split("");
+  const total    = chars.length;
+  const controls = useAnimation();
+  const hovering = useRef(false);
+  const rolling  = useRef(false);
+
+  const doRoll = useCallback(async () => {
+    if (rolling.current) return;
+    rolling.current = true;
+    await controls.start("rolling");
+    await controls.start("reset");
+    await controls.start("idle");
+    rolling.current = false;
+  }, [controls]);
+
+  useEffect(() => {
+    if (!autoRoll) return;
+    const id = setInterval(() => {
+      if (!hovering.current) doRoll();
+    }, autoRollInterval);
+    return () => clearInterval(id);
+  }, [autoRoll, autoRollInterval, doRoll]);
 
   return (
-    <motion.span
-      initial="initial"
-      whileHover="hovered"
-      style={{
-        position: "relative",
-        display: "inline-block",
-        overflow: "hidden",
-        cursor: "pointer",
-        lineHeight: 0.88,
-        verticalAlign: "top",
-        userSelect: "none",
-      }}
+    <span
+      onMouseEnter={() => { hovering.current = true;  doRoll(); }}
+      onMouseLeave={() => { hovering.current = false; }}
+      style={{ display: "inline-flex", cursor: "pointer", userSelect: "none", verticalAlign: "top" }}
     >
-      <span aria-hidden style={{ display: "block" }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: 0 }, hovered: { y: "-100%" } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display: "block", position: "absolute", inset: 0 }}>
-        {chars.map((l, i) => (
-          <motion.span
-            key={i}
-            variants={{ initial: { y: "100%" }, hovered: { y: 0 } }}
-            transition={{ ease: "easeInOut", delay: getDelay(i, chars.length) }}
-            style={{ display: "inline-block" }}
-          >
-            {l === " " ? "\u00A0" : l}
-          </motion.span>
-        ))}
-      </span>
-    </motion.span>
+      {chars.map((ch, i) => (
+        <TextRollChar
+          key={i}
+          char={ch}
+          controls={controls}
+          delay={getRollDelay(i, total, direction)}
+          duration={autoRollDuration}
+        />
+      ))}
+    </span>
   );
 };
 
@@ -101,6 +142,9 @@ interface SplitTextProps {
   tag?: ElementType;
   hoverRoll?: boolean;
   hoverRollDirection?: "left" | "right" | "center";
+  autoRoll?: boolean;
+  autoRollInterval?: number;
+  autoRollDuration?: number;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -121,6 +165,9 @@ function HoverRollSplitText({
   onLetterAnimationComplete,
   showCallback = false,
   hoverRollDirection = "left",
+  autoRoll = false,
+  autoRollInterval = 2500,
+  autoRollDuration = 400,
 }: SplitTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const unitRefs     = useRef<(HTMLSpanElement | null)[]>([]);
@@ -137,7 +184,6 @@ function HoverRollSplitText({
     if (!container || !targets.length) return;
 
     gsap.set(targets, { ...from });
-
     tlRef.current = gsap.timeline({
       paused: true,
       onComplete: () => {
@@ -182,22 +228,21 @@ function HoverRollSplitText({
       {units.map((unit, i) => {
         if (unit === " " && splitType === "chars") {
           return (
-            <span
-              key={i}
-              ref={(el) => { unitRefs.current[i] = el; }}
-              style={{ display: "inline-block" }}
-            >
+            <span key={i} ref={(el) => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>
               &nbsp;
             </span>
           );
         }
         return (
-          <span
-            key={i}
-            ref={(el) => { unitRefs.current[i] = el; }}
-            style={{ display: "inline-block" }}
-          >
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
+          <span key={i} ref={(el) => { unitRefs.current[i] = el; }} style={{ display: "inline-block" }}>
+            <TextRoll
+              direction={hoverRollDirection}
+              autoRoll={autoRoll}
+              autoRollInterval={autoRollInterval + i * 150}
+              autoRollDuration={autoRollDuration}
+            >
+              {unit}
+            </TextRoll>
           </span>
         );
       })}
@@ -207,9 +252,6 @@ function HoverRollSplitText({
 
 /* ════════════════════════════════════════════════════════
    STANDARD SPLIT TEXT
-   FIX: hooks are always called — hoverRoll branch renders
-   a different component via a wrapper, not an early return
-   inside a component that also calls hooks.
 ════════════════════════════════════════════════════════ */
 function StandardSplitText({
   text,
@@ -236,7 +278,6 @@ function StandardSplitText({
 
     const buildSpans = (): HTMLElement[] => {
       container.innerHTML = "";
-
       if (splitType === "chars") {
         const spans: HTMLElement[] = [];
         text.split(" ").forEach((word, wi, arr) => {
@@ -261,7 +302,6 @@ function StandardSplitText({
         });
         return spans;
       }
-
       if (splitType === "words") {
         return text.split(" ").map((word, wi, arr) => {
           const el = document.createElement("span");
@@ -272,7 +312,6 @@ function StandardSplitText({
           return el;
         });
       }
-
       return text.split("\n").map((line) => {
         const el = document.createElement("span");
         el.textContent = line;
@@ -326,16 +365,13 @@ function StandardSplitText({
   );
 }
 
-/* Public SplitText — routes to the correct implementation */
 function SplitText(props: SplitTextProps) {
-  if (props.hoverRoll) {
-    return <HoverRollSplitText {...props} />;
-  }
+  if (props.hoverRoll) return <HoverRollSplitText {...props} />;
   return <StandardSplitText {...props} />;
 }
 
 /* ════════════════════════════════════════════════════════
-   STYLES (unchanged from original)
+   STYLES (unchanged)
 ════════════════════════════════════════════════════════ */
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:ital,wght@1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -526,19 +562,17 @@ const STYLES = `
    MARQUEE DATA
 ════════════════════════════════════════════════════════ */
 const MARQUEE_RAW = [
-  "Play Economy", "✦", "Shared Adventure", "✦",
-  "Every World",  "✦", "Epic Quests",      "✦",
-  "United Players","✦","Infinite Realms",  "✦",
-  "Your Life MMORPG","✦","Level Up",        "✦",
+  "Film Production","✦","Commercial / Ad","✦","Corporate Film","✦",
+  "Event / Experience","✦","AI Content","✦","Photography","✦"
 ];
 
 /* ════════════════════════════════════════════════════════
    ABOUT COMPONENT
 ════════════════════════════════════════════════════════ */
 const About1 = () => {
-  const clipRef   = useRef<HTMLDivElement>(null);
-  const maskRef   = useRef<HTMLDivElement>(null);
-  const videoRef  = useRef<HTMLVideoElement>(null);
+  const clipRef    = useRef<HTMLDivElement>(null);
+  const maskRef    = useRef<HTMLDivElement>(null);
+  const videoRef   = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   /* Inject global styles once */
@@ -552,7 +586,7 @@ const About1 = () => {
     return () => { document.getElementById(id)?.remove(); };
   }, []);
 
-  /* GSAP scroll animation — plain useEffect, no useGSAP needed */
+  /* GSAP scroll animation */
   useEffect(() => {
     const clip    = clipRef.current;
     const mask    = maskRef.current;
@@ -560,7 +594,6 @@ const About1 = () => {
     const overlay = overlayRef.current;
     if (!clip || !mask || !video || !overlay) return;
 
-    // Ensure ScrollTrigger is ready
     ScrollTrigger.refresh();
 
     const tl = gsap.timeline({
@@ -571,13 +604,11 @@ const About1 = () => {
         scrub: 0.5,
         pin: true,
         pinSpacing: true,
-        // Prevent flicker on fast scrolls
         anticipatePin: 1,
       },
     });
 
     tl
-      /* ① Expand card to fullscreen using numeric vw/vh units */
       .fromTo(
         mask,
         {
@@ -594,14 +625,12 @@ const About1 = () => {
           ease: "power2.out",
         }
       )
-      /* ② Scale video in sync */
       .fromTo(
         video,
         { scale: 1.6, opacity: 0.85 },
         { scale: 1,   opacity: 1,    ease: "power2.out" },
         "<"
       )
-      /* ③ Fade in overlay text */
       .fromTo(
         overlay,
         { opacity: 0, y: 50 },
@@ -615,7 +644,7 @@ const About1 = () => {
     };
   }, []);
 
-  /* Update numeric pixel targets on window resize */
+  /* Refresh on resize */
   useEffect(() => {
     const handleResize = () => ScrollTrigger.refresh();
     window.addEventListener("resize", handleResize);
@@ -631,8 +660,8 @@ const About1 = () => {
       <div className="relative mb-8 mt-86 flex flex-col items-center gap-5 px-4">
 
         <div className="ab-label-row w-full max-w-5xl">
-          <span className="ab-label-l">WELCOME TO 21 FIFTYONE </span>
-          <span className="ab-label-r">Est. 2024 — Metagame Layer</span>
+          <span className="ab-label-l">WELCOME TO 21 FIFTYONE</span>
+          <span className="ab-label-r">21FIFTYONE</span>
         </div>
 
         <div style={{ width: "100%", maxWidth: "1100px" }}>
@@ -651,10 +680,13 @@ const About1 = () => {
             textAlign="center"
             hoverRoll
             hoverRollDirection="center"
+            autoRoll
+            autoRollInterval={5000}
+            autoRollDuration={620}
           />
 
           <SplitText
-            text="Shared Experience"
+            text="SHARED EXPERIENCE"
             tag="div"
             className="ab-headline-accent"
             delay={80}
@@ -668,6 +700,9 @@ const About1 = () => {
             textAlign="center"
             hoverRoll
             hoverRollDirection="left"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
           />
         </div>
 
@@ -684,7 +719,6 @@ const About1 = () => {
       {/* ── Scroll clip section ── */}
       <div className="h-dvh w-screen" id="clip" ref={clipRef}>
         <div className="mask-clip-path about-image" ref={maskRef}>
-
           <video
             ref={videoRef}
             className="stone-video"
@@ -694,7 +728,6 @@ const About1 = () => {
             muted
             playsInline
           />
-
           <div ref={overlayRef} className="scroll-text ab-scroll-overlay" style={{ opacity: 0 }}>
             <div className="ab-overlay-big">
               WHERE STORIES <br /> COME ALIVE
@@ -705,7 +738,6 @@ const About1 = () => {
                and precision.
             </div>
           </div>
-
         </div>
       </div>
 

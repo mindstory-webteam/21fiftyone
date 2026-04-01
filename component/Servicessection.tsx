@@ -168,6 +168,9 @@ function SingleServiceCard({
               textAlign="left"
               hoverRoll
               hoverRollDirection="center"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
           ))}
 
@@ -188,6 +191,9 @@ function SingleServiceCard({
               textAlign="left"
               hoverRoll
               hoverRollDirection="left"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
           )}
 
@@ -240,6 +246,9 @@ function SingleServiceCard({
               threshold={0.05}
               rootMargin="-10px"
               textAlign="left"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
           )}
           {card.ritualTagline && (
@@ -284,6 +293,9 @@ function SingleServiceCard({
               textAlign="left"
               hoverRoll
               hoverRollDirection="center"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
           ))}
 
@@ -874,6 +886,9 @@ export default function ServicesSection(props: ServicesSectionProps) {
                   textAlign="left"
                   hoverRoll
                   hoverRollDirection="center"
+                  autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                 />
               ))}
               {sectionTitleAccent && (
@@ -893,6 +908,9 @@ export default function ServicesSection(props: ServicesSectionProps) {
                   textAlign="left"
                   hoverRoll
                   hoverRollDirection="left"
+                  autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                 />
               )}
             </div>

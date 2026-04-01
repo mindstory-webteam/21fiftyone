@@ -511,6 +511,10 @@ export default function FeaturedCaseStudy() {
                   textAlign="left"
                   hoverRoll
                   hoverRollDirection="center"
+                  autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
+                  
                 />
                 <SplitText
                   text={CASE_STUDY.titleRed}
@@ -527,6 +531,9 @@ export default function FeaturedCaseStudy() {
                   textAlign="left"
                   hoverRoll
                   hoverRollDirection="left"
+                  autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
                 />
               </div>
             </div>
@@ -549,9 +556,8 @@ export default function FeaturedCaseStudy() {
         {/* ── MARQUEE TICKER STRIP ── */}
         {(() => {
           const ITEMS = [
-            "Every World", "Epic Quests", "United Players", "Infinite Realms",
-            "Your Life MMORPG", "Level Up", "Play Economy", "Shared Authorship",
-            "Dark Matter", "Cinematic Craft", "AI Production", "Cultural Vision",
+            "Film Production","✦","Commercial / Ad","✦","Corporate Film","✦",
+  "Event / Experience","✦","AI Content","✦","Photography","✦"
           ];
           // duplicate for seamless loop
           const all = [...ITEMS, ...ITEMS];

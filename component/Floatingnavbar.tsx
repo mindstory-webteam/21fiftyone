@@ -12,17 +12,17 @@ import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 
 const NAV_LINKS = [
-  { label: "HOME",     href: "/"     },
-  { label: "ABOUT", href: "/about" },
-  { label: "SERVICES",   href: "/services"   },
-  { label: "STUDIO",    href: "/studio"    },
-   { label: "CONTACT",    href: "/contact"    },
+  { label: "HOME",     href: "/"        },
+  { label: "ABOUT",    href: "/about"   },
+  { label: "SERVICES", href: "/services"},
+  { label: "STUDIO",   href: "/studio"  },
+  { label: "CONTACT",  href: "/contact" },
 ];
 
 const SOCIAL_LINKS = [
   { label: "Instagram", href: "https://www.instagram.com/21fiftyone?igsh=MXV2NTI3M2QzMTMwZw==" },
-  { label: "Facebook",  href: "https://www.facebook.com/share/1Aw4MkQKzk/?mibextid=wwXIfr"  },
-  { label: "Behance",   href: "https://www.behance.net/mindstorycreative"   },
+  { label: "Facebook",  href: "https://www.facebook.com/share/1Aw4MkQKzk/?mibextid=wwXIfr"    },
+  { label: "Behance",   href: "https://www.behance.net/mindstorycreative"                       },
 ];
 
 const B = {
@@ -252,29 +252,28 @@ function RollButton({
   );
 }
 
-function LogoMark({ size = "full", logoSrc }: { size?: "full" | "pill"; logoSrc: string }) {
+function LogoMark({ logoSrc }: { logoSrc: string }) {
   return (
     <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}>
       <img
         src={logoSrc}
         alt="Logo"
         style={{
-          height: size === "pill" ? 28 : 34,
+          height: 28,
           width: "auto",
           display: "block",
           objectFit: "contain",
-          transition: "height .55s cubic-bezier(.16,1,.3,1)",
         }}
       />
     </Link>
   );
 }
 
-function NavSplitLink({ label, href, active, onClick }: { label: string; href: string; active: boolean; onClick: () => void }) {
+function NavSplitLink({ label, href, active, iconColor }: { label: string; href: string; active: boolean; iconColor: string }) {
   const [hov, setHov] = useState(false);
   return (
     <Link
-      href={href} onClick={onClick}
+      href={href}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         textDecoration: "none", padding: "8px 14px",
@@ -291,7 +290,7 @@ function NavSplitLink({ label, href, active, onClick }: { label: string; href: s
         fontFamily="'Montserrat',sans-serif"
         fontWeight={active ? 700 : 500}
         letterSpacing="0.12em"
-        color={active ? B.red : hov ? "rgba(26,26,26,.80)" : "rgba(26,26,26,.46)"}
+        color={active ? B.red : hov ? iconColor : `${iconColor}70`}
         hoverColor={B.red}
         direction="center"
         staggerMs={20}
@@ -358,18 +357,6 @@ function MenuToggle({ open, onClick, plusHRef, plusVRef, iconRef, color = "#1a1a
         }} />
       </span>
     </button>
-  );
-}
-
-function StatusDot({ color = "rgba(26,26,26,0.38)" }: { color?: string }) {
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 6,
-      fontFamily: "'Montserrat',sans-serif", fontSize: 9,
-      letterSpacing: "0.12em", textTransform: "uppercase",
-      color, transition: "color .4s ease",
-    }}>
-    </span>
   );
 }
 
@@ -581,9 +568,8 @@ function pathnameToLabel(pathname: string): string {
 export default function FloatingNavbar() {
   const pathname = usePathname();
 
-  const [visible,        setVisible]        = useState(true);
-  const [scrolled,       setScrolled]       = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [visible,  setVisible]  = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const lastScrollY = useRef(0);
 
   const [menuOpen,  setMenuOpen]  = useState(false);
@@ -609,14 +595,13 @@ export default function FloatingNavbar() {
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
   const spinTlRef     = useRef<gsap.core.Timeline | null>(null);
 
-  const sectionTheme = useSectionTheme(scrolled);
+  // Always use the section theme — even at top
+  const sectionTheme = useSectionTheme(true);
   const pillStyle    = THEME_MAP[sectionTheme];
 
   useEffect(() => {
-    const THRESHOLD = 80;
     const onScroll = () => {
       const y = window.scrollY;
-      setScrollProgress(Math.min(1, Math.max(0, y / THRESHOLD)));
       setVisible(!(y > lastScrollY.current && y > 80));
       setScrolled(y > 60);
       lastScrollY.current = y;
@@ -691,14 +676,9 @@ export default function FloatingNavbar() {
     if (tagline)      tl.to(tagline,     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt);
     if (socialTitle)  tl.to(socialTitle, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt + 0.06);
     if (socialLinks.length) tl.to(socialLinks, {
-      y: 0,
-      opacity: 1,
-      duration: 0.48,
-      ease: "power3.out",
+      y: 0, opacity: 1, duration: 0.48, ease: "power3.out",
       stagger: { each: 0.07 },
-      onComplete: () => {
-        gsap.set(socialLinks, { clearProps: "opacity" });
-      }
+      onComplete: () => { gsap.set(socialLinks, { clearProps: "opacity" }); }
     });
 
     openTlRef.current = tl;
@@ -768,17 +748,18 @@ export default function FloatingNavbar() {
     closeMenu();
   }, [closeMenu]);
 
+  /* ── Pill style — always active (same look at top AND scrolled) ── */
   const pillBase: React.CSSProperties = {
     display:              "flex",
     alignItems:           "center",
     borderRadius:         9999,
-    background:           scrolled ? pillStyle.bg : "transparent",
-    border:               scrolled ? `0.5px solid ${pillStyle.border}` : "none",
-    boxShadow:            scrolled ? pillStyle.shadow : "none",
-    backdropFilter:       scrolled ? "saturate(180%) blur(20px)" : "none",
-    WebkitBackdropFilter: scrolled ? "saturate(180%) blur(20px)" : "none",
-    transition:           "background .55s cubic-bezier(.16,1,.3,1), border .55s cubic-bezier(.16,1,.3,1), box-shadow .55s cubic-bezier(.16,1,.3,1), padding .55s cubic-bezier(.16,1,.3,1)",
-    padding:              scrolled ? "8px 18px" : "0",
+    background:           pillStyle.bg,
+    border:               `0.5px solid ${pillStyle.border}`,
+    boxShadow:            pillStyle.shadow,
+    backdropFilter:       "saturate(180%) blur(20px)",
+    WebkitBackdropFilter: "saturate(180%) blur(20px)",
+    transition:           "background .55s cubic-bezier(.16,1,.3,1), border .55s cubic-bezier(.16,1,.3,1), box-shadow .55s cubic-bezier(.16,1,.3,1)",
+    padding:              "8px 18px",
   };
 
   return (
@@ -812,107 +793,42 @@ export default function FloatingNavbar() {
         }
         .fnb-navitem:hover::after { opacity: 1; }
 
-        /* ── MOBILE: hide desktop links, show mobile menu toggle in top bar ── */
+        /* ── mobile ── */
         @media (max-width: 768px) {
-          #fnb-panel              { width: 100% !important; }
-          .fnb-desktop-links      { display: none !important; }
-          .fnb-status-dot         { display: none !important; }
-          .fnb-mobile-menu-toggle { display: inline-flex !important; }
+          #fnb-panel         { width: 100% !important; }
+          .fnb-desktop-links { display: none !important; }
         }
-        /* hide mobile toggle on desktop */
-        .fnb-mobile-menu-toggle { display: none; }
 
         #fnb-panel::-webkit-scrollbar       { width: 3px; }
         #fnb-panel::-webkit-scrollbar-track { background: transparent; }
         #fnb-panel::-webkit-scrollbar-thumb { background: rgba(200,55,45,0.3); border-radius: 2px; }
       `}</style>
 
+      {/* ── Single always-visible pill bar ── */}
       <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 1100,
-        transform: visible ? "translateY(0)" : "translateY(-110%)",
+        position:   "fixed",
+        top:        0,
+        left:       0,
+        right:      0,
+        zIndex:     1100,
+        transform:  visible ? "translateY(0)" : "translateY(-110%)",
         transition: "transform .45s cubic-bezier(.16,1,.3,1)",
         pointerEvents: "none",
       }}>
-        {/* Pre-scroll bar */}
         <div style={{
-          width:                "100%",
-          background:           scrolled ? "transparent" : "rgba(255,255,255,0.96)",
-          borderBottom:         scrolled ? "none" : "0.5px solid rgba(0,0,0,0.06)",
-          backdropFilter:       scrolled ? "none" : "saturate(180%) blur(20px)",
-          WebkitBackdropFilter: scrolled ? "none" : "saturate(180%) blur(20px)",
-          transition:           "background .45s ease, border-color .45s ease",
-          opacity:              scrolled ? 0 : 1,
-          pointerEvents:        scrolled ? "none" as const : "auto" as const,
+          padding:        "14px 28px",
+          display:        "flex",
+          justifyContent: "space-between",
+          alignItems:     "center",
+          pointerEvents:  "auto",
         }}>
-          <div aria-hidden style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: 1,
-            background: `linear-gradient(90deg,transparent 0%,rgba(200,55,45,.14) 25%,rgba(200,55,45,.28) 50%,rgba(200,55,45,.14) 75%,transparent 100%)`,
-            pointerEvents: "none",
-            opacity: Math.max(0, 1 - scrollProgress),
-            transition: "opacity .3s ease",
-          }} />
-          <nav
-            role="navigation" aria-label="Main navigation"
-            style={{
-              maxWidth: 1400, margin: "0 auto",
-              height: 72, padding: "0 32px",
-              display: "flex", alignItems: "center",
-              justifyContent: "space-between",
-              position: "relative", gap: 20,
-            }}
-          >
-            <LogoMark size="full" logoSrc={LOGO_SRC} />
-
-            {/* Desktop centre links */}
-            <div
-              className="fnb-desktop-links"
-              style={{
-                position: "absolute", left: "50%", transform: "translateX(-50%)",
-                display: "flex", alignItems: "center", gap: 4,
-                opacity: Math.max(0, 1 - scrollProgress * 2.5),
-                pointerEvents: scrolled ? "none" : "auto",
-                transition: "opacity .3s ease",
-              }}
-            >
-              {NAV_LINKS.map((link) => (
-                <NavSplitLink
-                  key={link.label}
-                  label={link.label} href={link.href}
-                  active={activeLink === link.label}
-                  onClick={() => {}}
-                />
-              ))}
-            </div>
-
-            {/* Desktop status dot */}
-            <div className="fnb-status-dot">
-              <StatusDot />
-            </div>
-
-            {/* ── Mobile-only menu toggle (always visible at top on mobile) ── */}
-            <div className="fnb-mobile-menu-toggle">
-              <MenuToggle
-                open={menuOpen} onClick={toggleMenu}
-                plusHRef={plusHRef} plusVRef={plusVRef} iconRef={iconRef}
-                label={menuLabel} color="#1a1a1a"
-              />
-            </div>
-          </nav>
-        </div>
-
-        {/* Post-scroll pills */}
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0,
-          padding: "14px 28px",
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          opacity: scrolled ? 1 : 0,
-          pointerEvents: scrolled ? "auto" : "none",
-          transition: "opacity .35s ease",
-        }}>
+          {/* Left pill — Logo */}
           <div style={pillBase}>
-            <LogoMark size="pill" logoSrc={LOGO_SRC} />
+            <LogoMark logoSrc={LOGO_SRC} />
           </div>
-          <div style={{ ...pillBase }}>
+
+          {/* Right pill — Menu toggle */}
+          <div style={pillBase}>
             <MenuToggle
               open={menuOpen} onClick={toggleMenu}
               plusHRef={plusHRef} plusVRef={plusVRef} iconRef={iconRef}

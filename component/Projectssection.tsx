@@ -496,6 +496,9 @@ export default function ProjectsSection() {
               textAlign="left"
               hoverRoll
               hoverRollDirection="center"
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
             />
             <SplitText
               text="Projects"
@@ -511,6 +514,9 @@ export default function ProjectsSection() {
               rootMargin="-20px"
               textAlign="left"
               hoverRoll
+              autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
               hoverRollDirection="left"
             />
           </div>

@@ -4,8 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import SplitText from "./Splittext";
 
 const projects = [
-  {
+   {
     id: 1,
+    name: "indel suzuki",
+    category: "content creation",
+    year: "2025",
+    tags: ["Interactive", "Luxury"],
+      video:"/videos/projects/video-3.mp4",
+    
+    poster: "",
+  },
+  {
+    id: 2,
     name: "Fr Binoj Mulavarickal ",
     category: "Officia music",
     year: "2025",
@@ -15,7 +25,7 @@ const projects = [
     poster: "",
   },
   {
-    id: 2,
+    id: 3,
     name: "kallazhimusic ",
     category: "devotional music",
     year: "2024",
@@ -24,16 +34,7 @@ const projects = [
     
     poster: "",
   },
-  {
-    id: 3,
-    name: "indel suzuki",
-    category: "content creation",
-    year: "2025",
-    tags: ["Interactive", "Luxury"],
-      video:"/videos/projects/video-3.mp4",
-    
-    poster: "",
-  },
+
   
 ] as const;
 
@@ -518,6 +519,9 @@ export default function ProjectsScroll() {
                 rootMargin="-80px"
                 hoverRoll
                 hoverRollDirection="left"
+                autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
               />
             </div>
 
@@ -535,6 +539,9 @@ export default function ProjectsScroll() {
                 rootMargin="-80px"
                 hoverRoll
                 hoverRollDirection="center"
+                autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
               />
             </div>
 

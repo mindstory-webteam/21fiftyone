@@ -416,6 +416,10 @@ const Contact = () => {
             from={{ opacity: 0, y: 70 }} to={{ opacity: 1, y: 0 }}
             threshold={0.05} rootMargin="-20px"
             textAlign="left" hoverRoll hoverRollDirection="center"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
+            
           />
           <SplitText
             text="Something."
@@ -424,6 +428,9 @@ const Contact = () => {
             from={{ opacity: 0, y: 80, skewX: 6 }} to={{ opacity: 1, y: 0, skewX: 0 }}
             threshold={0.05} rootMargin="-20px"
             textAlign="left" hoverRoll hoverRollDirection="left"
+            autoRoll
+            autoRollInterval={5500}
+            autoRollDuration={620}
           />
           <p className="ct-hdr-desc" data-reveal data-d="1">
             Ready to elevate your brand with powerful visual storytelling?

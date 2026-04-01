@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, CSSProperties } from "react";
-import type { ElementType } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import Link from "next/link";
 import RollButton from "./Rollbutton";
+import SplitText from "./Splittext"; // ← external import
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -289,233 +289,24 @@ const STYLES = `
 `;
 
 /* ════════════════════════════════════════════════════════
-   TEXT ROLL
-════════════════════════════════════════════════════════ */
-const ROLL_STAGGER = 0.032;
-
-interface TextRollProps {
-  children: string;
-  direction?: "left" | "right" | "center";
-}
-
-const TextRoll = ({ children, direction = "left" }: TextRollProps) => {
-  const chars = children.split("");
-  const getDelay = (i: number, total: number) => {
-    if (direction === "center") return ROLL_STAGGER * Math.abs(i - (total - 1) / 2);
-    if (direction === "right")  return ROLL_STAGGER * (total - 1 - i);
-    return ROLL_STAGGER * i;
-  };
-  return (
-    <motion.span
-      initial="initial" whileHover="hovered"
-      style={{ position:"relative", display:"inline-block", overflow:"hidden",
-               cursor:"pointer", lineHeight:0.88, verticalAlign:"top", userSelect:"none" }}
-    >
-      <span aria-hidden style={{ display:"block" }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial:{ y:0 }, hovered:{ y:"-100%" } }}
-            transition={{ ease:"easeInOut", delay:getDelay(i, chars.length) }}
-            style={{ display:"inline-block" }}
-          >{l === " " ? "\u00A0" : l}</motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display:"block", position:"absolute", inset:0 }}>
-        {chars.map((l, i) => (
-          <motion.span key={i}
-            variants={{ initial:{ y:"100%" }, hovered:{ y:0 } }}
-            transition={{ ease:"easeInOut", delay:getDelay(i, chars.length) }}
-            style={{ display:"inline-block" }}
-          >{l === " " ? "\u00A0" : l}</motion.span>
-        ))}
-      </span>
-    </motion.span>
-  );
-};
-
-/* ════════════════════════════════════════════════════════
-   SPLIT TEXT
-════════════════════════════════════════════════════════ */
-type FromTo = {
-  opacity?: number; y?: number; x?: number;
-  scale?: number; rotation?: number; skewX?: number;
-  [key: string]: number | undefined;
-};
-interface SplitTextProps {
-  text: string; className?: string; delay?: number; duration?: number;
-  ease?: string; splitType?: "chars" | "words" | "lines";
-  from?: FromTo; to?: FromTo; threshold?: number; rootMargin?: string;
-  textAlign?: CSSProperties["textAlign"];
-  onLetterAnimationComplete?: () => void; showCallback?: boolean;
-  tag?: ElementType; hoverRoll?: boolean;
-  hoverRollDirection?: "left" | "right" | "center";
-}
-
-function HoverRollSplitText({
-  text, className="", delay=50, duration=1.25, ease="power3.out",
-  splitType="chars", from={ opacity:0, y:40 }, to={ opacity:1, y:0 },
-  threshold=0.1, rootMargin="-100px", textAlign="left",
-  onLetterAnimationComplete, showCallback=false, hoverRollDirection="left",
-}: SplitTextProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const unitRefs     = useRef<(HTMLSpanElement | null)[]>([]);
-  const tlRef        = useRef<gsap.core.Timeline | null>(null);
-  const units = splitType==="chars" ? text.split("") : splitType==="words" ? text.split(" ") : text.split("\n");
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const targets   = unitRefs.current.filter(Boolean) as HTMLSpanElement[];
-    if (!container || !targets.length) return;
-    gsap.set(targets, { ...from });
-    tlRef.current = gsap.timeline({ paused:true,
-      onComplete:() => { if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete(); }
-    });
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay/1000 });
-    const observer = new IntersectionObserver(
-      (entries) => { entries.forEach(e => { if (e.isIntersecting) { tlRef.current?.play(); observer.unobserve(container); } }); },
-      { threshold, rootMargin }
-    );
-    observer.observe(container);
-    return () => { observer.disconnect(); tlRef.current?.kill(); };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
-
-  return (
-    <div ref={containerRef} className={className} aria-label={text}
-      style={{ textAlign, lineHeight:"inherit", display:"flex", flexWrap:"wrap",
-               gap: splitType==="chars" ? "0" : "0.2em" }}
-    >
-      {units.map((unit, i) => {
-        if (unit===" " && splitType==="chars") return (
-          <span key={i} ref={el=>{ unitRefs.current[i]=el; }} style={{ display:"inline-block" }}>&nbsp;</span>
-        );
-        return (
-          <span key={i} ref={el=>{ unitRefs.current[i]=el; }} style={{ display:"inline-block" }}>
-            <TextRoll direction={hoverRollDirection}>{unit}</TextRoll>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-function SplitText({
-  text, className="", delay=50, duration=1.25, ease="power3.out",
-  splitType="chars", from={ opacity:0, y:40 }, to={ opacity:1, y:0 },
-  threshold=0.1, rootMargin="-100px", textAlign="left",
-  onLetterAnimationComplete, showCallback=false, tag:Tag="div",
-  hoverRoll=false, hoverRollDirection="left",
-}: SplitTextProps) {
-  const containerRef = useRef<HTMLElement>(null);
-  const tlRef        = useRef<gsap.core.Timeline | null>(null);
-
-  if (hoverRoll) return (
-    <HoverRollSplitText text={text} className={className} delay={delay} duration={duration}
-      ease={ease} splitType={splitType} from={from} to={to} threshold={threshold}
-      rootMargin={rootMargin} textAlign={textAlign}
-      onLetterAnimationComplete={onLetterAnimationComplete} showCallback={showCallback}
-      hoverRollDirection={hoverRollDirection} />
-  );
-
-  useEffect(() => {
-    const container = containerRef.current; if (!container) return;
-    const buildSpans = (): HTMLElement[] => {
-      container.innerHTML = "";
-      if (splitType==="chars") {
-        const spans: HTMLElement[] = [];
-        text.split(" ").forEach((word, wi, arr) => {
-          const wordEl = document.createElement("span");
-          wordEl.style.display = "inline-block"; wordEl.style.whiteSpace = "nowrap";
-          word.split("").forEach(char => {
-            const el = document.createElement("span");
-            el.textContent = char; el.style.display = "inline-block";
-            el.style.willChange = "transform, opacity";
-            wordEl.appendChild(el); spans.push(el);
-          });
-          container.appendChild(wordEl);
-          if (wi < arr.length-1) {
-            const sp = document.createElement("span");
-            sp.innerHTML = "&nbsp;"; sp.style.display = "inline-block";
-            container.appendChild(sp);
-          }
-        });
-        return spans;
-      }
-      if (splitType==="words") {
-        return text.split(" ").map((word, wi, arr) => {
-          const el = document.createElement("span");
-          el.textContent = word + (wi < arr.length-1 ? "\u00A0" : "");
-          el.style.display = "inline-block"; el.style.willChange = "transform, opacity";
-          container.appendChild(el); return el;
-        });
-      }
-      return text.split("\n").map(line => {
-        const el = document.createElement("span");
-        el.textContent = line; el.style.display = "block";
-        el.style.willChange = "transform, opacity"; container.appendChild(el); return el;
-      });
-    };
-    const targets = buildSpans(); if (!targets.length) return;
-    gsap.set(targets, { ...from });
-    tlRef.current = gsap.timeline({ paused:true,
-      onComplete:() => { if (showCallback && onLetterAnimationComplete) onLetterAnimationComplete(); }
-    });
-    tlRef.current.to(targets, { ...to, duration, ease, stagger: delay/1000 });
-    const observer = new IntersectionObserver(
-      (entries) => { entries.forEach(e => { if (e.isIntersecting) { tlRef.current?.play(); observer.unobserve(container); } }); },
-      { threshold, rootMargin }
-    );
-    observer.observe(container);
-    return () => { observer.disconnect(); tlRef.current?.kill(); if (container) container.innerHTML = text; };
-  }, [text, delay, duration, ease, splitType, threshold, rootMargin, showCallback]);
-
-  return <Tag ref={containerRef as React.Ref<never>} className={className}
-    style={{ textAlign, lineHeight:"inherit" }} aria-label={text} />;
-}
-
-/* ════════════════════════════════════════════════════════
-   ROLL BUTTON  (inlined — no import needed)
-════════════════════════════════════════════════════════ */
-const RB_STAGGER = 0.028;
-
-const RBLabel = ({ children, hovered }: { children: string; hovered: boolean }) => {
-  const chars = children.split("");
-  return (
-    <span style={{ position:"relative", display:"inline-block", overflow:"hidden", lineHeight:1, verticalAlign:"top" }}>
-      <span aria-hidden style={{ display:"block" }}>
-        {chars.map((l, i) => (
-          <motion.span key={i} animate={hovered ? { y:"-100%" } : { y:0 }}
-            transition={{ ease:"easeInOut", duration:0.34, delay:RB_STAGGER*i }}
-            style={{ display:"inline-block" }}>{l===" " ? "\u00A0" : l}</motion.span>
-        ))}
-      </span>
-      <span aria-hidden style={{ display:"block", position:"absolute", inset:0 }}>
-        {chars.map((l, i) => (
-          <motion.span key={i} animate={hovered ? { y:0 } : { y:"100%" }}
-            transition={{ ease:"easeInOut", duration:0.34, delay:RB_STAGGER*i }}
-            style={{ display:"inline-block" }}>{l===" " ? "\u00A0" : l}</motion.span>
-        ))}
-      </span>
-    </span>
-  );
-};
-
-/* ════════════════════════════════════════════════════════
    BENTO TILT
 ════════════════════════════════════════════════════════ */
-const BentoTilt = ({ children, className="" }: { children: React.ReactNode; className?: string }) => {
+const BentoTilt = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   const [ts, setTs] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const tiltX = ((e.clientY - top)  / height - 0.5) * 6;
-    const tiltY = ((e.clientX - left) / width  - 0.5) * -6;
+    const tiltX = ((e.clientY - top) / height - 0.5) * 6;
+    const tiltY = ((e.clientX - left) / width - 0.5) * -6;
     setTs(`perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(0.97,0.97,0.97)`);
   };
 
   return (
-    <div ref={ref} className={className}
+    <div
+      ref={ref}
+      className={className}
       onMouseMove={onMove}
       onMouseLeave={() => setTs("")}
       style={{ transform: ts, transition: ts ? "none" : "transform 0.6s cubic-bezier(0.23,1,0.32,1)" }}
@@ -543,7 +334,7 @@ const ExploreBtn = () => (
 const SERVICES = [
   {
     id: "01", src: "/videos/banner/s-1.webm",
-    title: "VISUAL PRODUCTION ", 
+    title: "VISUAL PRODUCTION",
     desc: "We craft brand narratives that resonate — from naming and positioning to full visual identity systems built to last.",
     large: true,
   },
@@ -568,7 +359,7 @@ const SERVICES = [
     title: "AI PRODUCTION",
     desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
   },
-   {
+  {
     id: "06", src: "/videos/banner/s-6.webm",
     title: "ENTERTAINMENT EVENTS",
     desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
@@ -584,7 +375,8 @@ const Features = () => {
     const id = "sv-global-styles";
     if (!document.getElementById(id)) {
       const el = document.createElement("style");
-      el.id = id; el.textContent = STYLES;
+      el.id = id;
+      el.textContent = STYLES;
       document.head.appendChild(el);
     }
   }, []);
@@ -593,38 +385,56 @@ const Features = () => {
 
   return (
     <section id="services" className="min-h-screen w-screen">
-      <div style={{ maxWidth:1280, margin:"0 auto", padding:"96px 40px 120px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "96px 40px 120px" }}>
 
         {/* ── Label row ── */}
         <div className="sv-label-row">
           <span className="sv-label-l">What We Do</span>
-          <span className="sv-label-r">Services — 2024</span>
+          <span className="sv-label-r">Services — 2025</span>
         </div>
 
         {/* ── Two-column header ── */}
         <div className="sv-header-grid">
 
-          {/* LEFT — big headings */}
+          {/* LEFT — big headings using imported SplitText */}
           <div>
             <SplitText
               text="Our Core"
               tag="div"
               className="sv-headline"
-              delay={30} duration={1.1} ease="power3.out"
+              delay={30}
+              duration={1.1}
+              ease="power3.out"
               splitType="chars"
-              from={{ opacity:0, y:70 }} to={{ opacity:1, y:0 }}
-              threshold={0.1} rootMargin="-40px"
-              textAlign="left" hoverRoll hoverRollDirection="left"
+              from={{ opacity: 0, y: 70 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-40px"
+              textAlign="left"
+              hoverRoll
+              hoverRollDirection="left"
+              autoRoll
+              autoRollInterval={5500}
+              autoRollDuration={620}
             />
             <SplitText
               text="Services"
               tag="div"
               className="sv-headline-accent"
-              delay={55} duration={1.35} ease="power4.out"
+              delay={55}
+              duration={1.35}
+              ease="power4.out"
               splitType="words"
-              from={{ opacity:0, y:60, skewX:6 }} to={{ opacity:1, y:0, skewX:0 }}
-              threshold={0.1} rootMargin="-40px"
-              textAlign="left" hoverRoll hoverRollDirection="left"
+              from={{ opacity: 0, y: 60, skewX: 6 }}
+              to={{ opacity: 1, y: 0, skewX: 0 }}
+              threshold={0.1}
+              rootMargin="-40px"
+              textAlign="left"
+              hoverRoll
+              hoverRollDirection="left"
+              autoRoll
+              autoRollInterval={5500}
+              autoRollDuration={620}
             />
           </div>
 
@@ -636,7 +446,7 @@ const Features = () => {
               </p>
               <p className="sv-sub-side">
                 Blending imagination, emotion, and precision—
- to create stories that feel as powerful as they look
+                to create stories that feel as powerful as they look
               </p>
             </div>
             <RollButton label="view Services" href="/services" />
@@ -651,7 +461,6 @@ const Features = () => {
             <div>
               <span className="sv-num">{large.id} /</span>
               <h2 className="sv-card-title">{large.title}</h2>
-              
               <p className="sv-card-desc">{large.desc}</p>
             </div>
           </div>
@@ -738,12 +547,12 @@ const Features = () => {
 
           {/* Accent card — dark bg */}
           <BentoTilt className="sv-bento-cell accent">
-            <div style={{ display:"flex", flexDirection:"column", justifyContent:"space-between", height:"100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
               <h2 className="sv-accent-title">
                 Mo<b>r</b>e<br />Comin<b>g</b><br />So<b>o</b>n.
               </h2>
               <svg width="52" height="52" viewBox="0 0 52 52" fill="none"
-                style={{ alignSelf:"flex-end" }}>
+                style={{ alignSelf: "flex-end" }}>
                 <circle cx="26" cy="26" r="25" stroke="var(--sv-red)" strokeWidth="1.5" />
                 <path d="M18 26h16M28 19l7 7-7 7" stroke="var(--sv-red)" strokeWidth="1.5"
                   strokeLinecap="round" strokeLinejoin="round" />
