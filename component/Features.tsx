@@ -651,7 +651,7 @@ const Features = () => {
             <div>
               <span className="sv-num">{large.id} /</span>
               <h2 className="sv-card-title">{large.title}</h2>
-              <h3 className="sv-card-title-serif" style={{ marginTop:4 }}>{large.titleAccent}</h3>
+              
               <p className="sv-card-desc">{large.desc}</p>
             </div>
           </div>
