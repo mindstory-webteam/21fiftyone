@@ -2,7 +2,8 @@
 
 import { useRef, useEffect, useCallback, CSSProperties } from "react";
 import type { ElementType } from "react";
-import { motion, useAnimation, AnimationControls } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
+import type { AnimationControls } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 

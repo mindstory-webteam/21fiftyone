@@ -125,7 +125,7 @@ const Contact = () => {
     {
       icon: <MapPin size={16} />,
       label: "Find Us",
-      value: "Mumbai, India",
+      value: "Mind Premium Private Limited 7th Floor, Tower 2, Regus Door No. 2703, Cabin 721, HiLITE Business Park, Pantheeramkavu, Kozhikode - 673 014",
       href: "#",
     },
   ];
