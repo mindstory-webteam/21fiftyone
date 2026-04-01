@@ -5,13 +5,16 @@ import { Mail, Phone, MapPin, ArrowUpRight, Send } from "lucide-react";
 import SplitText from "./Splittext";
 import RollButton from "./Rollbutton";
 
-const PHP_ENDPOINT = "/component/Contact.php";
+const EJS_SERVICE_ID  = "service_zwdympt";
+const EJS_TEMPLATE_ID = "template_vikbi0a";
+const EJS_PUBLIC_KEY  = "3YkH5VjLx7c2I0N3y";
 
 /* ─────────────────────────────────────────────────────────────
    CONTACT SECTION
 ───────────────────────────────────────────────────────────── */
 const Contact = () => {
   const sectionRef = useRef<HTMLElement>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -20,8 +23,8 @@ const Contact = () => {
     message: "",
   });
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
+  const [sent,    setSent]    = useState(false);
+  const [error,   setError]   = useState("");
 
   /* reveal on scroll */
   useEffect(() => {
@@ -49,38 +52,51 @@ const Contact = () => {
     if (error) setError("");
   };
 
- const handleSubmit = async () => {
-  if (!formData.name || !formData.email) return;
-  setError("");
-  setSending(true);
- 
-  try {
-    const res = await fetch(PHP_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name:    formData.name,
-        email:   formData.email,
-        company: formData.company,
-        service: formData.service,
-        message: formData.message,
-      }),
-    });
- 
-    const json = await res.json();
- 
-    if (!res.ok || json.error) {
-      throw new Error(json.error || "Unknown error");
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email) return;
+    setError("");
+    setSending(true);
+
+    try {
+      // Dynamically import so it's only loaded client-side
+      const emailjs = (await import("@emailjs/browser")).default;
+
+      const result = await emailjs.send(
+        EJS_SERVICE_ID,
+        EJS_TEMPLATE_ID,
+        {
+          name:    formData.name,
+          message: [
+            `Email: ${formData.email}`,
+            formData.company ? `Company: ${formData.company}` : "",
+            formData.service ? `Service: ${formData.service}` : "",
+            formData.message ? `\n${formData.message}` : "",
+          ].filter(Boolean).join("\n"),
+          time:    new Date().toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          }),
+        },
+        EJS_PUBLIC_KEY
+      );
+
+      if (result.status === 200) {
+        setSent(true);
+      } else {
+        throw new Error("Unexpected response from EmailJS");
+      }
+    } catch (err: any) {
+      console.error("EmailJS error:", err);
+      // Show a human-readable message instead of [object Object]
+      const msg =
+        typeof err?.text === "string"  ? err.text  :
+        typeof err?.message === "string" ? err.message :
+        "Failed to send. Please try again or email us directly.";
+      setError(msg);
+    } finally {
+      setSending(false);
     }
- 
-    setSent(true);
-  } catch (err: any) {
-    console.error("Mail error:", err);
-    setError(err.message || "Failed to send. Please try again or email us directly.");
-  } finally {
-    setSending(false);
-  }
-};
+  };
 
   const services = [
     "AI Video",
@@ -133,8 +149,6 @@ const Contact = () => {
           overflow: hidden;
           padding-bottom: 120px;
         }
-
-        /* ── noise texture overlay ── */
         .ct::after {
           content: '';
           position: absolute;
@@ -146,154 +160,82 @@ const Contact = () => {
 
         /* ── HEADER ── */
         .ct-hdr {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 100px 80px 56px;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          gap: 40px;
-          border-bottom: 1px solid var(--line);
-          position: relative;
-          z-index: 1;
+          max-width: 1280px; margin: 0 auto; padding: 100px 80px 56px;
+          display: flex; justify-content: space-between; align-items: flex-end;
+          gap: 40px; border-bottom: 1px solid var(--line); position: relative; z-index: 1;
         }
         .ct-hdr-left { flex: 1; min-width: 0; overflow: visible; }
         .ct-eyebrow {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          font-weight: 500;
-          letter-spacing: 0.32em;
-          text-transform: uppercase;
-          color: var(--red);
-          display: block;
-          margin-bottom: 16px;
+          font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+          letter-spacing: 0.32em; text-transform: uppercase; color: var(--red);
+          display: block; margin-bottom: 16px;
         }
         .ct-h1 {
           font-family: 'Anton', sans-serif !important;
           font-size: clamp(48px, 7vw, 104px) !important;
-          line-height: 0.88 !important;
-          letter-spacing: -0.01em !important;
-          color: var(--black) !important;
-          text-transform: uppercase;
-          display: block !important;
-          overflow: visible !important;
-          padding: 10px 6px 6px !important;
-          margin-left: -6px !important;
+          line-height: 0.88 !important; letter-spacing: -0.01em !important;
+          color: var(--black) !important; text-transform: uppercase;
+          display: block !important; overflow: visible !important;
+          padding: 10px 6px 6px !important; margin-left: -6px !important;
         }
         .ct-h1 > div { overflow: visible !important; }
         .ct-h1-accent {
-          font-family: 'Playfair Display', serif !important;
-          font-style: italic !important;
-          font-size: clamp(40px, 5.8vw, 88px) !important;
-          color: var(--red) !important;
-          line-height: 0.95 !important;
-          letter-spacing: -0.01em !important;
-          display: block !important;
-          overflow: visible !important;
-          padding: 0 6px 6px !important;
-          margin-left: -6px !important;
-          margin-top: -0.04em;
+          font-family: 'Playfair Display', serif !important; font-style: italic !important;
+          font-size: clamp(40px, 5.8vw, 88px) !important; color: var(--red) !important;
+          line-height: 0.95 !important; letter-spacing: -0.01em !important;
+          display: block !important; overflow: visible !important;
+          padding: 0 6px 6px !important; margin-left: -6px !important; margin-top: -0.04em;
         }
         .ct-h1-accent > div { overflow: visible !important; }
         .ct-hdr-desc {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 15px;
-          line-height: 1.82;
-          color: #5a5450;
-          font-weight: 300;
-          max-width: 460px;
-          margin-top: 24px;
+          font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.82;
+          color: #5a5450; font-weight: 300; max-width: 460px; margin-top: 24px;
         }
         .ct-hdr-right {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 20px;
-          padding-bottom: 8px;
-          flex-shrink: 0;
+          display: flex; flex-direction: column; align-items: flex-end;
+          gap: 20px; padding-bottom: 8px; flex-shrink: 0;
         }
 
         /* ── BODY ── */
         .ct-body {
-          max-width: 1280px;
-          margin: 0 auto;
-          padding: 64px 80px 0;
-          display: grid;
-          grid-template-columns: 1fr 1.6fr;
-          gap: 48px;
-          position: relative;
-          z-index: 1;
+          max-width: 1280px; margin: 0 auto; padding: 64px 80px 0;
+          display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px;
+          position: relative; z-index: 1;
         }
 
         /* ── LEFT PANEL ── */
         .ct-left { display: flex; flex-direction: column; gap: 32px; }
-
-        /* info cards */
         .ct-info-cards { display: flex; flex-direction: column; gap: 3px; }
         .ct-info-card {
-          display: flex;
-          align-items: center;
-          gap: 18px;
-          padding: 20px 24px;
-          background: #ece7df;
-          border-left: 3px solid var(--red);
-          text-decoration: none;
-          transition: background 0.2s, box-shadow 0.2s;
-          cursor: pointer;
+          display: flex; align-items: center; gap: 18px; padding: 20px 24px;
+          background: #ece7df; border-left: 3px solid var(--red);
+          text-decoration: none; transition: background 0.2s, box-shadow 0.2s; cursor: pointer;
         }
-        .ct-info-card:hover {
-          background: var(--black);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-        }
+        .ct-info-card:hover { background: var(--black); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
         .ct-info-card:hover .ct-info-icon { color: var(--red); }
         .ct-info-card:hover .ct-info-label { color: rgba(255,255,255,0.4); }
         .ct-info-card:hover .ct-info-val { color: #fff; }
         .ct-info-card:hover .ct-info-arrow { opacity: 1; color: var(--red); }
-        .ct-info-icon {
-          color: var(--muted);
-          flex-shrink: 0;
-          transition: color 0.2s;
-        }
+        .ct-info-icon { color: var(--muted); flex-shrink: 0; transition: color 0.2s; }
         .ct-info-text { flex: 1; }
         .ct-info-label {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 9px;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: var(--muted);
-          display: block;
-          margin-bottom: 4px;
-          transition: color 0.2s;
+          font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.28em;
+          text-transform: uppercase; color: var(--muted); display: block;
+          margin-bottom: 4px; transition: color 0.2s;
         }
         .ct-info-val {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--black);
-          transition: color 0.2s;
+          font-family: 'DM Sans', sans-serif; font-size: 14px;
+          font-weight: 500; color: var(--black); transition: color 0.2s;
         }
-        .ct-info-arrow {
-          opacity: 0;
-          transition: opacity 0.2s, color 0.2s;
-          color: var(--muted);
-        }
+        .ct-info-arrow { opacity: 0; transition: opacity 0.2s, color 0.2s; color: var(--muted); }
 
-        /* availability badge */
         .ct-avail {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 16px 24px;
-          border: 1px solid var(--line);
-          background: transparent;
+          display: flex; align-items: center; gap: 12px; padding: 16px 24px;
+          border: 1px solid var(--line); background: transparent;
         }
         .ct-avail-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #2ecc71;
-          flex-shrink: 0;
-          box-shadow: 0 0 0 3px rgba(46,204,113,0.2);
+          width: 8px; height: 8px; border-radius: 50%; background: #2ecc71;
+          flex-shrink: 0; box-shadow: 0 0 0 3px rgba(46,204,113,0.2);
           animation: ct-pulse 2s infinite;
         }
         @keyframes ct-pulse {
@@ -301,253 +243,133 @@ const Contact = () => {
           50%      { box-shadow: 0 0 0 6px rgba(46,204,113,0.08); }
         }
         .ct-avail-text {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: var(--black);
+          font-family: 'DM Sans', sans-serif; font-size: 10px;
+          letter-spacing: 0.22em; text-transform: uppercase; color: var(--black);
         }
         .ct-avail-text span { color: var(--muted); }
 
-        /* stat strip */
         .ct-stats {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          border: 1px solid var(--line);
+          display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line);
         }
-        .ct-stat {
-          padding: 20px 16px;
-          border-right: 1px solid var(--line);
-          text-align: center;
-        }
+        .ct-stat { padding: 20px 16px; border-right: 1px solid var(--line); text-align: center; }
         .ct-stat:last-child { border-right: none; }
         .ct-stat-num {
-          font-family: 'Anton', sans-serif;
-          font-size: 28px;
-          color: var(--red);
-          line-height: 1;
-          display: block;
+          font-family: 'Anton', sans-serif; font-size: 28px;
+          color: var(--red); line-height: 1; display: block;
         }
         .ct-stat-lbl {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 9px;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--muted);
-          margin-top: 6px;
-          display: block;
+          font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.2em;
+          text-transform: uppercase; color: var(--muted); margin-top: 6px; display: block;
         }
 
         /* ── RIGHT PANEL — FORM ── */
         .ct-form-wrap {
-          background: var(--black);
-          padding: 48px;
-          position: relative;
-          overflow: hidden;
+          background: var(--black); padding: 48px; position: relative; overflow: hidden;
         }
-        /* red top accent */
         .ct-form-wrap::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0;
-          width: 100%; height: 3px;
-          background: var(--red);
+          content: ''; position: absolute; top: 0; left: 0;
+          width: 100%; height: 3px; background: var(--red);
         }
-
-        .ct-form-head {
-          margin-bottom: 36px;
-        }
+        .ct-form-head { margin-bottom: 36px; }
         .ct-form-eyebrow {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 9px;
-          letter-spacing: 0.32em;
-          text-transform: uppercase;
-          color: var(--red);
-          display: block;
-          margin-bottom: 10px;
+          font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.32em;
+          text-transform: uppercase; color: var(--red); display: block; margin-bottom: 10px;
         }
         .ct-form-title {
-          font-family: 'Anton', sans-serif;
-          font-size: 28px;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: #fff;
-          line-height: 1;
+          font-family: 'Anton', sans-serif; font-size: 28px; letter-spacing: 0.04em;
+          text-transform: uppercase; color: #fff; line-height: 1;
         }
 
-        /* form grid */
         .ct-form { display: flex; flex-direction: column; gap: 3px; }
         .ct-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
         .ct-field { display: flex; flex-direction: column; gap: 0; }
         .ct-label {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 9px;
-          letter-spacing: 0.26em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.3);
-          padding: 10px 16px 0;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.06);
+          font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.26em;
+          text-transform: uppercase; color: rgba(255,255,255,0.3); padding: 10px 16px 0;
+          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
           border-bottom: none;
         }
-        .ct-input,
-        .ct-select,
-        .ct-textarea {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
-          font-weight: 400;
-          color: #fff;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-top: none;
-          padding: 10px 16px 14px;
-          outline: none;
-          transition: background 0.2s, border-color 0.2s;
-          width: 100%;
-          -webkit-appearance: none;
+        .ct-input, .ct-select, .ct-textarea {
+          font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 400;
+          color: #fff; background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.06); border-top: none;
+          padding: 10px 16px 14px; outline: none;
+          transition: background 0.2s, border-color 0.2s; width: 100%; -webkit-appearance: none;
         }
-        .ct-input::placeholder,
-        .ct-textarea::placeholder { color: rgba(255,255,255,0.18); }
-        .ct-input:focus,
-        .ct-select:focus,
-        .ct-textarea:focus {
-          background: rgba(200,55,45,0.06);
-          border-color: rgba(200,55,45,0.4);
+        .ct-input::placeholder, .ct-textarea::placeholder { color: rgba(255,255,255,0.18); }
+        .ct-input:focus, .ct-select:focus, .ct-textarea:focus {
+          background: rgba(200,55,45,0.06); border-color: rgba(200,55,45,0.4);
         }
-        .ct-select {
-          cursor: pointer;
-          color: rgba(255,255,255,0.6);
-        }
+        .ct-select { cursor: pointer; color: rgba(255,255,255,0.6); }
         .ct-select option { background: var(--black); color: #fff; }
         .ct-textarea { resize: none; height: 110px; }
 
-        /* submit row */
         .ct-submit-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          margin-top: 4px;
-          padding-top: 20px;
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 16px; margin-top: 4px; padding-top: 20px;
           border-top: 1px solid rgba(255,255,255,0.06);
         }
         .ct-submit-note {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          letter-spacing: 0.14em;
-          color: rgba(255,255,255,0.2);
-          line-height: 1.6;
+          font-family: 'DM Sans', sans-serif; font-size: 10px;
+          letter-spacing: 0.14em; color: rgba(255,255,255,0.2); line-height: 1.6;
         }
         .ct-submit-btn {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 14px 28px;
-          background: var(--red);
-          border: none;
-          color: #fff;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          font-weight: 500;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          cursor: pointer;
-          white-space: nowrap;
-          flex-shrink: 0;
-          transition: background 0.2s, transform 0.15s;
+          display: flex; align-items: center; gap: 10px; padding: 14px 28px;
+          background: var(--red); border: none; color: #fff;
+          font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+          letter-spacing: 0.28em; text-transform: uppercase; cursor: pointer;
+          white-space: nowrap; flex-shrink: 0; transition: background 0.2s, transform 0.15s;
         }
-        .ct-submit-btn:hover:not(:disabled) {
-          background: #a82d24;
-          transform: translateY(-1px);
-        }
+        .ct-submit-btn:hover:not(:disabled) { background: #a82d24; transform: translateY(-1px); }
         .ct-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* error message */
         .ct-error {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.14em;
-          color: #ff6b6b;
-          background: rgba(255,107,107,0.08);
-          border: 1px solid rgba(255,107,107,0.2);
-          padding: 10px 16px;
-          margin-top: 4px;
+          font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em;
+          color: #ff6b6b; background: rgba(255,107,107,0.08);
+          border: 1px solid rgba(255,107,107,0.2); padding: 10px 16px; margin-top: 4px;
         }
 
-        /* success state */
         .ct-success {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 16px;
-          padding: 48px 24px;
-          text-align: center;
+          display: flex; flex-direction: column; align-items: center;
+          justify-content: center; gap: 16px; padding: 48px 24px; text-align: center;
         }
         .ct-success-icon {
-          width: 56px; height: 56px;
-          border: 2px solid var(--red);
+          width: 56px; height: 56px; border: 2px solid var(--red);
           display: flex; align-items: center; justify-content: center;
-          color: var(--red);
-          font-size: 24px;
+          color: var(--red); font-size: 24px;
         }
         .ct-success-h {
-          font-family: 'Anton', sans-serif;
-          font-size: 24px;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: #fff;
+          font-family: 'Anton', sans-serif; font-size: 24px;
+          letter-spacing: 0.06em; text-transform: uppercase; color: #fff;
         }
         .ct-success-p {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 13px;
-          color: rgba(255,255,255,0.4);
-          letter-spacing: 0.08em;
-          line-height: 1.7;
+          font-family: 'DM Sans', sans-serif; font-size: 13px;
+          color: rgba(255,255,255,0.4); letter-spacing: 0.08em; line-height: 1.7;
         }
 
         /* ── BOTTOM STRIP ── */
         .ct-strip {
-          max-width: 1280px;
-          margin: 48px auto 0;
-          padding: 0 80px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-          border-top: 1px solid var(--line);
-          padding-top: 32px;
-          position: relative;
-          z-index: 1;
+          max-width: 1280px; margin: 48px auto 0; padding: 0 80px;
+          display: flex; align-items: center; justify-content: space-between;
+          gap: 24px; border-top: 1px solid var(--line); padding-top: 32px;
+          position: relative; z-index: 1;
         }
         .ct-strip-text {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--muted);
+          font-family: 'DM Sans', sans-serif; font-size: 11px;
+          letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
         }
         .ct-strip-links { display: flex; align-items: center; gap: 24px; }
         .ct-strip-link {
-          font-family: 'DM Sans', sans-serif;
-          font-size: 10px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          color: var(--muted);
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: color 0.2s;
+          font-family: 'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.22em;
+          text-transform: uppercase; color: var(--muted); text-decoration: none;
+          display: flex; align-items: center; gap: 6px; transition: color 0.2s;
         }
         .ct-strip-link:hover { color: var(--red); }
 
         /* ── REVEAL ── */
         [data-reveal] {
-          opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
-                      transform 0.8s cubic-bezier(0.16,1,0.3,1);
+          opacity: 0; transform: translateY(24px);
+          transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
         }
         [data-reveal].revealed { opacity: 1; transform: translateY(0); }
         [data-reveal][data-d="1"] { transition-delay: 0.08s; }
@@ -589,39 +411,23 @@ const Contact = () => {
           <span className="ct-eyebrow" data-reveal>Get In Touch</span>
           <SplitText
             text="Let's Make"
-            tag="div"
-            className="ct-h1"
-            delay={38}
-            duration={1.2}
-            ease="power3.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 70 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.05}
-            rootMargin="-20px"
-            textAlign="left"
-            hoverRoll
-            hoverRollDirection="center"
+            tag="div" className="ct-h1"
+            delay={38} duration={1.2} ease="power3.out" splitType="chars"
+            from={{ opacity: 0, y: 70 }} to={{ opacity: 1, y: 0 }}
+            threshold={0.05} rootMargin="-20px"
+            textAlign="left" hoverRoll hoverRollDirection="center"
           />
           <SplitText
             text="Something."
-            tag="div"
-            className="ct-h1-accent"
-            delay={30}
-            duration={1.4}
-            ease="power4.out"
-            splitType="chars"
-            from={{ opacity: 0, y: 80, skewX: 6 }}
-            to={{ opacity: 1, y: 0, skewX: 0 }}
-            threshold={0.05}
-            rootMargin="-20px"
-            textAlign="left"
-            hoverRoll
-            hoverRollDirection="left"
+            tag="div" className="ct-h1-accent"
+            delay={30} duration={1.4} ease="power4.out" splitType="chars"
+            from={{ opacity: 0, y: 80, skewX: 6 }} to={{ opacity: 1, y: 0, skewX: 0 }}
+            threshold={0.05} rootMargin="-20px"
+            textAlign="left" hoverRoll hoverRollDirection="left"
           />
           <p className="ct-hdr-desc" data-reveal data-d="1">
             Ready to elevate your brand with powerful visual storytelling?
- Share your vision with us—our team will connect with you to craft something impactful.
+            Share your vision with us—our team will connect with you to craft something impactful.
           </p>
         </div>
         <div className="ct-hdr-right" data-reveal data-d="2">
@@ -634,8 +440,6 @@ const Contact = () => {
 
         {/* ── LEFT ── */}
         <div className="ct-left">
-
-          {/* contact info cards */}
           <div className="ct-info-cards" data-reveal data-d="1">
             {contactInfo.map((info) => (
               <a key={info.label} className="ct-info-card" href={info.href}>
@@ -649,7 +453,6 @@ const Contact = () => {
             ))}
           </div>
 
-          {/* availability */}
           <div className="ct-avail" data-reveal data-d="2">
             <span className="ct-avail-dot" />
             <span className="ct-avail-text">
@@ -657,7 +460,6 @@ const Contact = () => {
             </span>
           </div>
 
-          {/* stats */}
           <div className="ct-stats" data-reveal data-d="3">
             <div className="ct-stat">
               <span className="ct-stat-num">9+</span>
@@ -672,7 +474,6 @@ const Contact = () => {
               <span className="ct-stat-lbl">Projects Done</span>
             </div>
           </div>
-
         </div>
 
         {/* ── RIGHT — FORM ── */}
@@ -696,88 +497,54 @@ const Contact = () => {
               <div className="ct-form-row">
                 <div className="ct-field">
                   <label className="ct-label">Your Name *</label>
-                  <input
-                    className="ct-input"
-                    type="text"
-                    name="name"
-                    placeholder="John Smith"
-                    value={formData.name}
-                    onChange={handleChange}
-                    autoComplete="off"
-                  />
+                  <input className="ct-input" type="text" name="name"
+                    placeholder="John Smith" value={formData.name}
+                    onChange={handleChange} autoComplete="off" />
                 </div>
                 <div className="ct-field">
                   <label className="ct-label">Email Address *</label>
-                  <input
-                    className="ct-input"
-                    type="email"
-                    name="email"
-                    placeholder="john@company.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="off"
-                  />
+                  <input className="ct-input" type="email" name="email"
+                    placeholder="john@company.com" value={formData.email}
+                    onChange={handleChange} autoComplete="off" />
                 </div>
               </div>
 
               <div className="ct-form-row">
                 <div className="ct-field">
                   <label className="ct-label">Company / Brand</label>
-                  <input
-                    className="ct-input"
-                    type="text"
-                    name="company"
-                    placeholder="Your company name"
-                    value={formData.company}
-                    onChange={handleChange}
-                    autoComplete="off"
-                  />
+                  <input className="ct-input" type="text" name="company"
+                    placeholder="Your company name" value={formData.company}
+                    onChange={handleChange} autoComplete="off" />
                 </div>
                 <div className="ct-field">
                   <label className="ct-label">Service Needed</label>
-                  <select
-                    className="ct-select"
-                    name="service"
-                    value={formData.service}
-                    onChange={handleChange}
-                  >
+                  <select className="ct-select" name="service"
+                    value={formData.service} onChange={handleChange}>
                     <option value="">Select a service</option>
-                    {services.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
+                    {services.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
 
               <div className="ct-field">
                 <label className="ct-label">Project Brief</label>
-                <textarea
-                  className="ct-textarea"
-                  name="message"
+                <textarea className="ct-textarea" name="message"
                   placeholder="Tell us about your project, goals, timeline, and budget..."
-                  value={formData.message}
-                  onChange={handleChange}
-                />
+                  value={formData.message} onChange={handleChange} />
               </div>
 
-              {/* error banner */}
               {error && <p className="ct-error">{error}</p>}
 
               <div className="ct-submit-row">
                 <p className="ct-submit-note">
-                  We respond within 24 hours.<br />
-                  No spam, ever.
+                  We respond within 24 hours.<br />No spam, ever.
                 </p>
                 <button
                   className="ct-submit-btn"
                   onClick={handleSubmit}
                   disabled={sending || !formData.name || !formData.email}
                 >
-                  {sending ? (
-                    <>Sending…</>
-                  ) : (
-                    <><Send size={12} /> Send Message</>
-                  )}
+                  {sending ? <>Sending…</> : <><Send size={12} /> Send Message</>}
                 </button>
               </div>
             </div>
