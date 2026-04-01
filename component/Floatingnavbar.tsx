@@ -20,9 +20,9 @@ const NAV_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", href: "https://instagram.com" },
-  { label: "LinkedIn",  href: "https://linkedin.com"  },
-  { label: "Behance",   href: "https://behance.net"   },
+  { label: "Instagram", href: "https://www.instagram.com/21fiftyone?igsh=MXV2NTI3M2QzMTMwZw==" },
+  { label: "Facebook",  href: "https://www.facebook.com/share/1Aw4MkQKzk/?mibextid=wwXIfr"  },
+  { label: "Behance",   href: "https://www.behance.net/mindstorycreative"   },
 ];
 
 const B = {
