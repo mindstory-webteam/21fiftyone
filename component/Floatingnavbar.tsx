@@ -252,7 +252,6 @@ function RollButton({
   );
 }
 
-// ── ONLY THIS COMPONENT CHANGED ──
 function LogoMark({ size = "full", logoSrc }: { size?: "full" | "pill"; logoSrc: string }) {
   return (
     <Link href="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", flexShrink: 0 }}>
@@ -370,12 +369,6 @@ function StatusDot({ color = "rgba(26,26,26,0.38)" }: { color?: string }) {
       letterSpacing: "0.12em", textTransform: "uppercase",
       color, transition: "color .4s ease",
     }}>
-      {/* <span style={{
-        width: 5, height: 5, borderRadius: "50%",
-        background: B.red, flexShrink: 0,
-        animation: "fnb-pulse 2.4s ease-in-out infinite",
-      }} />
-      Paris, FR */}
     </span>
   );
 }
@@ -698,15 +691,15 @@ export default function FloatingNavbar() {
     if (tagline)      tl.to(tagline,     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt);
     if (socialTitle)  tl.to(socialTitle, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, socialsAt + 0.06);
     if (socialLinks.length) tl.to(socialLinks, {
-  y: 0,
-  opacity: 1,
-  duration: 0.48,
-  ease: "power3.out",
-  stagger: { each: 0.07 },
-  onComplete: () => {
-    gsap.set(socialLinks, { clearProps: "opacity" });
-  }
-});
+      y: 0,
+      opacity: 1,
+      duration: 0.48,
+      ease: "power3.out",
+      stagger: { each: 0.07 },
+      onComplete: () => {
+        gsap.set(socialLinks, { clearProps: "opacity" });
+      }
+    });
 
     openTlRef.current = tl;
     return tl;
@@ -819,11 +812,16 @@ export default function FloatingNavbar() {
         }
         .fnb-navitem:hover::after { opacity: 1; }
 
+        /* ── MOBILE: hide desktop links, show mobile menu toggle in top bar ── */
         @media (max-width: 768px) {
-          #fnb-panel         { width: 100% !important; }
-          .fnb-desktop-links { display: none !important; }
-          .fnb-status-dot    { display: none !important; }
+          #fnb-panel              { width: 100% !important; }
+          .fnb-desktop-links      { display: none !important; }
+          .fnb-status-dot         { display: none !important; }
+          .fnb-mobile-menu-toggle { display: inline-flex !important; }
         }
+        /* hide mobile toggle on desktop */
+        .fnb-mobile-menu-toggle { display: none; }
+
         #fnb-panel::-webkit-scrollbar       { width: 3px; }
         #fnb-panel::-webkit-scrollbar-track { background: transparent; }
         #fnb-panel::-webkit-scrollbar-thumb { background: rgba(200,55,45,0.3); border-radius: 2px; }
@@ -864,6 +862,8 @@ export default function FloatingNavbar() {
             }}
           >
             <LogoMark size="full" logoSrc={LOGO_SRC} />
+
+            {/* Desktop centre links */}
             <div
               className="fnb-desktop-links"
               style={{
@@ -883,8 +883,19 @@ export default function FloatingNavbar() {
                 />
               ))}
             </div>
+
+            {/* Desktop status dot */}
             <div className="fnb-status-dot">
               <StatusDot />
+            </div>
+
+            {/* ── Mobile-only menu toggle (always visible at top on mobile) ── */}
+            <div className="fnb-mobile-menu-toggle">
+              <MenuToggle
+                open={menuOpen} onClick={toggleMenu}
+                plusHRef={plusHRef} plusVRef={plusVRef} iconRef={iconRef}
+                label={menuLabel} color="#1a1a1a"
+              />
             </div>
           </nav>
         </div>

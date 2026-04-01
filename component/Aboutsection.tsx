@@ -45,6 +45,7 @@ export default function AboutSection() {
           --line:  rgba(12,12,12,0.12);
         }
 
+        /* ─── Base Section ─────────────────────────────────────────── */
         .about {
           width: 100%;
           background: var(--cream);
@@ -52,6 +53,7 @@ export default function AboutSection() {
           overflow: hidden;
           position: relative;
           text-align: justify;
+          box-sizing: border-box;
         }
         .about::before {
           content: '';
@@ -64,14 +66,17 @@ export default function AboutSection() {
           max-width: 1280px;
           margin: 0 auto;
           padding: 0 64px;
+          box-sizing: border-box;
         }
 
-        /* Label row */
+        /* ─── Label row ─────────────────────────────────────────────── */
         .about-label-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 56px;
+          flex-wrap: wrap;
+          gap: 8px;
         }
         .about-label {
           font-family: 'DM Sans', sans-serif;
@@ -89,7 +94,7 @@ export default function AboutSection() {
           color: var(--muted);
         }
 
-        /* Hero grid */
+        /* ─── Hero grid ─────────────────────────────────────────────── */
         .about-hero {
           display: grid;
           grid-template-columns: 1fr 580px;
@@ -98,23 +103,22 @@ export default function AboutSection() {
           margin-bottom: 96px;
         }
 
-        /* SplitText heading styles */
+        /* ─── SplitText headings ────────────────────────────────────── */
         .about-headline {
           font-family: 'Anton', sans-serif !important;
-          font-size: clamp(88px, 12vw, 168px) !important;
+          font-size: clamp(56px, 12vw, 168px) !important;
           line-height: 0.88 !important;
           letter-spacing: -0.02em !important;
           color: var(--black) !important;
           text-transform: uppercase;
           padding-bottom: 10px;
           display: block;
-          /* allow TextRoll overflow to clip correctly */
           overflow: visible;
         }
         .about-headline-accent {
           font-family: 'Playfair Display', serif !important;
           font-style: italic !important;
-          font-size: clamp(64px, 8.5vw, 120px) !important;
+          font-size: clamp(40px, 8.5vw, 120px) !important;
           color: var(--red) !important;
           line-height: 1 !important;
           letter-spacing: -0.01em !important;
@@ -122,21 +126,19 @@ export default function AboutSection() {
           margin-top: 8px;
           overflow: visible;
         }
-
-        /* ── TextRoll sits inside HoverRollSplitText flex container ──
-           Make each character unit clip its own roll animation        */
         .about-headline [data-roll-unit],
         .about-headline-accent [data-roll-unit] {
           overflow: hidden;
         }
 
-        /* Dark intro card */
+        /* ─── Dark intro card ───────────────────────────────────────── */
         .about-intro-card {
           background: var(--black);
           padding: 48px 44px 44px;
           position: relative;
           align-self: end;
           margin-left: 64px;
+          box-sizing: border-box;
         }
         .about-intro-card::before {
           content: '';
@@ -158,6 +160,7 @@ export default function AboutSection() {
           gap: 48px;
           padding-top: 28px;
           border-top: 1px solid rgba(255,255,255,0.08);
+          flex-wrap: wrap;
         }
         .stat-num {
           font-family: 'Anton', sans-serif;
@@ -176,7 +179,7 @@ export default function AboutSection() {
           display: block;
         }
 
-        /* Body grid */
+        /* ─── Body grid ─────────────────────────────────────────────── */
         .about-body-grid {
           display: grid;
           grid-template-columns: 380px 1fr 300px;
@@ -184,7 +187,7 @@ export default function AboutSection() {
           align-items: start;
         }
 
-        /* Image */
+        /* ─── Image ─────────────────────────────────────────────────── */
         .image-stack { position: relative; }
         .image-main {
           width: 100%;
@@ -217,7 +220,7 @@ export default function AboutSection() {
           border-top: 1px solid var(--line);
         }
 
-        /* Text column */
+        /* ─── Text column ───────────────────────────────────────────── */
         .about-text-col { padding-top: 8px; }
         .about-section-title {
           font-family: 'DM Sans', sans-serif;
@@ -260,6 +263,7 @@ export default function AboutSection() {
           color: var(--black);
           position: relative;
           z-index: 1;
+          margin: 0;
         }
         .about-quote-block cite {
           font-family: 'DM Sans', sans-serif;
@@ -272,7 +276,7 @@ export default function AboutSection() {
           display: block;
         }
 
-        /* Tags */
+        /* ─── Tags ──────────────────────────────────────────────────── */
         .about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; }
         .tag {
           border: 1px solid rgba(12,12,12,0.18);
@@ -299,7 +303,7 @@ export default function AboutSection() {
         .tag:hover { color: var(--cream); border-color: var(--black); }
         .tag:hover::after { transform: scaleX(1); }
 
-        /* Right col */
+        /* ─── Right col ─────────────────────────────────────────────── */
         .about-right-col { display: flex; flex-direction: column; gap: 32px; padding-top: 8px; }
         .v-marquee-wrap {
           height: 160px;
@@ -327,26 +331,8 @@ export default function AboutSection() {
           0%   { transform: translateY(0); }
           100% { transform: translateY(-50%); }
         }
-        .about-cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 16px;
-          background: var(--red);
-          color: #fff;
-          padding: 18px 28px;
-          font-family: 'DM Sans', sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          text-decoration: none;
-          font-weight: 500;
-          transition: gap 0.3s;
-        }
-        .about-cta:hover { gap: 24px; }
-        .about-cta svg { transition: transform 0.3s; }
-        .about-cta:hover svg { transform: translateX(4px); }
 
-        /* Process strip */
+        /* ─── Process strip ─────────────────────────────────────────── */
         .about-hr { border: none; border-top: 1px solid var(--line); margin: 80px 0 0; }
         .process-strip {
           display: grid;
@@ -355,7 +341,6 @@ export default function AboutSection() {
         }
         .process-item {
           padding: 0 32px 0 0;
-          
           transition: transform 0.3s ease;
         }
         .process-item:first-child { padding-left: 0; }
@@ -387,7 +372,7 @@ export default function AboutSection() {
           font-weight: 300;
         }
 
-        /* Scroll reveal */
+        /* ─── Scroll reveal ─────────────────────────────────────────── */
         [data-reveal] {
           opacity: 0;
           transform: translateY(28px);
@@ -405,18 +390,228 @@ export default function AboutSection() {
         .image-stack[data-reveal] { transform: translateY(40px) scale(0.97); }
         .image-stack[data-reveal].revealed { transform: translateY(0) scale(1); }
 
-        @media (max-width: 1100px) {
-          .about-body-grid { grid-template-columns: 300px 1fr; }
-          .about-right-col { display: none; }
+        /* ════════════════════════════════════════════════════════════
+           RESPONSIVE BREAKPOINTS
+           ════════════════════════════════════════════════════════════ */
+
+        /* ─── Large desktop: 1280px–1440px ─────────────────────────── */
+        @media (max-width: 1440px) {
+          .about-hero {
+            grid-template-columns: 1fr 500px;
+          }
+          .about-body-grid {
+            grid-template-columns: 340px 1fr 280px;
+            gap: 48px;
+          }
         }
-        @media (max-width: 800px) {
-          .about-inner { padding: 0 24px; }
-          .about::before { left: 24px; right: 24px; }
-          .about-hero { grid-template-columns: 1fr; }
-          .about-intro-card { margin-top: 32px; }
-          .about-body-grid { grid-template-columns: 1fr; }
-          .process-strip { grid-template-columns: 1fr 1fr; gap: 40px; }
-          .process-item { border-right: none; padding-right: 0; }
+
+        /* ─── Medium desktop: 1100px–1280px ────────────────────────── */
+        @media (max-width: 1280px) {
+          .about-inner { padding: 0 48px; }
+          .about::before { left: 48px; right: 48px; }
+          .about-hero {
+            grid-template-columns: 1fr 440px;
+          }
+          .about-intro-card {
+            margin-left: 40px;
+            padding: 40px 36px 36px;
+          }
+          .about-body-grid {
+            grid-template-columns: 300px 1fr 260px;
+            gap: 40px;
+          }
+          .card-stat { gap: 32px; }
+          .stat-num { font-size: 38px; }
+        }
+
+        /* ─── Tablet landscape / small desktop: 1024px–1100px ──────── */
+        @media (max-width: 1100px) {
+          .about-body-grid {
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+          }
+          .about-right-col { display: none; }
+          .about-hero {
+            grid-template-columns: 1fr 400px;
+          }
+        }
+
+        /* ─── Tablet portrait: 768px–1024px ────────────────────────── */
+        @media (max-width: 1024px) {
+          .about { padding: 80px 0 100px; }
+          .about-inner { padding: 0 40px; }
+          .about::before { left: 40px; right: 40px; }
+
+          .about-label-row { margin-bottom: 40px; }
+
+          .about-hero {
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin-bottom: 64px;
+          }
+          .about-intro-card {
+            margin-left: 0;
+            margin-top: 40px;
+            padding: 36px 32px 32px;
+          }
+
+          .about-body-grid {
+            grid-template-columns: 260px 1fr;
+            gap: 36px;
+          }
+          .about-right-col { display: none; }
+
+          .process-strip {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 48px 32px;
+            padding-top: 48px;
+          }
+          .process-item {
+            padding: 0;
+            border-right: none;
+          }
+
+          .about-hr { margin: 64px 0 0; }
+        }
+
+        /* ─── Large mobile / small tablet: 600px–768px ─────────────── */
+        @media (max-width: 768px) {
+          .about { padding: 64px 0 80px; }
+          .about-inner { padding: 0 28px; }
+          .about::before { left: 28px; right: 28px; }
+
+          .about-label-row { margin-bottom: 32px; }
+
+          .about-hero {
+            grid-template-columns: 1fr;
+            margin-bottom: 48px;
+          }
+          .about-intro-card {
+            margin-left: 0;
+            margin-top: 32px;
+            padding: 32px 28px 28px;
+          }
+          .about-intro-card p { font-size: 14px; }
+          .card-stat { gap: 24px; }
+          .stat-num { font-size: 36px; }
+
+          .about-body-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+          .about-right-col { display: none; }
+
+          .image-main { aspect-ratio: 4/3; }
+
+          .about-quote-block {
+            padding: 28px 28px;
+            margin: 32px 0;
+          }
+          .about-quote-block blockquote { font-size: 19px; }
+
+          .process-strip {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 36px 24px;
+            padding-top: 40px;
+          }
+          .process-item { padding: 0; border-right: none; }
+          .process-title { font-size: 18px; }
+
+          .about-hr { margin: 48px 0 0; }
+        }
+
+        /* ─── Mobile: 480px–600px ───────────────────────────────────── */
+        @media (max-width: 600px) {
+          .about { padding: 56px 0 72px; }
+          .about-inner { padding: 0 20px; }
+          .about::before { left: 20px; right: 20px; }
+
+          .about-label-row { margin-bottom: 28px; }
+
+          .about-hero { margin-bottom: 40px; }
+          .about-intro-card {
+            padding: 28px 24px 24px;
+            margin-top: 28px;
+          }
+          .about-intro-card p { font-size: 13.5px; line-height: 1.75; }
+          .card-stat { gap: 20px; flex-wrap: nowrap; }
+          .stat-num { font-size: 32px; }
+          .stat-label { font-size: 9px; }
+
+          .about-paragraph { font-size: 15px; }
+
+          .about-quote-block {
+            padding: 24px 20px;
+            margin: 28px 0;
+          }
+          .about-quote-block::before { font-size: 88px; top: -10px; left: 16px; }
+          .about-quote-block blockquote { font-size: 17px; line-height: 1.55; }
+
+          .process-strip {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px 20px;
+            padding-top: 36px;
+          }
+          .process-title { font-size: 17px; }
+          .process-desc { font-size: 12px; }
+
+          .about-hr { margin: 40px 0 0; }
+          .about-tags { gap: 6px; }
+          .tag { padding: 7px 13px; }
+        }
+
+        /* ─── Small mobile: 360px–480px ─────────────────────────────── */
+        @media (max-width: 480px) {
+          .about { padding: 48px 0 64px; }
+          .about-inner { padding: 0 16px; }
+          .about::before { left: 16px; right: 16px; }
+
+          .about-label-row { margin-bottom: 24px; gap: 6px; }
+          .about-label, .about-label-right { font-size: 9px; letter-spacing: 0.2em; }
+
+          .about-hero { margin-bottom: 32px; }
+          .about-intro-card {
+            padding: 24px 20px 20px;
+            margin-top: 24px;
+          }
+          .about-intro-card p { font-size: 13px; margin-bottom: 20px; }
+          .card-stat { gap: 16px; padding-top: 20px; }
+          .stat-num { font-size: 28px; }
+
+          .about-section-title { font-size: 9px; margin-bottom: 16px; }
+          .about-paragraph { font-size: 14px; line-height: 1.78; margin-bottom: 20px; }
+
+          .about-quote-block {
+            padding: 20px 16px;
+            margin: 24px 0;
+          }
+          .about-quote-block::before { font-size: 72px; top: -8px; left: 12px; }
+          .about-quote-block blockquote { font-size: 16px; }
+          .about-quote-block cite { font-size: 9px; margin-top: 14px; }
+
+          .image-main { aspect-ratio: 4/3; }
+          .image-caption { font-size: 9px; }
+
+          .process-strip {
+            grid-template-columns: 1fr;
+            gap: 32px;
+            padding-top: 32px;
+          }
+          .process-title { font-size: 20px; }
+          .process-desc { font-size: 13px; }
+
+          .about-hr { margin: 36px 0 0; }
+        }
+
+        /* ─── Extra small mobile: < 360px ───────────────────────────── */
+        @media (max-width: 360px) {
+          .about-inner { padding: 0 14px; }
+          .about-intro-card { padding: 20px 16px 18px; }
+          .card-stat { gap: 12px; }
+          .stat-num { font-size: 26px; }
+          .about-paragraph { font-size: 13.5px; }
+          .about-quote-block blockquote { font-size: 15px; }
+          .process-strip { gap: 28px; }
         }
       `}</style>
 
@@ -432,7 +627,6 @@ export default function AboutSection() {
           {/* Hero: SplitText headings + dark card */}
           <div className="about-hero">
             <div>
-              {/* "We" — line 1, with TextRoll hover */}
               <SplitText
                 text="WE MAKE"
                 tag="div"
@@ -452,25 +646,6 @@ export default function AboutSection() {
                 hoverRollDirection="center"
               />
 
-              {/* "Make" — line 2, with TextRoll hover */}
-              {/* <SplitText
-                text="Make"
-                tag="div"
-                className="about-headline"
-                delay={40}
-                duration={1.25}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 60 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="-60px"
-                textAlign="left"
-                hoverRoll
-                hoverRollDirection="center"
-              /> */}
-
-              {/* "Culture" — italic accent, line 3, with TextRoll hover */}
               <SplitText
                 text="Stories"
                 tag="div"
@@ -492,10 +667,9 @@ export default function AboutSection() {
             {/* Dark card */}
             <div className="about-intro-card" data-reveal data-d="2">
               <p>
-               We are a visual production studio driven by storytelling, creativity, and precision.
-At the intersection of cinematic craft and modern technology, we create content that connects, engages, and leaves a lasting impact.
-From films to brand visuals, every project is designed to elevate your story and transform ideas into powerful visual experiences.
-
+                We are a visual production studio driven by storytelling, creativity, and precision.
+                At the intersection of cinematic craft and modern technology, we create content that connects, engages, and leaves a lasting impact.
+                From films to brand visuals, every project is designed to elevate your story and transform ideas into powerful visual experiences.
               </p>
               <div className="card-stat">
                 <div>
@@ -520,17 +694,8 @@ From films to brand visuals, every project is designed to elevate your story and
             {/* Image stack */}
             <div className="image-stack" data-reveal data-d="3">
               <div className="image-main">
-                <img
-                  src="/image/about-4.jpg"
-                  alt="Studio portrait"
-                />
+                <img src="/image/about-4.jpg" alt="Studio portrait" />
               </div>
-              {/* <div className="image-accent">
-                <img
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"
-                  alt="Luxury shoot"
-                />
-              </div> */}
               <p className="image-caption">Studio — Paris, 2024</p>
             </div>
 
@@ -538,12 +703,8 @@ From films to brand visuals, every project is designed to elevate your story and
             <div className="about-text-col">
               <p className="about-section-title" data-reveal data-d="3">The Origin</p>
               <p className="about-paragraph" data-reveal data-d="4">
-               Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
-In a world full of content, we focus on creating visuals that stand out, connect emotionally, and stay memorable.
-
-              </p>
-              <p className="about-paragraph" data-reveal data-d="4">
-             
+                Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
+                In a world full of content, we focus on creating visuals that stand out, connect emotionally, and stay memorable.
               </p>
 
               <div className="about-quote-block" data-reveal data-d="5">
@@ -555,7 +716,7 @@ In a world full of content, we focus on creating visuals that stand out, connect
               </div>
             </div>
 
-            {/* Right col */}
+            {/* Right col — hidden below 1100px */}
             <div className="about-right-col" data-reveal data-d="4">
               <div className="about-tags" data-reveal data-d="6">
                 {["Luxury", "AI Production", "3D & CGI", "Print & Film", "Editorial", "Paris"].map((t) => (
@@ -563,31 +724,19 @@ In a world full of content, we focus on creating visuals that stand out, connect
                 ))}
               </div>
               <p className="about-paragraph" data-reveal data-d="5">
-             We blend cinematic storytelling with modern production techniques to craft content that is both visually striking and meaningful.
+                We blend cinematic storytelling with modern production techniques to craft content that is both visually striking and meaningful.
               </p>
-
               <div className="v-marquee-wrap">
                 <div className="v-marquee">
                   {[
-                    "VISUAL PRODUCTION","FILM & CINEMA","BRAND STORYTELLING","AI CONTENT","EVENTS","CREATIVE DIRECTION"
+                    "VISUAL PRODUCTION","FILM & CINEMA","BRAND STORYTELLING","AI CONTENT","EVENTS","CREATIVE DIRECTION",
+                    "VISUAL PRODUCTION","FILM & CINEMA","BRAND STORYTELLING","AI CONTENT","EVENTS","CREATIVE DIRECTION",
                   ].map((brand, i) => (
                     <div key={i} className="v-marquee-item">{brand}</div>
                   ))}
                 </div>
               </div>
-
-            <RollButton label="About Us" href="/projects"/>
-
-              {/* <p style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "11px",
-                color: "var(--muted)",
-                letterSpacing: "0.12em",
-                lineHeight: "1.8",
-              }}>
-                We accept a limited number of new partners each quarter.{" "}
-                <strong style={{ color: "var(--black)" }}>2 slots open</strong> for Q3 2025.
-              </p> */}
+              <RollButton label="About Us" href="/projects" />
             </div>
           </div>
 

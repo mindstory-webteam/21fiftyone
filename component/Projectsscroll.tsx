@@ -524,7 +524,7 @@ export default function ProjectsScroll() {
             {/* BOTTOM LINE */}
             <div className="ps-split-accent">
               <SplitText
-                text="Works 2022–2024"
+                text="Works "
                 splitType="words"
                 from={{ opacity: 0, y: 100 }}
                 to={{ opacity: 1, y: 0 }}

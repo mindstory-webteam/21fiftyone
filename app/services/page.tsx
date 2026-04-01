@@ -24,7 +24,7 @@ export default function Home() {
             heroTitleAccent: "CRAFTED FOR ",
             heroDesc:
               " We create high-quality visual content that captures attention and communicates your brand with clarity. From concept to execution, every frame is designed to engage and inspire.",
-            heroVideo: "/videos/video-1.webm",
+            heroVideo: "/videos/banner/s-1.webm",
             heroPoints: [
               "High-end video production across formats",
               "Visual storytelling tailored to brand identity",
@@ -94,7 +94,7 @@ export default function Home() {
             heroTitleAccent: "Storytelling.",
             heroDesc:
               "From script to screen, we produce cinematic films that tell powerful stories. Every project is approached with artistic depth and production excellence.",
-            heroVideo: "/videos/video-2.webm",
+            heroVideo: "/videos/banner/s-2.webm",
             heroPoints: [
               "Feature films and short films",
               "Script development and storytelling",
@@ -163,7 +163,7 @@ export default function Home() {
             heroTitleAccent: "Inhabit.",
             heroDesc:
               " We create corporate films that communicate your brand’s vision, values, and strengths—building credibility and connection with your audience.",
-            heroVideo: "/videos/video-3.webm",
+            heroVideo: "/videos/banner/s-3.webm",
             heroPoints: [
               "Company profile videos",
               "Brand storytelling films",
@@ -233,7 +233,7 @@ export default function Home() {
             heroTitleAccent: "Attention.",
             heroDesc:
               "  We produce high-impact commercials that capture attention instantly and drive results across platforms.",
-            heroVideo: "/videos/video-3.webm",
+            heroVideo: "/videos/banner/s-4.webm",
             heroPoints: [
               "TV & digital advertisements",
               "Product and brand commercials",
@@ -303,7 +303,7 @@ export default function Home() {
             heroTitleAccent: "Innovation.",
             heroDesc:
               "  We leverage AI to create next-generation visuals and content—pushing creative boundaries while increasing speed and efficiency.",
-            heroVideo: "/videos/video-3.webm",
+            heroVideo: "/videos/banner/s-5.webm",
             heroPoints: [
               "AI-generated visuals and videos",
               "Virtual production workflows",
@@ -373,7 +373,7 @@ export default function Home() {
             heroTitleAccent: "Experience.",
             heroDesc:
               " We design and produce immersive entertainment experiences that engage audiences and create unforgettable moments.",
-            heroVideo: "/videos/video-3.webm",
+            heroVideo: "/videos/banner/s-6.webm",
             heroPoints: [
               "Event production and management",
               "Stage and show direction",
