@@ -417,7 +417,7 @@ export default function Hero2() {
 
           {/* Line 1: "WE ARE THE" */}
           <SplitText
-            text="We Are The"
+            text="WE ARE THE"
             tag="div"
             className="hero2-line-1"
             delay={40}
@@ -435,7 +435,7 @@ export default function Hero2() {
 
           {/* Line 2: "Alchemists" italic red */}
           <SplitText
-            text="Alchemists"
+            text="Storytellers"
             tag="div"
             className="hero2-line-accent"
             delay={35}
@@ -453,7 +453,7 @@ export default function Hero2() {
 
           {/* Line 3: "OF DIGITAL NOIR." */}
           <SplitText
-            text="Of Digital Noir."
+            text="OF VISUAL MAGIC."
             tag="div"
             className="hero2-line-2"
             delay={38}
@@ -475,7 +475,7 @@ export default function Hero2() {
             {/* Image pane */}
             <div className="hero2-image-pane" data-reveal data-d="3">
               <img
-                src="https://images.unsplash.com/photo-1529154166925-574a0236a4f4?w=900&q=90"
+                src="/image/about-3.jpg"
                 alt="Studio environment dark moody"
               />
               <span className="hero2-img-caption">Paris Studio — 2024</span>
@@ -487,42 +487,41 @@ export default function Hero2() {
               <div>
                 <p className="hero2-origin-label" data-reveal data-d="2">The Origin</p>
                 <h2 className="hero2-sub-heading" data-reveal data-d="2">
-                  Where Craft<br />Meets Machine
+                  WHERE VISION <br /> MEETS CRAFT
                 </h2>
                 <p className="hero2-paragraph" data-reveal data-d="3">
-                  Founded in the quiet hours of 2021, our agency was born from a
-                  singular obsession — the belief that the digital world has grown too
-                  predictable, too &ldquo;safe.&rdquo; We sought a return to the bold,
-                  the dramatic, the cinematic.
+                  Born from a passion for storytelling, 21 fifty one  was created to transform ideas into powerful visual experiences.
+We believe every frame holds meaning—where creativity, precision, and emotion come together to shape stories that leave a lasting impact.
+
                 </p>
                 <p className="hero2-paragraph" data-reveal data-d="3">
-                  The name 21FiftyOne is a tribute to the legendary year of cinematic
-                  transformation and our commitment to the 21st state of mind — a place
-                  where creative rebellion meets absolute technical mastery.
+                  21 fiftyone  was born from a simple belief—every idea has the power to become something extraordinary when shaped with the right vision.
+In a world filled with content, we focus on creating stories that stand apart—bold, cinematic, and emotionally driven.
+We combine creative storytelling with technical precision, crafting visuals that are not just seen, but felt.
+
                 </p>
               </div>
 
               {/* Quote */}
               <div className="hero2-quote-block" data-reveal data-d="4">
                 <blockquote>
-                  &ldquo;We don&rsquo;t build websites. We engineer digital monuments
-                  that pulse with life and precision.&rdquo;
+                  &ldquo;We don’t just create visuals. We craft stories that move, inspire, and stay with you.&rdquo;
                 </blockquote>
-                <cite>— Jonathan Gilbert, Founder &amp; Creative Director</cite>
+                <cite>— Creative Team, 21 fiftyone</cite>
               </div>
 
               {/* Stats */}
               <div className="hero2-stats" data-reveal data-d="5">
                 <div>
-                  <span className="hero2-stat-num">120+</span>
+                  <span className="hero2-stat-num">100+</span>
                   <span className="hero2-stat-label">Projects</span>
                 </div>
                 <div>
-                  <span className="hero2-stat-num">48</span>
+                  <span className="hero2-stat-num">25+</span>
                   <span className="hero2-stat-label">Brands</span>
                 </div>
                 <div>
-                  <span className="hero2-stat-num">4yr</span>
+                  <span className="hero2-stat-num">10yr</span>
                   <span className="hero2-stat-label">Studio</span>
                 </div>
               </div>

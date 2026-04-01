@@ -434,7 +434,7 @@ export default function AboutSection() {
             <div>
               {/* "We" — line 1, with TextRoll hover */}
               <SplitText
-                text="We Make"
+                text="WE MAKE"
                 tag="div"
                 className="about-headline"
                 delay={45}
@@ -472,7 +472,7 @@ export default function AboutSection() {
 
               {/* "Culture" — italic accent, line 3, with TextRoll hover */}
               <SplitText
-                text="Culture"
+                text="Stories"
                 tag="div"
                 className="about-headline-accent"
                 delay={35}
@@ -492,21 +492,22 @@ export default function AboutSection() {
             {/* Dark card */}
             <div className="about-intro-card" data-reveal data-d="2">
               <p>
-                Detroit is an AI Production House in Paris, obsessed with crafting
-                culture for luxury brands. We sit at the intersection of human
-                artistry and machine precision.
+               We are a visual production studio driven by storytelling, creativity, and precision.
+At the intersection of cinematic craft and modern technology, we create content that connects, engages, and leaves a lasting impact.
+From films to brand visuals, every project is designed to elevate your story and transform ideas into powerful visual experiences.
+
               </p>
               <div className="card-stat">
                 <div>
-                  <span className="stat-num">120+</span>
+                  <span className="stat-num">100+</span>
                   <span className="stat-label">Projects</span>
                 </div>
                 <div>
-                  <span className="stat-num">48</span>
+                  <span className="stat-num">25+</span>
                   <span className="stat-label">Brands</span>
                 </div>
                 <div>
-                  <span className="stat-num">4yr</span>
+                  <span className="stat-num">10+</span>
                   <span className="stat-label">Studio</span>
                 </div>
               </div>
@@ -520,16 +521,16 @@ export default function AboutSection() {
             <div className="image-stack" data-reveal data-d="3">
               <div className="image-main">
                 <img
-                  src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=90"
+                  src="/image/about-4.jpg"
                   alt="Studio portrait"
                 />
               </div>
-              <div className="image-accent">
+              {/* <div className="image-accent">
                 <img
                   src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"
                   alt="Luxury shoot"
                 />
-              </div>
+              </div> */}
               <p className="image-caption">Studio — Paris, 2024</p>
             </div>
 
@@ -537,15 +538,12 @@ export default function AboutSection() {
             <div className="about-text-col">
               <p className="about-section-title" data-reveal data-d="3">The Origin</p>
               <p className="about-paragraph" data-reveal data-d="4">
-                Founded in the quiet hours of 2021, our agency was born from a
-                singular obsession: the belief that the digital world has grown too
-                predictable, too &ldquo;safe.&rdquo; We sought a return to the
-                bold&mdash;the dramatic&mdash;the cinematic.
+               Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
+In a world full of content, we focus on creating visuals that stand out, connect emotionally, and stay memorable.
+
               </p>
               <p className="about-paragraph" data-reveal data-d="4">
-                Detroit merges the raw energy of editorial photography with the
-                infinite possibilities of AI and CGI. Every frame is a deliberate
-                act. Every pixel, a decision.
+             
               </p>
 
               <div className="about-quote-block" data-reveal data-d="5">
@@ -565,17 +563,13 @@ export default function AboutSection() {
                 ))}
               </div>
               <p className="about-paragraph" data-reveal data-d="5">
-                Our studio partners with Louis Vuitton, Hermès, Dom Pérignon and
-                Chanel to tell stories that feel both timeless and radically now.
+             We blend cinematic storytelling with modern production techniques to craft content that is both visually striking and meaningful.
               </p>
 
               <div className="v-marquee-wrap">
                 <div className="v-marquee">
                   {[
-                    "Louis Vuitton","Hermès","Dom Pérignon","Chanel",
-                    "La Mer","Google","Taittinger","Marly Garden",
-                    "Louis Vuitton","Hermès","Dom Pérignon","Chanel",
-                    "La Mer","Google","Taittinger","Marly Garden",
+                    "VISUAL PRODUCTION","FILM & CINEMA","BRAND STORYTELLING","AI CONTENT","EVENTS","CREATIVE DIRECTION"
                   ].map((brand, i) => (
                     <div key={i} className="v-marquee-item">{brand}</div>
                   ))}
@@ -601,10 +595,10 @@ export default function AboutSection() {
           <hr className="about-hr" data-reveal data-d="5" />
           <div className="process-strip">
             {[
-              { num: "01", title: "Conceive", desc: "Deep immersion in your brand world — uncovering the tension between heritage and the unexpected." },
-              { num: "02", title: "Design",   desc: "Storyboards, art direction and AI pre-visualization built in parallel — at speed." },
-              { num: "03", title: "Produce",  desc: "On-location or studio. Physical and digital. Human talent and machine intelligence — unified." },
-              { num: "04", title: "Deliver",  desc: "Print-ready masters, film cuts and 3D assets — all from one studio, one creative vision." },
+              { num: "01", title: "CONCEIVE", desc: "We dive deep into your vision—understanding your brand, audience, and story to uncover ideas that truly stand out." },
+              { num: "02", title: "DESIGN",   desc: "We shape concepts into visual direction through storyboards, creative planning, and pre-visualization with precision." },
+              { num: "03", title: "PRODUCE",  desc: "From shoot to execution, we bring ideas to life—blending cinematic craft, technology, and creative excellence." },
+              { num: "04", title: "DELIVER",  desc: "We refine every frame and deliver high-quality content optimized for impact across all platforms." },
             ].map(({ num, title, desc }, i) => (
               <div key={num} className="process-item" data-reveal data-d={String(i + 4)}>
                 <p className="process-num">{num}</p>

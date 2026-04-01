@@ -349,7 +349,7 @@ export default function Hero3() {
 
   const SLIDES_COUNT = 1;
   const slides = [
-    { eyebrow: "21FIFTYONE — Paris",      line1: "We",    line2: "Make",  accent: "Culture.",    sub: "AI Production House · Luxury & Editorial",      cta: "View Our Work" },
+    { eyebrow: "21FIFTYONE — Paris",      line1: "WE",    line2: "CREATE",  accent: "Visual",    sub: "A creative production house crafting cinematic stories, brand films, and digital content that captivate, connect, and leave a lasting impression.",      cta: "Contact Us" },
   
   ];
   const slide = slides[currentIndex % SLIDES_COUNT];

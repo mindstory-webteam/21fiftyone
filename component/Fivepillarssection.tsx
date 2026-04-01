@@ -431,10 +431,9 @@ export default function FivePillarsSection() {
                 <line x1="80" y1="60" x2="96" y2="60"  stroke="#c8372d" strokeWidth="0.5" strokeDasharray="2 4"/>
               </svg>
               <span className="p-card__num">01</span>
-              <h3 className="p-card__title"><span className="p-card__title-inner">Radical Precision</span></h3>
+              <h3 className="p-card__title"><span className="p-card__title-inner">STORY</span></h3>
               <p className="p-card__desc">
-                Every pixel is accounted for. Every transition is intentional. We
-                reject the generic in favour of the engineered.
+               Every project begins with a powerful idea—crafted into a narrative that connects and resonates.
               </p>
             </div>
 
@@ -447,10 +446,9 @@ export default function FivePillarsSection() {
                 </svg>
               </div>
               <span className="p-card__num">02</span>
-              <h3 className="p-card__title"><span className="p-card__title-inner">Cinematic Vision</span></h3>
+              <h3 className="p-card__title"><span className="p-card__title-inner">CREATIVITY</span></h3>
               <p className="p-card__desc">
-                Visual storytelling that captivates and holds attention through tonal
-                depth, light, and composed silence.
+                Bold thinking and original concepts that bring uniqueness to every frame.
               </p>
             </div>
 
@@ -462,10 +460,9 @@ export default function FivePillarsSection() {
                 </svg>
               </div>
               <span className="p-card__num">03</span>
-              <h3 className="p-card__title"><span className="p-card__title-inner">High Velocity</span></h3>
+              <h3 className="p-card__title"><span className="p-card__title-inner">PRECISION</span></h3>
               <p className="p-card__desc">
-                Rapid deployment of complex solutions without sacrificing an ounce of
-                quality or creative integrity.
+             Attention to detail at every stage—from planning to final output.
               </p>
             </div>
 
@@ -479,11 +476,9 @@ export default function FivePillarsSection() {
                 </svg>
               </div>
               <span className="p-card__num">04</span>
-              <h3 className="p-card__title"><span className="p-card__title-inner">Technological Alchemy</span></h3>
+              <h3 className="p-card__title"><span className="p-card__title-inner">TECHNOLOGY</span></h3>
               <p className="p-card__desc">
-                Converting raw code into digital gold through proprietary frameworks
-                and obsessive testing. The machine bends to the vision, never the
-                reverse.
+               Leveraging cutting-edge tools, including AI, to enhance storytelling and production.
               </p>
             </div>
 
@@ -495,12 +490,10 @@ export default function FivePillarsSection() {
             <div className="p-fifth-left" data-reveal data-d="5">
               <span className="p-card__num">05</span>
               <h3 className="p-card__title" style={{ position: "relative", zIndex: 1 }}>
-                <span className="p-card__title-inner">Cultural Authorship</span>
+                <span className="p-card__title-inner">IMPACT</span>
               </h3>
               <p className="p-card__desc" style={{ position: "relative", zIndex: 1, marginTop: "14px" }}>
-                We don&rsquo;t follow trends — we architect them. Each project is
-                designed to outlive the season and embed itself in the cultural
-                conversation of its era.
+                Creating visuals that don’t just look good—but leave a lasting impression.
               </p>
             </div>
 

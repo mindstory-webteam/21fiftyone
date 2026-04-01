@@ -6,58 +6,35 @@ import SplitText from "./Splittext";
 const projects = [
   {
     id: 1,
-    name: "LOUIS VUITTON\nASNIERES",
-    category: "SOCIAL QUEST",
-    year: "2024",
+    name: "Fr Binoj Mulavarickal ",
+    category: "Officia music",
+    year: "2025",
     tags: ["Brand Experience", "Digital"],
-    video: "/videos/video-1.webm",
-    poster: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=1200&q=90",
+  
+    video: "/videos/projects/Neramayi Kaalamayi _ Fr. Binoj Mulavarickal _ Jmymah & Gichu Joy _ Christmas Song 2025.mp4",
+    poster: "",
   },
   {
     id: 2,
-    name: "HERMES\nODYSSEY",
-    category: "FRAGRANCE FINDER",
+    name: "kallazhimusic ",
+    category: "devotional music",
     year: "2024",
     tags: ["Interactive", "Luxury"],
-    video: "/videos/video-2.webm",
-    poster: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200&q=90",
+      video: "/videos/projects/Latest Ayyappa devotional _ ഏറ്റവും പുതിയ അയ്യപ്പഭക്തിഗാനം _ ചിന്മുദ്രാംഗി _ Chinmundranki _.mp4",
+    
+    poster: "",
   },
   {
     id: 3,
-    name: "LA MER\nRITUAL",
-    category: "SKINCARE PRINT",
-    year: "2023",
-    tags: ["Campaign", "Print"],
-    video: "/videos/video-3.webm",
-    poster: "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=1200&q=90",
+    name: "indel suzuki",
+    category: "content creation",
+    year: "2025",
+    tags: ["Interactive", "Luxury"],
+      video:"/videos/projects/video-3.mp4",
+    
+    poster: "",
   },
-  {
-    id: 4,
-    name: "MARLY\nGARDEN",
-    category: "PRINT LUXE PARFUM",
-    year: "2023",
-    tags: ["Editorial", "Fragrance"],
-    video: "/videos/video-1.webm",
-    poster: "https://images.unsplash.com/photo-1541643600914-78b084683702?w=1200&q=90",
-  },
-  {
-    id: 5,
-    name: "PARIS\nBERLIN",
-    category: "SOCIAL QUEST II",
-    year: "2023",
-    tags: ["Social", "Motion"],
-    video: "/videos/video-2.webm",
-    poster: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=90",
-  },
-  {
-    id: 6,
-    name: "LOUIS VUITTON\nGRASSE",
-    category: "SOCIAL QUEST II",
-    year: "2022",
-    tags: ["Heritage", "Digital"],
-    video: "/videos/video-3.webm",
-    poster: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200&q=90",
-  },
+  
 ] as const;
 
 const TOTAL = projects.length;

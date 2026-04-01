@@ -4,27 +4,27 @@ import { useEffect, useRef } from "react";
 
 const CARDS = [
   {
-    number: "120+",
+    number: "100+",
     label: "Projects Delivered",
-    sub: "From startups to Fortune 500s",
+    sub: "Stories brought to life",
     side: "left",
   },
   {
-    number: "48",
+    number: "25+",
     label: "Global Clients",
-    sub: "Across 18 countries",
+    sub: "Brands we’ve partnered with",
     side: "right",
   },
   {
-    number: "4yr",
+    number: "10yr",
     label: "Studio Experience",
-    sub: "Est. 2021 — Paris",
+    sub: "Of creative excellence",
     side: "left",
   },
   {
     number: "98%",
     label: "Client Retention",
-    sub: "Relationships built to last",
+    sub: "Client trust & retention",
     side: "right",
   },
 ];

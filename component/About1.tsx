@@ -631,13 +631,13 @@ const About1 = () => {
       <div className="relative mb-8 mt-86 flex flex-col items-center gap-5 px-4">
 
         <div className="ab-label-row w-full max-w-5xl">
-          <span className="ab-label-l">Welcome to Zentry</span>
+          <span className="ab-label-l">WELCOME TO 21 FIFTYONE </span>
           <span className="ab-label-r">Est. 2024 — Metagame Layer</span>
         </div>
 
         <div style={{ width: "100%", maxWidth: "1100px" }}>
           <SplitText
-            text="Discover World's"
+            text="DISCOVER STORIES"
             tag="div"
             className="ab-headline"
             delay={40}
@@ -654,7 +654,7 @@ const About1 = () => {
           />
 
           <SplitText
-            text="Shared Adventure"
+            text="Shared Experience"
             tag="div"
             className="ab-headline-accent"
             delay={80}
@@ -673,11 +673,10 @@ const About1 = () => {
 
         <div className="ab-sub-wrap text-center">
           <p className="ab-sub-main">
-            The Game of Games begins — your life, now an epic MMORPG
+            Cinematic storytelling begins here — where ideas turn into powerful visual experiences.
           </p>
           <p className="ab-sub-side">
-            Zentry unites every player from countless games and platforms, both
-            digital and physical, into a unified Play Economy
+            21fifty one brings together film, brand, and digital storytelling into one seamless creative journey—crafted with precision, emotion, and imagination.
           </p>
         </div>
       </div>
@@ -689,7 +688,7 @@ const About1 = () => {
           <video
             ref={videoRef}
             className="stone-video"
-            src="/videos/video-1.webm"
+            src="/videos/banner/0_Ladybug_Insect_1280x720.webm"
             autoPlay
             loop
             muted
@@ -698,12 +697,12 @@ const About1 = () => {
 
           <div ref={overlayRef} className="scroll-text ab-scroll-overlay" style={{ opacity: 0 }}>
             <div className="ab-overlay-big">
-              World s<br />Largest
+              WHERE STORIES <br /> COME ALIVE
             </div>
             <div className="ab-overlay-accent">
-              A unified Play Economy —<br />
-              every game, every world,<br />
-              every player.
+              Driven by vision —<br />
+               shaped by creativity, emotion<br />
+               and precision.
             </div>
           </div>
 

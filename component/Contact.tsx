@@ -5,6 +5,8 @@ import { Mail, Phone, MapPin, ArrowUpRight, Send } from "lucide-react";
 import SplitText from "./Splittext";
 import RollButton from "./Rollbutton";
 
+const PHP_ENDPOINT = "/component/Contact.php";
+
 /* ─────────────────────────────────────────────────────────────
    CONTACT SECTION
 ───────────────────────────────────────────────────────────── */
@@ -19,6 +21,7 @@ const Contact = () => {
   });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   /* reveal on scroll */
   useEffect(() => {
@@ -43,15 +46,41 @@ const Contact = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (error) setError("");
   };
 
-  const handleSubmit = () => {
-    setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      setSent(true);
-    }, 1800);
-  };
+ const handleSubmit = async () => {
+  if (!formData.name || !formData.email) return;
+  setError("");
+  setSending(true);
+ 
+  try {
+    const res = await fetch(PHP_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name:    formData.name,
+        email:   formData.email,
+        company: formData.company,
+        service: formData.service,
+        message: formData.message,
+      }),
+    });
+ 
+    const json = await res.json();
+ 
+    if (!res.ok || json.error) {
+      throw new Error(json.error || "Unknown error");
+    }
+ 
+    setSent(true);
+  } catch (err: any) {
+    console.error("Mail error:", err);
+    setError(err.message || "Failed to send. Please try again or email us directly.");
+  } finally {
+    setSending(false);
+  }
+};
 
   const services = [
     "AI Video",
@@ -433,6 +462,18 @@ const Contact = () => {
         }
         .ct-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+        /* error message */
+        .ct-error {
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          color: #ff6b6b;
+          background: rgba(255,107,107,0.08);
+          border: 1px solid rgba(255,107,107,0.2);
+          padding: 10px 16px;
+          margin-top: 4px;
+        }
+
         /* success state */
         .ct-success {
           display: flex;
@@ -579,7 +620,8 @@ const Contact = () => {
             hoverRollDirection="left"
           />
           <p className="ct-hdr-desc" data-reveal data-d="1">
-            Ready to elevate your brand with world-class visual content? Tell us about your project and our creative team will get back to you within 24 hours.
+            Ready to elevate your brand with powerful visual storytelling?
+ Share your vision with us—our team will connect with you to craft something impactful.
           </p>
         </div>
         <div className="ct-hdr-right" data-reveal data-d="2">
@@ -717,6 +759,9 @@ const Contact = () => {
                   onChange={handleChange}
                 />
               </div>
+
+              {/* error banner */}
+              {error && <p className="ct-error">{error}</p>}
 
               <div className="ct-submit-row">
                 <p className="ct-submit-note">

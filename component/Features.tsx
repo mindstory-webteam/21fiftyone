@@ -132,9 +132,18 @@ const STYLES = `
   .sv-bento-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     gap: 20px;
   }
+
+  /* ── Bottom row: 3 equal columns ── */
+  .sv-bento-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
   .sv-bento-cell {
     position: relative;
     border-radius: 12px;
@@ -275,6 +284,7 @@ const STYLES = `
     .sv-bento-grid { grid-template-columns: 1fr; }
     .sv-bento-cell.tall { grid-row: span 1; min-height: 320px; }
     .sv-bento-large { height: 50vw; min-height: 260px; }
+    .sv-bento-row { grid-template-columns: 1fr; }
   }
 `;
 
@@ -489,9 +499,6 @@ const RBLabel = ({ children, hovered }: { children: string; hovered: boolean }) 
   );
 };
 
-
-
-
 /* ════════════════════════════════════════════════════════
    BENTO TILT
 ════════════════════════════════════════════════════════ */
@@ -535,25 +542,35 @@ const ExploreBtn = () => (
 ════════════════════════════════════════════════════════ */
 const SERVICES = [
   {
-    id: "01", src: "/videos/video-1.webm",
-    title: "Brand Strategy", titleAccent: "& Identity",
+    id: "01", src: "/videos/banner/s-1.webm",
+    title: "VISUAL PRODUCTION ", 
     desc: "We craft brand narratives that resonate — from naming and positioning to full visual identity systems built to last.",
     large: true,
   },
   {
-    id: "02", src: "/videos/video-2.webm",
-    title: "Digital Design",
+    id: "02", src: "/videos/banner/s-2.webm",
+    title: "MOVIE PRODUCTION",
     desc: "Websites, apps, and interfaces where every pixel earns its place. Interaction-first design that converts.",
     tall: true,
   },
   {
-    id: "03", src: "/videos/video-3.webm",
-    title: "Motion & Film",
+    id: "03", src: "/videos/banner/s-3.webm",
+    title: "CORPORATE FILMS",
     desc: "Cinematic storytelling for campaigns, product launches, and brand films that move people.",
   },
   {
-    id: "04", src: "/videos/video-1.webm",
-    title: "3D & Spatial",
+    id: "04", src: "/videos/banner/s-4.webm",
+    title: "COMMERCIAL PRODUCTION",
+    desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
+  },
+  {
+    id: "05", src: "/videos/banner/s-5.webm",
+    title: "AI PRODUCTION",
+    desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
+  },
+   {
+    id: "06", src: "/videos/banner/s-6.webm",
+    title: "ENTERTAINMENT EVENTS",
     desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
   },
 ];
@@ -615,11 +632,11 @@ const Features = () => {
           <div className="sv-header-right">
             <div>
               <p className="sv-sub-main">
-                End-to-end creative production for brands that want to be remembered.
+                The Art of Visual Storytelling
               </p>
               <p className="sv-sub-side">
-                From strategy to final pixel — we partner with ambitious teams to
-                build work that stands apart in a world full of noise.
+                Blending imagination, emotion, and precision—
+ to create stories that feel as powerful as they look
               </p>
             </div>
             <RollButton label="view Services" href="/services" />
@@ -641,7 +658,7 @@ const Features = () => {
           <ExploreBtn />
         </BentoTilt>
 
-        {/* ── 2×2 bento grid ── */}
+        {/* ── 2×2 bento grid (cards 02–04) ── */}
         <div className="sv-bento-grid">
 
           {/* Card 2 — tall left */}
@@ -686,6 +703,39 @@ const Features = () => {
             <ExploreBtn />
           </BentoTilt>
 
+        </div>
+
+        {/* ── Bottom row: cards 05, 06 + accent ── */}
+        <div className="sv-bento-row">
+
+          {/* Card 5 — AI Production */}
+          <BentoTilt className="sv-bento-cell">
+            <video src={gridCards[3].src} loop muted autoPlay className="sv-card-video" />
+            <div className="sv-card-overlay" />
+            <div className="sv-card-inner">
+              <div>
+                <span className="sv-num">{gridCards[3].id} /</span>
+                <h2 className="sv-card-title">{gridCards[3].title}</h2>
+                <p className="sv-card-desc">{gridCards[3].desc}</p>
+              </div>
+            </div>
+            <ExploreBtn />
+          </BentoTilt>
+
+          {/* Card 6 — Entertainment Events */}
+          <BentoTilt className="sv-bento-cell">
+            <video src={gridCards[4].src} loop muted autoPlay className="sv-card-video" />
+            <div className="sv-card-overlay" />
+            <div className="sv-card-inner">
+              <div>
+                <span className="sv-num">{gridCards[4].id} /</span>
+                <h2 className="sv-card-title">{gridCards[4].title}</h2>
+                <p className="sv-card-desc">{gridCards[4].desc}</p>
+              </div>
+            </div>
+            <ExploreBtn />
+          </BentoTilt>
+
           {/* Accent card — dark bg */}
           <BentoTilt className="sv-bento-cell accent">
             <div style={{ display:"flex", flexDirection:"column", justifyContent:"space-between", height:"100%" }}>
@@ -702,6 +752,7 @@ const Features = () => {
           </BentoTilt>
 
         </div>
+
       </div>
     </section>
   );

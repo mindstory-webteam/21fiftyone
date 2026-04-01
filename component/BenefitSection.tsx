@@ -25,31 +25,31 @@ const TOKENS = `
 /* ─── Data ─── */
 const SLIDES = [
   {
-    number: "01", title: "Quiet Peaks", subtitle: "Alpine Serenity",
-    body: "Breathe in the stillness of the summit. Our retreats are designed around the natural rhythm of altitude — where the air is pure and the silence is loud.",
+    number: "01", title: "DISCOVERY", subtitle: "Understanding Your Vision",
+    body: "We begin by diving deep into your ideas, brand, and goals—uncovering the story that needs to be told and the impact it should create.",
     bg: "#0c0c0c", color: "#f2ede6",
   },
   {
-    number: "02", title: "Pure Energy", subtitle: "Renewable Horizons",
-    body: "Every experience is powered by the mountain itself. Wind, water and light converge into a force that refreshes both body and mind.",
+    number: "02", title: "CONCEPT & DESIGN", subtitle: "Shaping the Story",
+    body: " We develop concepts, storyboards, and visual styles that bring your story to life.",
     bg: "#1a1210", color: "#f2ede6",
   },
   {
-    number: "03", title: "Alpine Snow", subtitle: "Crystalline Clarity",
-    body: "Clean as the first snowfall. Unspoiled terrain and unfiltered skies create a canvas that reminds you why the earth is worth protecting.",
+    number: "03", title: "PRODUCTION", subtitle: "Bringing Ideas to Life",
+    body: " From shoot to execution, we create high-quality visuals with cinematic precision.",
     bg: "#f2ede6", color: "#0c0c0c",
   },
   {
-    number: "04", title: "Wild Terrain", subtitle: "Raw & Untamed",
-    body: "Beyond the marked trails lives a world that demands respect. For those who seek the edges — the reward is a view nobody else has earned.",
+    number: "04", title: "DELIVERY", subtitle: "Finalizing the Experience",
+    body: "We refine, edit, and deliver content optimized for maximum impact across platforms.",
     bg: "#2a1f1a", color: "#f2ede6",
   },
 ];
 
 const MARQUEE_ITEMS = [
-  "Mountain Calm","✦","Pure Air","✦","Endlessly Renewable","✦",
-  "Alpine Energy","✦","Nature Leads","✦","Wild & Free","✦",
-  "Summit Reached","✦","Clean Living","✦",
+  "Film Production","✦","Commercial / Ad","✦","Corporate Film","✦",
+  "Event / Experience","✦","AI Content","✦","Photography","✦"
+
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -900,7 +900,7 @@ export default function BenefitSection() {
 
                 <div className="bs-headline-accent-wrap">
                   <SplitText
-                    text="Mountain Calm"
+                    text="Creative Process"
                     splitType="words"
                     from={{ opacity: 0, y: 80 }}
                     to={{ opacity: 1, y: 0 }}

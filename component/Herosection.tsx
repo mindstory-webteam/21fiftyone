@@ -16,10 +16,11 @@ if (typeof window !== "undefined") {
    VIDEOS
 ═══════════════════════════════════════════ */
 const VIDEOS = [
-  "/videos/video-1.webm",
-  "/videos/video-2.webm",
-  "/videos/video-3.webm",
-  "/videos/video-1.webm",
+  
+  "/videos/banner/7011667_Film_Filming_1280x720.webm",
+  "/videos/banner/0_Ladybug_Insect_1280x720.webm",
+  "/videos/banner/7011716_Filming_Directing_1280x720.webm",
+
 ];
 const getVideo = (i: number) =>
   VIDEOS[((i % VIDEOS.length) + VIDEOS.length) % VIDEOS.length];

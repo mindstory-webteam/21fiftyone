@@ -8,9 +8,9 @@ import { Fragment } from "react";
 /* ─── CASE STUDY DATA ─── */
 const CASE_STUDY = {
   badge: "Featured Case Study",
-  titleBlack: "Project",
-  titleRed: "Lumina",
-  desc: "Redefining the digital ecosystem for a global luxury automotive house through noir-inspired architectural design.",
+  titleBlack: "OUR",
+  titleRed: "WORK",
+  desc: "Redefining visual storytelling for a modern brand—through cinematic direction, refined aesthetics, and purposeful design.",
   video: "/videos/video-2.webm",
   meta: [
     { label: "Client",    value: "Aethelgard Motors" },
