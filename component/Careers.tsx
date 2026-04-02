@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { motion, useAnimation, AnimationControls } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
+
+type AnimationControls = ReturnType<typeof useAnimation>;
 import type { ElementType, CSSProperties } from "react";
 import Link from "next/link";
 
