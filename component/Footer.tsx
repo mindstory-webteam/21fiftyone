@@ -23,8 +23,8 @@ const NAV_COLS = [
     links: [
       { label: "About",   href: "/about"  },
       { label: "Studio",  href: "/studio" },
-      { label: "Careers", href: "#"       },
-      { label: "Contact", href: "#"       },
+      { label: "Careers", href: "/careers"       },
+      { label: "Contact", href: "/contact"       },
     ],
   },
   {
