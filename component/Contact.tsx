@@ -231,7 +231,7 @@ const Contact = () => {
 
         .ct-avail {
           display: flex; align-items: center; gap: 12px; padding: 16px 24px;
-          border: 1px solid var(--line); background: transparent;
+         
         }
         .ct-avail-dot {
           width: 8px; height: 8px; border-radius: 50%; background: #2ecc71;
@@ -461,15 +461,15 @@ const Contact = () => {
           </div>
 
           <div className="ct-avail" data-reveal data-d="2">
-            <span className="ct-avail-dot" />
+            {/* <span className="ct-avail-dot" />
             <span className="ct-avail-text">
               Currently accepting new projects &nbsp;<span>— 2025</span>
-            </span>
+            </span> */}
           </div>
 
           <div className="ct-stats" data-reveal data-d="3">
             <div className="ct-stat">
-              <span className="ct-stat-num">9+</span>
+              <span className="ct-stat-num">10+</span>
               <span className="ct-stat-lbl">Years Active</span>
             </div>
             <div className="ct-stat">
@@ -560,14 +560,14 @@ const Contact = () => {
       </div>
 
       {/* ══ BOTTOM STRIP ══ */}
-      <div className="ct-strip" data-reveal>
+      {/* <div className="ct-strip" data-reveal>
         <span className="ct-strip-text">© 2025 21FiftyOne. All rights reserved.</span>
         <div className="ct-strip-links">
           <a className="ct-strip-link" href="/privacy">Privacy Policy <ArrowUpRight size={10} /></a>
           <a className="ct-strip-link" href="/terms">Terms <ArrowUpRight size={10} /></a>
           <a className="ct-strip-link" href="https://instagram.com" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={10} /></a>
         </div>
-      </div>
+      </div> */}
 
     </section>
   );

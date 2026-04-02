@@ -42,7 +42,7 @@ const PROJECTS = [
     category: "CGI · Motion",
     year: "2023",
     desc: "We turned a century of craft into a 60-second visual poem. The bottle never appeared once.",
-    video: "/videos/projects/video-3.mp4",
+    video: "/videos/projects/video-3.webm",
     tag: "CGI",
   },
 ];

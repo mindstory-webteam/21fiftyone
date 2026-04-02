@@ -11,7 +11,7 @@ export default function Home() {
 
       <ServicesSection
         sectionEyebrow="What We Do"
-        sectionTitle="SERVICES BUILTFOR THE"
+        sectionTitle="SERVICES BUILT FOR THE"
         sectionTitleAccent="Future."
         sectionDesc="Every project is crafted with purpose and precision.
  We create cinematic content and visual experiences that go beyond trends—designed to connect, engage, and leave a lasting impact."
