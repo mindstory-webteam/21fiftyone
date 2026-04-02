@@ -127,13 +127,37 @@ export const TextRoll: React.FC<TextRollUnitProps> = ({
   const controls = useAnimation();
   const hovering = useRef(false);
   const rolling  = useRef(false);
+  const mounted  = useRef(false); // ← FIX: track mount state
+
+  // ← FIX: set mounted true after component mounts, false on unmount
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const doRoll = async () => {
-    if (rolling.current) return;
+    // ← FIX: guard — do nothing if not mounted yet or already rolling
+    if (!mounted.current || rolling.current) return;
     rolling.current = true;
+
     await controls.start("rolling");
+
+    // ← FIX: guard after each await in case component unmounted mid-animation
+    if (!mounted.current) {
+      rolling.current = false;
+      return;
+    }
+
     // instant reset to below
     await controls.start("reset");
+
+    if (!mounted.current) {
+      rolling.current = false;
+      return;
+    }
+
     await controls.start("idle");
     rolling.current = false;
   };

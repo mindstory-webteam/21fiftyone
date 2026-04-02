@@ -153,7 +153,7 @@ export default function Hero3() {
   const SLIDES_COUNT = 1;
   const slides = [
     {
-      eyebrow: "21FIFTYONE — Paris",
+      eyebrow: "",
       line1: "WE", line2: "CREATE", accent: "Visual",
       sub: "A creative production house crafting cinematic stories, brand films, and digital content that captivate, connect, and leave a lasting impression.",
       cta: "Contact Us",

@@ -501,7 +501,7 @@ export default function ProjectsScroll() {
 
         {/* ── BIG HEADING — CENTERED ── */}
         <div className="ps-heading-block">
-          <p className="ps-heading-eyebrow">Detroit Studio — Paris</p>
+          <p className="ps-heading-eyebrow">21fiftyone Studio</p>
 
           <div className="ps-split-wrapper">
 

@@ -492,7 +492,7 @@ function SlidePanel({ panelRef, preLayersRef, open, activeLink, onLinkClick }: S
             margin: "0 0 8px",
           }}>
             <span style={{ width: 20, height: 1, background: B.red, flexShrink: 0 }} />
-            21FiftyOne — Paris
+            
           </p>
 
           <ul className="fnb-navlist" role="list" style={{

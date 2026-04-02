@@ -218,7 +218,7 @@ export default function ProjectsSection() {
         .proj-title-accent {
           font-family: 'Playfair Display', serif !important;
           font-style: italic !important;
-          font-size: clamp(44px, 5.8vw, 88px) !important;
+          font-size: clamp(24px, 2.8vw, 48px) !important;
           color: var(--red) !important;
           line-height: 0.95 !important;
           letter-spacing: -0.01em !important;
@@ -501,7 +501,7 @@ export default function ProjectsSection() {
             autoRollDuration={620}
             />
             <SplitText
-              text="Projects"
+              text="PROJECTS"
               tag="div"
               className="proj-title-accent"
               delay={32}

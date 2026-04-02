@@ -38,6 +38,13 @@ const NAV_COLS = [
        { label: "ENTERTAINMENT EVENTS", href: "/services" },
     ],
   },
+  {
+    heading: "Policies",
+    links: [
+     { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms-conditions" },
+    ],
+  },
 ];
 
 const SOCIAL_LINKS = [
