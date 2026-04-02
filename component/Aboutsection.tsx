@@ -558,7 +558,7 @@ export default function AboutSection() {
           font-weight: 300;
           transition: color 0.3s;
         }
-        .process-card:hover .process-card-desc { color: #6a6462; }
+        .process-card:hover .process-card-desc { color: #ffff; }
         .process-ghost-num {
           position: absolute;
           bottom: -20px;
@@ -957,13 +957,13 @@ export default function AboutSection() {
             </div>
 
             {/* Bottom CTA strip */}
-            <div className="process-cta-strip" data-reveal>
+            {/* <div className="process-cta-strip" data-reveal>
               <p className="process-cta-text">
                 Ready to start your project?&nbsp;&nbsp;
                 <strong>Let&rsquo;s build something unforgettable.</strong>
               </p>
               <RollButton label="About Us" href="/projects" />
-            </div>
+            </div> */}
 
           </div>
         </div>
