@@ -484,7 +484,7 @@ export default function Hero2() {
             {/* Image pane */}
             <div className="hero2-image-pane" data-reveal data-d="3">
               <img
-                src="/image/about-3.jpg"
+                src="/image/about-3.webp"
                 alt="Studio environment dark moody"
               />
               <span className="hero2-img-caption">Paris Studio — 2024</span>

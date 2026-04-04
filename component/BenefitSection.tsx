@@ -517,7 +517,7 @@ export default function BenefitSection() {
               </div>
 
               {/* RIGHT: marquee text card */}
-              <MarqueeTextCard />
+              {/* <MarqueeTextCard /> */}
 
             </div>
           </div>

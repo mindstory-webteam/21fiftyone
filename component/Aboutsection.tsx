@@ -823,7 +823,7 @@ export default function AboutSection() {
             {/* Image stack */}
             <div className="image-stack" data-reveal data-d="3">
               <div className="image-main">
-                <img src="/image/about-4.jpg" alt="Studio portrait" />
+                <img src="/image/about-4.webp" alt="Studio portrait" />
               </div>
             </div>
 
@@ -854,9 +854,9 @@ export default function AboutSection() {
                   <span key={t} className="tag">{t}</span>
                 ))}
               </div>
-              <p className="about-paragraph" data-reveal data-d="5">
+              {/* <p className="about-paragraph" data-reveal data-d="5">
                 We blend cinematic storytelling with modern production techniques to craft content that is both visually striking and meaningful.
-              </p>
+              </p> */}
               <div className="v-marquee-wrap">
                 <div className="v-marquee">
                   {[
