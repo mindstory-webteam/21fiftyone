@@ -4,6 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import SplitText from "./Splittext";
 
 const projects = [
+
+  {
+    id: 2,
+    name: "indel suzuki ",
+    category: "content creation",
+    year: "2025",
+    tags: ["Brand Experience", "Digital"],
+  
+    video: "/videos/projects/video-3.webm",
+    poster: "",
+  },
   
   {
     id: 2,
