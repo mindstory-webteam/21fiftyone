@@ -4,16 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import SplitText from "./Splittext";
 
 const projects = [
-   {
-    id: 1,
-    name: "indel suzuki",
-    category: "content creation",
-    year: "2025",
-    tags: ["Interactive", "Luxury"],
-      video:"/videos/projects/video-3.mp4",
-    
-    poster: "",
-  },
+  
   {
     id: 2,
     name: "Fr Binoj Mulavarickal ",
@@ -633,7 +624,7 @@ export default function ProjectsScroll() {
               <div className="ps-progress" style={{ width: `${((current + 1) / TOTAL) * 100}%` }} />
 
               <div className="ps-hint" style={{ opacity: current === 0 ? 1 : 0 }}>
-                <span className="ps-hint-label">Scroll</span>
+                <span className="ps-hint-label">Scrll</span>
                 <div className="ps-hint-line" />
               </div>
             </div>
