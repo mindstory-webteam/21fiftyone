@@ -469,7 +469,7 @@ export default function BenefitSection() {
 
           <div className="bs-label-row" data-reveal>
             <span className="bs-label-l">Mountain Experience</span>
-            <span className="bs-label-r">21FIFTYONE</span>
+            {/* <span className="bs-label-r">21FIFTYONE</span> */}
           </div>
 
           <div className="bs-header">

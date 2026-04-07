@@ -744,7 +744,7 @@ export default function AboutSection() {
           {/* Label row */}
           <div className="about-label-row" data-reveal>
             <span className="about-label">21FIFTYONE</span>
-            <span className="about-label-right">21FIFTYONE</span>
+            {/* <span className="about-label-right">21FIFTYONE</span> */}
           </div>
 
           {/* Hero: SplitText headings + dark card */}

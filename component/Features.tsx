@@ -390,7 +390,7 @@ const Features = () => {
         {/* ── Label row ── */}
         <div className="sv-label-row">
           <span className="sv-label-l">What We Do</span>
-          <span className="sv-label-r">Services — 2025</span>
+          {/* <span className="sv-label-r">Services — 2025</span> */}
         </div>
 
         {/* ── Two-column header ── */}
