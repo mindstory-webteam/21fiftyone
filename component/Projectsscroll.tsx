@@ -4,25 +4,21 @@ import { useEffect, useRef, useState } from "react";
 import SplitText from "./Splittext";
 
 const projects = [
-
   {
-    id: 2,
+    id: 1,
     name: "indel suzuki ",
     category: "content creation",
     year: "2025",
     tags: ["Brand Experience", "Digital"],
-  
     video: "/videos/projects/video-3.webm",
     poster: "",
   },
-  
   {
     id: 2,
     name: "Fr Binoj Mulavarickal ",
     category: "Officia music",
     year: "2025",
     tags: ["Brand Experience", "Digital"],
-  
     video: "/videos/projects/Neramayi Kaalamayi _ Fr. Binoj Mulavarickal _ Jmymah & Gichu Joy _ Christmas Song 2025.mp4",
     poster: "",
   },
@@ -32,12 +28,9 @@ const projects = [
     category: "devotional music",
     year: "2024",
     tags: ["Interactive", "Luxury"],
-      video: "/videos/projects/Latest Ayyappa devotional _ ഏറ്റവും പുതിയ അയ്യപ്പഭക്തിഗാനം _ ചിന്മുദ്രാംഗി _ Chinmundranki _.mp4",
-    
+    video: "/videos/projects/Latest Ayyappa devotional _ ഏറ്റവും പുതിയ അയ്യപ്പഭക്തിഗാനം _ ചിന്മുദ്രാംഗി _ Chinmundranki _.mp4",
     poster: "",
   },
-
-  
 ] as const;
 
 const TOTAL = projects.length;
@@ -128,9 +121,6 @@ export default function ProjectsScroll() {
           font-family: 'Barlow', sans-serif;
         }
 
-        /* ══════════════════════════════════════
-           BIG HEADING — CENTERED
-        ══════════════════════════════════════ */
         .ps-heading-block {
           width: 100%;
           padding: 100px 60px 0;
@@ -154,7 +144,6 @@ export default function ProjectsScroll() {
           color: #d42b2b;
           margin-bottom: 28px;
         }
-        /* line on BOTH sides for centered eyebrow */
         .ps-heading-eyebrow::before,
         .ps-heading-eyebrow::after {
           content: '';
@@ -172,11 +161,10 @@ export default function ProjectsScroll() {
           margin-top: 48px;
         }
 
-        /* ── Split text heading wrapper ── */
         .ps-split-wrapper {
           display: flex;
           flex-direction: column;
-          align-items: center;   /* CENTER the text columns */
+          align-items: center;
           gap: 12px;
           margin-top: 20px;
           width: 100%;
@@ -192,7 +180,6 @@ export default function ProjectsScroll() {
           text-transform: uppercase;
           color: #0d0d0d;
           white-space: nowrap;
-          /* let SplitText's flex children centre */
           display: flex;
           justify-content: center;
         }
@@ -211,9 +198,6 @@ export default function ProjectsScroll() {
           justify-content: center;
         }
 
-        /* ══════════════════════════════════════
-           SCROLL SECTION
-        ══════════════════════════════════════ */
         .ps-scroll-section {
           position: relative;
           height: ${TOTAL * 100}vh;
@@ -229,7 +213,6 @@ export default function ProjectsScroll() {
           overflow: hidden;
         }
 
-        /* ── LEFT VIDEO ── */
         .ps-video-panel {
           position: relative;
           width: 100%;
@@ -312,9 +295,6 @@ export default function ProjectsScroll() {
           border-radius: 20px;
         }
 
-        /* ══════════════════════════════════════
-           RIGHT LIST PANEL
-        ══════════════════════════════════════ */
         .ps-list-panel {
           position: relative;
           height: 100vh;
@@ -374,7 +354,6 @@ export default function ProjectsScroll() {
         .ps-list-full::-webkit-scrollbar { width: 4px; }
         .ps-list-full::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
 
-        /* Item */
         .ps-item {
           position: relative;
           height: 110px;
@@ -501,13 +480,11 @@ export default function ProjectsScroll() {
 
       <div className="ps-root">
 
-        {/* ── BIG HEADING — CENTERED ── */}
+        {/* ── BIG HEADING ── */}
         <div className="ps-heading-block">
           <p className="ps-heading-eyebrow">21fiftyone Studio</p>
 
           <div className="ps-split-wrapper">
-
-            {/* TOP LINE */}
             <div className="ps-split-line">
               <SplitText
                 text="Selected"
@@ -522,12 +499,11 @@ export default function ProjectsScroll() {
                 hoverRoll
                 hoverRollDirection="left"
                 autoRoll
-            autoRollInterval={5500}
-            autoRollDuration={620}
+                autoRollInterval={5500}
+                autoRollDuration={620}
               />
             </div>
 
-            {/* BOTTOM LINE */}
             <div className="ps-split-accent">
               <SplitText
                 text="Works "
@@ -542,11 +518,10 @@ export default function ProjectsScroll() {
                 hoverRoll
                 hoverRollDirection="center"
                 autoRoll
-            autoRollInterval={5500}
-            autoRollDuration={620}
+                autoRollInterval={5500}
+                autoRollDuration={620}
               />
             </div>
-
           </div>
 
           <div className="ps-heading-divider" />
@@ -559,7 +534,7 @@ export default function ProjectsScroll() {
             {/* LEFT: Video */}
             <div className="ps-video-panel">
               {projects.map((p, i) => (
-                <div key={p.id} className={`ps-video-slide${i === displayIndex ? " ps-vid-on" : ""}`}>
+                <div key={i} className={`ps-video-slide${i === displayIndex ? " ps-vid-on" : ""}`}>
                   <VideoPanel video={p.video} poster={p.poster} active={i === displayIndex} />
                 </div>
               ))}
@@ -598,7 +573,7 @@ export default function ProjectsScroll() {
                   const isOn = current === i || hoveredIndex === i;
                   return (
                     <div
-                      key={p.id}
+                      key={i}
                       ref={el => { itemRefs.current[i] = el; }}
                       className={`ps-item${isOn ? " ps-on" : ""}`}
                       onMouseEnter={() => setHoveredIndex(i)}

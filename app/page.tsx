@@ -13,6 +13,7 @@ import Footer from "@/component/Footer";
 import HeroSection from "@/component/Herosection";
 
 import ProjectsScroll from "@/component/Projectsscroll";
+import SocialFloat from "@/component/Socialfloat";
 
 const NAV_ITEMS = [
   { label: "Collections", ariaLabel: "View Collections", link: "/collections" },
@@ -37,6 +38,7 @@ export default function Home() {
      
         <FloatingNavbar />
         <HeroSection />
+        <SocialFloat  />
          {/* <CraftingCulture /> */}
          <About1/> 
 

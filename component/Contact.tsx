@@ -438,7 +438,7 @@ const Contact = () => {
           </p>
         </div>
         <div className="ct-hdr-right" data-reveal data-d="2">
-          <RollButton label="View Our Work" href="/work" />
+          <RollButton label="View Our Work" href="/studio" />
         </div>
       </div>
 
