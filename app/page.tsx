@@ -38,7 +38,7 @@ export default function Home() {
      
         <FloatingNavbar />
         <HeroSection />
-        <SocialFloat  />
+        {/* <SocialFloat  /> */}
          {/* <CraftingCulture /> */}
          <About1/> 
 
