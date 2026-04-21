@@ -43,6 +43,8 @@ const portfolioData: { id: number; category: string; tag: string; link: string; 
   { id: 31, category: 'concept',   tag: 'Concept',   link: 'https://www.instagram.com/reel/DRJ1aPfEdlL/embed',       industry: 'food&beverage',              type: 'reel' },
   { id: 32, category: 'concept',   tag: 'Concept',   link: 'https://www.youtube.com/embed/QjRnmIeut9w',              industry: 'entertainment&media',        type: 'youtube' },
   { id: 33, category: 'interview', tag: 'Interview', link: 'https://www.youtube.com/embed/kQn_NSt1AxQ',              industry: 'entertainment&media',        type: 'youtube' },
+   { id: 34, category: 'concept',   tag: 'Concept',   link: 'https://www.instagram.com/reel/DWgx8m3CU1b/embed',         industry: 'entertainment&media',        type: 'reel' },
+   { id: 34, category: 'concept',   tag: 'Concept',   link: 'https://www.instagram.com/reel/DWWd9v-zcDy/embed',         industry: 'entertainment&media',        type: 'reel' },
 ];
 
 const industries = [
