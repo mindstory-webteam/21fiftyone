@@ -11,7 +11,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title:       "21FiftyOne",
   description: "AI Production House · Luxury & Editorial",
+   verification: {
+    google: "1-WhDAqdhHAFquzeH_Ng5GewcF94oqd_t6NwEblLpSk",
+  },
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
