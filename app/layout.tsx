@@ -15,9 +15,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "21fiftyone",
-  description: "powered by Mind premium",
+  description: "AI Production House · Luxury & Editorial",
   icons: {
     icon: "/logo/2151icon.png",
+  },
+  
+   verification: {
+    google: "1-WhDAqdhHAFquzeH_Ng5GewcF94oqd_t6NwEblLpSk",
   },
 };
 
