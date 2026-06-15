@@ -537,7 +537,7 @@ We combine creative storytelling with technical precision, crafting visuals that
 
               {/* CTA */}
               <div className="hero2-cta-row" data-reveal data-d="6">
-                <RollButton label="Our Work" href="/work" />
+                <RollButton label="Our Work" href="/studio" />
                 <span className="hero2-scroll-hint">Scroll to explore</span>
               </div>
 

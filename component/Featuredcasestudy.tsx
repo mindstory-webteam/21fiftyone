@@ -545,9 +545,9 @@ export default function FeaturedCaseStudy() {
 
             {/* CTA */}
             <div className="fcs-cta-row" data-reveal data-d="3">
-              <RollButton label="View Case Study" href="/work/lumina" />
+              <RollButton label="View Case Study" href="/studio" />
               <div className="fcs-divider" />
-              <a className="fcs-link" href="/work">All Projects</a>
+              {/* <a className="fcs-link" href="/work">All Projects</a> */}
             </div>
 
           </div>
