@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "21fiftyone",
-  description: "AI Production House · Luxury & Editorial",
+  title: "Video Production Company in Calicut, Kerala | 21Fiftyone",
+  description: "Looking for a video production company in Calicut? 21Fiftyone creates cinematic brand videos, commercials, reels, and digital content in Kerala. Contact Us Now!",
   icons: {
     icon: "/logo/2151icon.png",
   },
