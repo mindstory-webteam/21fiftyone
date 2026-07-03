@@ -9,8 +9,6 @@ import Hero2 from "@/component/Hero2";
 import BreakTheMold from "@/component/Breakthemold";
 
 
-
-
 import Image from "next/image";
 import ProjectsSection from "@/component/Projectssection";
 import StatsSection from "@/component/StatsSection";

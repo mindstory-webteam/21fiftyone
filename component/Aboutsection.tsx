@@ -36,25 +36,25 @@ export default function AboutSection() {
     {
       num: "01",
       title: "CONCEIVE",
-      desc: "We dive deep into your vision—understanding your brand, audience, and story to uncover ideas that truly stand out.",
+      desc: "We understand your brand, audience, message, budget, location, and final use case before suggesting the right creative direction.",
       icon: "◎",
     },
     {
       num: "02",
       title: "DESIGN",
-      desc: "We shape concepts into visual direction through storyboards, creative planning, and pre-visualization with precision.",
+      desc: "We shape the idea into a visual plan with scripts, mood references, shot flow, storyboards, and production requirements.",
       icon: "◈",
     },
     {
       num: "03",
       title: "PRODUCE",
-      desc: "From shoot to execution, we bring ideas to life—blending cinematic craft, technology, and creative excellence.",
+      desc: "We handle the shoot with the right crew, equipment, lighting, direction, and on-location coordination for the video format.",
       icon: "◐",
     },
     {
       num: "04",
       title: "DELIVER",
-      desc: "We refine every frame and deliver high-quality content optimized for impact across all platforms.",
+      desc: "We edit, grade, refine, and export the final videos in formats suitable for websites, ads, presentations, reels, and digital campaigns.",
       icon: "◉",
     },
   ];
