@@ -710,10 +710,10 @@ const About1 = () => {
 
         <div className="ab-sub-wrap text-center">
           <p className="ab-sub-main">
-            Cinematic storytelling begins here — where ideas turn into powerful visual experiences.
+            Video Production Company in Calicut Creating Powerful Visual Stories
           </p>
           <p className="ab-sub-side">
-            21fifty one brings together film, brand, and digital storytelling into one seamless creative journey—crafted with precision, emotion, and imagination.
+            At 21Fifty One, we bring film, branding, and digital storytelling together to craft stories that connect with people and leave a lasting impact.
           </p>
         </div>
       </div>

@@ -109,24 +109,37 @@ const Contact = () => {
     "Other",
   ];
 
+  /* ─────────────────────────────────────────────
+     CONTACT INFO — each entry can hold one or more
+     clickable values (used here to show two phone
+     numbers under "Call Us").
+  ───────────────────────────────────────────── */
   const contactInfo = [
     {
       icon: <Mail size={16} />,
       label: "Email Us",
-      value: "hello@21fiftyone.com",
-      href: "mailto:hello@21fiftyone.com",
+      items: [
+        { value: "hello@21fiftyone.com", href: "mailto:hello@21fiftyone.com" },
+      ],
     },
     {
       icon: <Phone size={16} />,
       label: "Call Us",
-      value: "+91 98765 43210",
-      href: "tel:+919876543210",
+      items: [
+        { value: "+91 98765 43210", href: "tel:+919876543210" },
+        { value: "+91 8281610051", href: "tel:+918281610051" },
+      ],
     },
     {
       icon: <MapPin size={16} />,
       label: "Find Us",
-      value: "Mind Premium Private Limited 7th Floor, Tower 2, Regus Door No. 2703, Cabin 721, HiLITE Business Park, Pantheeramkavu, Kozhikode - 673 014",
-      href: "#",
+      items: [
+        {
+          value:
+            "Mind Premium Private Limited 7th Floor, Tower 2, Regus Door No. 2703, Cabin 721, HiLITE Business Park, Pantheeramkavu, Kozhikode - 673 014",
+          href: "#",
+        },
+      ],
     },
   ];
 
@@ -207,16 +220,16 @@ const Contact = () => {
         .ct-left { display: flex; flex-direction: column; gap: 32px; }
         .ct-info-cards { display: flex; flex-direction: column; gap: 3px; }
         .ct-info-card {
-          display: flex; align-items: center; gap: 18px; padding: 20px 24px;
+          display: flex; align-items: flex-start; gap: 18px; padding: 20px 24px;
           background: #ece7df; border-left: 3px solid var(--red);
-          text-decoration: none; transition: background 0.2s, box-shadow 0.2s; cursor: pointer;
+          text-decoration: none; transition: background 0.2s, box-shadow 0.2s;
         }
         .ct-info-card:hover { background: var(--black); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
         .ct-info-card:hover .ct-info-icon { color: var(--red); }
         .ct-info-card:hover .ct-info-label { color: rgba(255,255,255,0.4); }
         .ct-info-card:hover .ct-info-val { color: #fff; }
         .ct-info-card:hover .ct-info-arrow { opacity: 1; color: var(--red); }
-        .ct-info-icon { color: var(--muted); flex-shrink: 0; transition: color 0.2s; }
+        .ct-info-icon { color: var(--muted); flex-shrink: 0; transition: color 0.2s; margin-top: 2px; }
         .ct-info-text { flex: 1; }
         .ct-info-label {
           font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.28em;
@@ -227,7 +240,13 @@ const Contact = () => {
           font-family: 'DM Sans', sans-serif; font-size: 14px;
           font-weight: 500; color: var(--black); transition: color 0.2s;
         }
-        .ct-info-arrow { opacity: 0; transition: opacity 0.2s, color 0.2s; color: var(--muted); }
+        .ct-info-val-link {
+          display: block; text-decoration: none; cursor: pointer;
+        }
+        .ct-info-val-link:hover { color: var(--red); }
+        .ct-info-card:hover .ct-info-val-link:hover { color: var(--red); }
+        .ct-info-val-link + .ct-info-val-link { margin-top: 4px; }
+        .ct-info-arrow { opacity: 0; transition: opacity 0.2s, color 0.2s; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
 
         .ct-avail {
           display: flex; align-items: center; gap: 12px; padding: 16px 24px;
@@ -449,14 +468,22 @@ const Contact = () => {
         <div className="ct-left">
           <div className="ct-info-cards" data-reveal data-d="1">
             {contactInfo.map((info) => (
-              <a key={info.label} className="ct-info-card" href={info.href}>
+              <div key={info.label} className="ct-info-card">
                 <span className="ct-info-icon">{info.icon}</span>
                 <span className="ct-info-text">
                   <span className="ct-info-label">{info.label}</span>
-                  <span className="ct-info-val">{info.value}</span>
+                  {info.items.map((item, idx) => (
+                    <a
+                      key={idx}
+                      href={item.href}
+                      className="ct-info-val ct-info-val-link"
+                    >
+                      {item.value}
+                    </a>
+                  ))}
                 </span>
                 <span className="ct-info-arrow"><ArrowUpRight size={14} /></span>
-              </a>
+              </div>
             ))}
           </div>
 

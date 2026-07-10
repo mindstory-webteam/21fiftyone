@@ -525,7 +525,7 @@ export default function ProjectsSection() {
             <p className="proj-count">
               <span>{PROJECTS.length.toString().padStart(2, "0")}</span> Projects
             </p>
-            <RollButton label="All Work" href="/work" />
+            <RollButton label="All Work" href="/studio" />
           </div>
         </div>
 
@@ -551,7 +551,7 @@ export default function ProjectsSection() {
                   </div>
                   {/* ── "View" instead of "View Case" ── */}
                   <div className="proj-card-cta">
-                    <RollButton label="View" href={`/work/${p.id}`} />
+                    <RollButton label="View" href={`/studio`} />
                   </div>
                 </div>
               ))}
