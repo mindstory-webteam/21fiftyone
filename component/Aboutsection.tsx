@@ -867,7 +867,7 @@ export default function AboutSection() {
                   ))}
                 </div>
               </div>
-              <RollButton label="About Us" href="/projects" />
+              <RollButton label="About Us" href="/about" />
             </div>
           </div>
 
