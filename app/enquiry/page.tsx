@@ -2,13 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-/* =========================================================
-   21FIFTYONE — Enquiry / Landing Page  (Next.js App Router)
-   File: app/enquiry/page.tsx
-   Styles are 1:1 identical to the original HTML version.
-   Fonts are imported inside the <style> block below, so no
-   changes to layout.tsx are required.
-   ========================================================= */
+
+const SHEET_ENDPOINT = process.env.NEXT_PUBLIC_SHEET_ENDPOINT ?? "";
 
 interface ServiceItem {
   tc: string;
@@ -106,6 +101,12 @@ export default function Home() {
   const [popupSuccess, setPopupSuccess] = useState(false);
   const [bannerBtnText, setBannerBtnText] = useState("Request a Call Back");
 
+  // NEW: submission-in-progress + error state for both forms
+  const [bannerSubmitting, setBannerSubmitting] = useState(false);
+  const [popupSubmitting, setPopupSubmitting] = useState(false);
+  const [bannerError, setBannerError] = useState(false);
+  const [popupError, setPopupError] = useState(false);
+
   const popupFormRef = useRef<HTMLFormElement>(null);
   const closeTimerRef = useRef<number | null>(null);
   const bannerTimerRef = useRef<number | null>(null);
@@ -115,6 +116,7 @@ export default function Home() {
   const closeModal = () => {
     setModalOpen(false);
     setPopupSuccess(false);
+    setPopupError(false);
     popupFormRef.current?.reset();
   };
 
@@ -182,19 +184,77 @@ export default function Home() {
     };
   }, []);
 
-  /* form submit (demo — replace with your backend/Formspree/API endpoint) */
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, source: "banner" | "popup") => {
-    e.preventDefault();
-    if (source === "popup") {
-      setPopupSuccess(true);
-      closeTimerRef.current = window.setTimeout(closeModal, 2600);
-    } else {
-      setBannerBtnText("Sent — Thank You!");
-      e.currentTarget.reset();
-      bannerTimerRef.current = window.setTimeout(
-        () => setBannerBtnText("Request a Call Back"),
-        2600
+  /* ---------------------------------------------------------
+     Sends the form payload to the Google Apps Script Web App,
+     which appends a row into the connected Google Sheet.
+     --------------------------------------------------------- */
+  const sendToSheet = async (payload: Record<string, unknown>) => {
+    if (!SHEET_ENDPOINT) {
+      console.error(
+        "NEXT_PUBLIC_SHEET_ENDPOINT is not set. Add it to your .env.local file."
       );
+      throw new Error("Missing SHEET_ENDPOINT");
+    }
+    await fetch(SHEET_ENDPOINT, {
+      method: "POST",
+      // Apps Script web apps don't return CORS headers fetch can
+      // read, so we fire the request in no-cors mode. The row is
+      // still written to the sheet — we just can't inspect the
+      // response body here.
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+  };
+
+  /* form submit — now posts to Google Sheets via Apps Script */
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    source: "banner" | "popup"
+  ) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = {
+      source,
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      service: formData.get("service"),
+      message: formData.get("message") || "",
+    };
+
+    if (source === "popup") {
+      setPopupSubmitting(true);
+      setPopupError(false);
+      try {
+        await sendToSheet(payload);
+        setPopupSuccess(true);
+        closeTimerRef.current = window.setTimeout(closeModal, 2600);
+      } catch (err) {
+        console.error("Popup form submission failed:", err);
+        setPopupError(true);
+      } finally {
+        setPopupSubmitting(false);
+      }
+    } else {
+      setBannerSubmitting(true);
+      setBannerError(false);
+      try {
+        await sendToSheet(payload);
+        setBannerBtnText("Sent — Thank You!");
+        form.reset();
+        bannerTimerRef.current = window.setTimeout(
+          () => setBannerBtnText("Request a Call Back"),
+          2600
+        );
+      } catch (err) {
+        console.error("Banner form submission failed:", err);
+        setBannerError(true);
+      } finally {
+        setBannerSubmitting(false);
+      }
     }
   };
 
@@ -298,7 +358,14 @@ export default function Home() {
                 ))}
               </select>
             </div>
-            <button type="submit" className="btn-solid">{bannerBtnText}</button>
+            <button type="submit" className="btn-solid" disabled={bannerSubmitting}>
+              {bannerSubmitting ? "Sending…" : bannerBtnText}
+            </button>
+            {bannerError && (
+              <p className="form-note" style={{ color: "#e2231a" }}>
+                Something went wrong. Please try again.
+              </p>
+            )}
             <p className="form-note">No spam. Just a conversation about your story.</p>
           </form>
         </div>
@@ -536,7 +603,14 @@ export default function Home() {
                   placeholder="Tell us briefly about your project..."
                 ></textarea>
               </div>
-              <button type="submit" className="btn-solid">Send Enquiry</button>
+              <button type="submit" className="btn-solid" disabled={popupSubmitting}>
+                {popupSubmitting ? "Sending…" : "Send Enquiry"}
+              </button>
+              {popupError && (
+                <p className="form-note" style={{ color: "#e2231a" }}>
+                  Something went wrong. Please try again.
+                </p>
+              )}
             </form>
           </div>
 
@@ -748,6 +822,7 @@ header.scrolled .nav-right .btn-ghost{color:var(--gold); border-color:var(--gold
   display:inline-block;
 }
 .btn-solid:hover{background:transparent; color:var(--gold); transform:translateY(-2px);}
+.btn-solid:disabled{opacity:0.6; cursor:not-allowed; transform:none;}
 .menu-toggle{display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer;}
 .menu-toggle span{width:24px; height:1px; background:#ffffff; transition:background .3s ease;}
 header.scrolled .menu-toggle span{background:var(--ivory);}
