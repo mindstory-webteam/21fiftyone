@@ -36,25 +36,25 @@ export default function AboutSection() {
     {
       num: "01",
       title: "CONCEIVE",
-      desc: "We dive deep into your vision—understanding your brand, audience, and story to uncover ideas that truly stand out.",
+      desc: "We understand your brand, audience, message, budget, location, and final use case before suggesting the right creative direction.",
       icon: "◎",
     },
     {
       num: "02",
       title: "DESIGN",
-      desc: "We shape concepts into visual direction through storyboards, creative planning, and pre-visualization with precision.",
+      desc: "We shape the idea into a visual plan with scripts, mood references, shot flow, storyboards, and production requirements.",
       icon: "◈",
     },
     {
       num: "03",
       title: "PRODUCE",
-      desc: "From shoot to execution, we bring ideas to life—blending cinematic craft, technology, and creative excellence.",
+      desc: "We handle the shoot with the right crew, equipment, lighting, direction, and on-location coordination for the video format.",
       icon: "◐",
     },
     {
       num: "04",
       title: "DELIVER",
-      desc: "We refine every frame and deliver high-quality content optimized for impact across all platforms.",
+      desc: "We edit, grade, refine, and export the final videos in formats suitable for websites, ads, presentations, reels, and digital campaigns.",
       icon: "◉",
     },
   ];
@@ -796,9 +796,7 @@ export default function AboutSection() {
             {/* Dark card */}
             <div className="about-intro-card" data-reveal data-d="2">
               <p>
-                We are a visual production studio driven by storytelling, creativity, and precision.
-                At the intersection of cinematic craft and modern technology, we create content that connects, engages, and leaves a lasting impact.
-                From films to brand visuals, every project is designed to elevate your story and transform ideas into powerful visual experiences.
+                As a leading video production company in Calicut, we believe every story has the power to inspire, connect, and make an impact. We combine cinematic creativity with modern technology to create films and brand visuals that feel authentic, engaging, and memorable. From concept to completion, every project is crafted with passion, precision, and purpose—transforming ideas into visual experiences that leave a lasting impression.
               </p>
               <div className="card-stat">
                 <div>
@@ -831,11 +829,10 @@ export default function AboutSection() {
             <div className="about-text-col">
               <p className="about-section-title" data-reveal data-d="3">The Origin</p>
               <p className="about-paragraph" data-reveal data-d="4">
-                Founded with a passion for storytelling, 21 fiftyone was built on a simple belief — every idea holds the potential to become something extraordinary.
-                In a world full of content, we focus on creating visuals that stand out, connect emotionally, and stay memorable.
+                Founded with a genuine love for storytelling, 21 Fiftyone was created with one simple belief, every idea has the power to become something remarkable. As a leading Video Production Company in Calicut, we bring ideas to life through creative visuals that capture attention, connect with audiences emotionally, and leave a lasting impression.
               </p>
               <p className="about-paragraph" data-reveal data-d="4">
-                Built on a passion for storytelling, 21 fiftyone believes every idea has the potential to shine. We create visuals that cut through the clutter, connect deeply, and leave a lasting mark.
+                At 21 Fiftyone, storytelling is at the heart of everything we do. As a trusted Video Production Company, we transform concepts into engaging visual experiences that stand out in a crowded digital world. From brand stories to promotional videos, we create content that resonates with viewers, sparks engagement, and helps brands make a meaningful impact.
               </p>
 
               <div className="about-quote-block" data-reveal data-d="5">

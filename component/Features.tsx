@@ -335,34 +335,34 @@ const SERVICES = [
   {
     id: "01", src: "/videos/banner/s-1.webm",
     title: "VISUAL PRODUCTION",
-    desc: "We craft brand narratives that resonate — from naming and positioning to full visual identity systems built to last.",
+    desc: "We create brand videos, product visuals, campaign content, and social media video assets with a clear visual style. From idea to final edit, each output is planned for the platform where it will be used.",
     large: true,
   },
   {
     id: "02", src: "/videos/banner/s-2.webm",
     title: "MOVIE PRODUCTION",
-    desc: "Websites, apps, and interfaces where every pixel earns its place. Interaction-first design that converts.",
+    desc: "We support short films, music-led stories, cinematic projects, and narrative video content with script development, direction, shoot planning, and post-production.",
     tall: true,
   },
   {
     id: "03", src: "/videos/banner/s-3.webm",
     title: "CORPORATE FILMS",
-    desc: "Cinematic storytelling for campaigns, product launches, and brand films that move people.",
+    desc: "We create company profile videos, leadership videos, training videos, interview-led stories, and business presentation films that explain your brand in a professional way.",
   },
   {
     id: "04", src: "/videos/banner/s-4.webm",
     title: "COMMERCIAL PRODUCTION",
-    desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
+    desc: "We produce ad films, product commercials, launch videos, digital ads, and campaign creatives for brands that need focused video content for marketing.",
   },
   {
     id: "05", src: "/videos/banner/s-5.webm",
     title: "AI PRODUCTION",
-    desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
+    desc: "We use AI tools to support creative production, concept visuals, AI video anchors, product explainers, hybrid content, and faster campaign asset creation.",
   },
   {
     id: "06", src: "/videos/banner/s-6.webm",
     title: "ENTERTAINMENT EVENTS",
-    desc: "Immersive 3D experiences, AR activations, and spatial design for the next generation of platforms.",
+    desc: "We cover and produce event visuals for launches, performances, brand experiences, cultural programs, corporate events, and digital event promotions.",
   },
 ];
 
