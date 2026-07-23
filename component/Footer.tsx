@@ -277,6 +277,11 @@ export default function Footer() {
           .ft-nav-cols { grid-template-columns: 1fr; }
           .ft-wordmark-img { max-height: 36vw; }
         }
+
+        .ft-brand-email { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: ${B.red}; transition: opacity 0.2s ease; margin-bottom: 6px; }
+.ft-brand-email:hover { opacity: 0.7; }
+.ft-brand-phone { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: ${B.red}; transition: opacity 0.2s ease; margin-bottom: 32px; }
+.ft-brand-phone:hover { opacity: 0.7; }
       `}</style>
 
       <footer className="ft-footer">
@@ -293,6 +298,10 @@ export default function Footer() {
             <Link href="mailto:hello@21fiftyone.com" className="ft-brand-email">
               hello@21fiftyone.com
             </Link>
+            <br/>
+            <Link href="tel:+918281610051" className="ft-brand-phone">
+  +91 82816 10051
+</Link>
             <span className="ft-socials-label">Follow Us</span>
             {/* ── CHANGED: icon-only inline row ── */}
             <div className="ft-socials-row">
