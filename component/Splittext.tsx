@@ -88,7 +88,7 @@ const TextRollChar: React.FC<TextRollCharProps> = ({ char, delay, duration, cont
       </motion.span>
       {/* hidden row slides up from below */}
       <motion.span
-        aria-hidden
+        aria-hidden="true"
         style={{ display: "block", position: "absolute", inset: 0, whiteSpace: "pre" }}
         animate={controls}
         variants={{
@@ -207,6 +207,13 @@ export const TextRoll: React.FC<TextRollUnitProps> = ({
 /* ═══════════════════════════════════════════════════════════
    HOVER ROLL SPLIT TEXT
    Scroll-reveals each unit with GSAP, each unit has TextRoll.
+
+   SEO FIX: the container carries the single, clean, real text
+   via aria-label + role="text". Every animated unit wrapper
+   below it is marked aria-hidden="true" so crawlers/screen
+   readers only ever see ONE copy of the text — the doubled-
+   letter animation markup (e.g. "HHOOMMEE") is treated as
+   purely decorative and excluded from the accessible tree.
 ═══════════════════════════════════════════════════════════ */
 function HoverRollSplitText({
   text,
@@ -274,6 +281,7 @@ function HoverRollSplitText({
       ref={containerRef}
       className={className}
       aria-label={text}
+      role="text"
       style={{
         textAlign,
         lineHeight: "inherit",
@@ -288,6 +296,7 @@ function HoverRollSplitText({
             <span
               key={i}
               ref={(el) => { unitRefs.current[i] = el; }}
+              aria-hidden="true"
               style={{ display: "inline-block" }}
             >
               &nbsp;
@@ -298,6 +307,7 @@ function HoverRollSplitText({
           <span
             key={i}
             ref={(el) => { unitRefs.current[i] = el; }}
+            aria-hidden="true"
             style={{ display: "inline-block" }}
           >
             <TextRoll
