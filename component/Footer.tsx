@@ -16,6 +16,10 @@ const LOGO_SRC = "/logo/2151-logo.png";
 // ── Place wordmark-halfcut.png inside /public/images/ ──
 const WORDMARK_SRC = "/logo/2151-logo.png";
 
+// ── Address shown at the top of the brand column, clickable → opens Google Maps ──
+const ADDRESS_TEXT = "Regus Door No. 2703, Cabin 721, HiLITE Business Park, 7th Floor, Tower 2, Pantheeramkavu, Kozhikode, Kerala 673014";
+const ADDRESS_MAPS_URL = "https://maps.google.com/?q=Thrissur+Kozhikode+Kerala+India";
+
 const NAV_COLS = [
   
   {
@@ -213,7 +217,27 @@ export default function Footer() {
 
         .ft-brand-logo { display: block; margin-bottom: 20px; text-decoration: none; }
         .ft-brand-logo img { height: 32px; width: auto; display: block; object-fit: contain; }
-        .ft-brand-tagline { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; line-height: 1.75; color: ${B.muted}; margin: 0 0 28px; max-width: 220px; }
+        .ft-brand-tagline { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 300; line-height: 1.75; color: ${B.muted}; margin: 0 0 20px; max-width: 220px; }
+
+        /* ── ADDRESS (top of brand column, above email) ── */
+        .ft-brand-address {
+          display: inline-flex;
+          align-items: flex-start;
+          gap: 6px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11.5px;
+          font-weight: 400;
+          line-height: 1.5;
+          letter-spacing: 0.02em;
+          color: ${B.muted};
+          text-decoration: none;
+          margin-bottom: 16px;
+          max-width: 220px;
+          transition: color 0.2s ease;
+        }
+        .ft-brand-address:hover { color: ${B.red}; }
+        .ft-brand-address svg { flex-shrink: 0; margin-top: 1px; }
+
         .ft-brand-email { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: ${B.red}; transition: opacity 0.2s ease; margin-bottom: 32px; }
         .ft-brand-email:hover { opacity: 0.7; }
 
@@ -295,6 +319,21 @@ export default function Footer() {
             <p className="ft-brand-tagline">
               Elevating brands through the art of digital alchemy and technical precision.
             </p>
+
+            {/* ── ADDRESS: clickable, opens Google Maps in a new tab ── */}
+            <Link
+              href={ADDRESS_MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ft-brand-address"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>{ADDRESS_TEXT}</span>
+            </Link>
+
             <Link href="mailto:hello@21fiftyone.com" className="ft-brand-email">
               hello@21fiftyone.com
             </Link>

@@ -136,7 +136,7 @@ const Contact = () => {
       items: [
         {
           value:
-            "Mind Premium Private Limited 7th Floor, Tower 2, Regus Door No. 2703, Cabin 721, HiLITE Business Park, Pantheeramkavu, Kozhikode - 673 014",
+            "Regus Door No. 2703, Cabin 721, HiLITE Business Park, 7th Floor, Tower 2, Pantheeramkavu, Kozhikode, Kerala 673014",
           href: "#",
         },
       ],
