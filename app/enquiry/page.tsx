@@ -505,7 +505,7 @@ export default function Home() {
           <div className="footer-grid">
             <div className="footer-brand">
               <a href="#top" className="logo">
-                <img src="/assest/image/2151-logo (1).png" alt="21Fiftyone logo" />
+                <img src="/logo/2151-logo.png" alt="21Fiftyone logo" />
               </a>
               <p>Elevating brands through the art of digital alchemy and technical precision.</p>
               <a className="mail" href="mailto:hello@21fiftyone.com">hello@21fiftyone.com</a>
