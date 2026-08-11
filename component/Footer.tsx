@@ -337,10 +337,18 @@ export default function Footer() {
             <Link href="mailto:hello@21fiftyone.com" className="ft-brand-email">
               hello@21fiftyone.com
             </Link>
-            <br/>
-            <Link href="tel:+917736402151" className="ft-brand-phone">
-  +91 77364 02151
-</Link>
+           <br />
+            {/*-------------contact number changed----------------------  */}
+          <Link href="tel:+918281610051" className="ft-brand-phone">
+            +91 82816 10051
+          </Link>
+          
+          <br />
+          
+          <Link href="tel:+919778189712" className="ft-brand-phone">
+            +91 97781 89712
+          </Link>
+          {/*-----------------end contact number------------------  */}
             <span className="ft-socials-label">Follow Us</span>
             {/* ── CHANGED: icon-only inline row ── */}
             <div className="ft-socials-row">
